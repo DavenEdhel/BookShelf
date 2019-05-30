@@ -3,6 +3,7 @@ using System.Linq;
 using BookWiki.Core;
 using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.PathModels;
+using BookWiki.Core.Search;
 using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Views;
 using BookWiki.Presentation.Apple.Views.Main;

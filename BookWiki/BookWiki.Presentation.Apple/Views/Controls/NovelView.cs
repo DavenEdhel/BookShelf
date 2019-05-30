@@ -156,6 +156,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             _content.SelectionChanged += OnSelectionChanged;
             _content.ShowsVerticalScrollIndicator = false;
             _content.Font = UIFont.FromName("TimesNewRomanPSMT", 20);
+            _content.ContentInset = new UIEdgeInsets(0, 0, 50, 0);
 
             var novelContent = new AtLeastSingleSpaceString(_novel.Content);
 
@@ -198,6 +199,13 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
             Add(_content);
 
+            _pageNumber = new UILabel();
+            _pageNumber.Font = UIFont.BoldSystemFontOfSize(20);
+            _pageNumber.TextAlignment = UITextAlignment.Right;
+            _pageNumber.TextColor = UIColor.LightGray;
+            UpdatePaging();
+            Add(_pageNumber);
+
             _cursor = new CursorView();
             InitCursor();
 
@@ -207,6 +215,10 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             {
                 _content.ChangeSize(Frame.Width - _margin * 2, Frame.Height);
                 _content.ChangeX(_margin);
+
+                _pageNumber.SetSizeThatFits();
+                _pageNumber.ChangeWidth(200);
+                _pageNumber.PositionToRightAndBottomInside(this, 5, 5);
 
                 _cursor.PositionToCenterInside(this);
             };
@@ -222,6 +234,25 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             }
 
             _save.AttemptToRun();
+
+            UpdatePaging();
+
+            ScrollToBottom();
+        }
+
+        private void ScrollToBottom()
+        {
+            //if (CursorPosition > _content.Text.Length - 300)
+            //{
+            //    _content.SetContentOffset(new CGPoint(0, _content.ContentSize.Height - _content.Frame.Height * 2 / 3), true);
+            //}
+        }
+
+        private void UpdatePaging()
+        {
+            var p = (int)(_content.ContentSize.Height / 1120) + 1;
+
+            _pageNumber.Text = $"{p} стр.";
         }
 
         private NSMutableAttributedString MarkSpelling(NSMutableAttributedString result)
@@ -401,6 +432,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         }
 
         private bool _shouldCheckSpelling;
+        private UILabel _pageNumber;
 
         private bool OnShouldChangeText(UITextView textview, NSRange range, string text)
         {

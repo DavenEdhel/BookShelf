@@ -12,6 +12,13 @@ namespace BookWiki.Presentation.Apple.Extentions
             return another.Frame.Width - element.Frame.Width - margin;
         }
 
+        public static nfloat BottomInside(this UIView element, UIView another, float margin = 0)
+        {
+            var result = another.Frame.Height - element.Frame.Height - margin;
+
+            return result;
+        }
+
         public static nfloat LeftInside(this UIView element, UIView another, float margin = 0)
         {
             return margin;
@@ -91,6 +98,12 @@ namespace BookWiki.Presentation.Apple.Extentions
         public static void PositionToLeftAndCenterInside(this UIView element, UIView another, float leftMargin = 0)
         {
             element.Frame = new CGRect(element.LeftInside(another, leftMargin), element.CenterVerticallyInside(another), element.Frame.Width, element.Frame.Height);
+        }
+
+        public static void PositionToRightAndBottomInside(this UIView element, UIView another, float rightMargin = 0,
+            float bottomMargin = 0)
+        {
+            element.Frame = new CGRect(element.RightInside(another, rightMargin), element.BottomInside(another, bottomMargin), element.Frame.Width, element.Frame.Height);
         }
 
         public static void PositionToCenterInside(this UIView element, UIView another)

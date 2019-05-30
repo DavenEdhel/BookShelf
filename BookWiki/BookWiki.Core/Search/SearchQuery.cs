@@ -1,34 +1,39 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using BookWiki.Core.Search;
+﻿using System.Linq;
+using PureOop;
 
-namespace BookWiki.Core
+namespace BookWiki.Core.Search
 {
     public class SearchQuery : IQuery
     {
         private readonly ILibrary _library;
         private readonly string _query;
-        private readonly IProperty<SearchResult[]> _result;
 
         public SearchQuery(ILibrary library, string query)
         {
             _library = library;
             _query = query;
-
-            if (_query == "Все")
-            {
-                Results = new RunOnceSequence<SearchResult>(new EnumerableSequence<SearchResult>(_library.Items.Select(x => new SearchResult(x)), _library.Items.Length));
-            }
-            else
-            {
-                Results = new RunOnceSequence<SearchResult>(new SearchResultSequence(this, _library.Items));
-            }
         }
 
+        [JustOnce]
         public string Title => _query;
 
+        [JustOnce]
         public string PlainText => _query.ToLowerInvariant();
 
-        public ISequence<SearchResult> Results { get; }
+        [JustOnce]
+        public ISequence<SearchResult> Results
+        {
+            get
+            {
+                if (_query == "Все")
+                {
+                    return new RunOnceSequence<SearchResult>(new EnumerableSequence<SearchResult>(_library.Items.Select(x => new SearchResult(x)), _library.Items.Length));
+                }
+                else
+                {
+                    return new RunOnceSequence<SearchResult>(new SearchResultSequence(this, _library.Items));
+                }
+            }
+        }
     }
 }

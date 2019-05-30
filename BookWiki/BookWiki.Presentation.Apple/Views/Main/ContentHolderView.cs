@@ -10,14 +10,16 @@ namespace BookWiki.Presentation.Apple.Views
 {
     public class ContentHolderView : View
     {
+        private readonly Func<int> _getBottomOffset;
         private readonly Func<object, UIView> _createContent;
 
         private UIView _current;
 
         private readonly Dictionary<object, UIView> _reuseCache = new Dictionary<object, UIView>();
 
-        public ContentHolderView(Func<object, UIView> createContent)
+        public ContentHolderView(Func<int> getBottomOffset, Func<object, UIView> createContent)
         {
+            _getBottomOffset = getBottomOffset;
             _createContent = createContent;   
 
             Initialize();
@@ -29,7 +31,7 @@ namespace BookWiki.Presentation.Apple.Views
             {
                 if (_current != null)
                 {
-                    _current.ChangeSize(Superview.Frame.Width - 200, Superview.Frame.Height);
+                    _current.ChangeSize(Superview.Frame.Width - 200, Frame.Height);
                     _current.PositionToCenterHorizontally(this);
 
                     _current.LayoutSubviews();

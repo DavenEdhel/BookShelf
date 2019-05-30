@@ -60,7 +60,7 @@ namespace BookWiki.Presentation.Apple.Controllers
             _tabsView.OnTabSelected += TabsViewOnOnTabSelected;
             _tabsView.Initialize(_session.OpenedContentTabs.Select(path => _library.Load(path)).ToArray());
 
-            _contentHolderView = new ContentHolderView(data =>
+            _contentHolderView = new ContentHolderView(() => _bottomOffset, data =>
             {
                 if (data is IFileSystemNode node)
                 {
