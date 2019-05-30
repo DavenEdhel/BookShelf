@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PureOopAddin</name>
+    </assembly>
+    <members>
+        <member name="T:JustOnceAttribute">
+            <summary>
+            Property marked with this attribute executes it's getter code only once.
+            During second access it returns previously calculated value.
+            </summary>
+        </member>
+    </members>
+</doc>

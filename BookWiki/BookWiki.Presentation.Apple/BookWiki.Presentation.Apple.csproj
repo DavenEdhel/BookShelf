@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProjectGuid>{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>BookWiki.Presentation.Apple</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>BookWiki.Presentation.Apple</AssemblyName>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <MtouchArch>x86_64</MtouchArch>
+    <MtouchLink>None</MtouchLink>
+    <MtouchDebug>true</MtouchDebug>
+    <MtouchSdkVersion>12.2</MtouchSdkVersion>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <MtouchFloat32>false</MtouchFloat32>
+    <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <MtouchFastDev>false</MtouchFastDev>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <MtouchLink>None</MtouchLink>
+    <MtouchArch>x86_64</MtouchArch>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <MtouchArch>ARM64</MtouchArch>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchDebug>true</MtouchDebug>
+    <MtouchLink>None</MtouchLink>
+    <MtouchFloat32>true</MtouchFloat32>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <MtouchArch>ARM64</MtouchArch>
+    <ConsolePause>false</ConsolePause>
+    <CodesignKey>iPhone Developer</CodesignKey>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
+    <AppExtensionDebugBundleId />
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Controllers\SessionContext.cs" />
+    <Compile Include="Models\Application.cs" />
+    <Compile Include="Models\HotKeys\HotKey.cs" />
+    <Compile Include="Models\HotKeys\HotKeyScheme.cs" />
+    <Compile Include="Models\HotKeys\IKeyPressReceiver.cs" />
+    <Compile Include="Models\HotKeys\Key.cs" />
+    <Compile Include="Models\HotKeys\Keyboard.cs" />
+    <Compile Include="Models\HotKeys\KeyCombination.cs" />
+    <Compile Include="Models\UserFolderPath.cs" />
+    <Compile Include="Models\Utils\ThreadSafeProperty.cs" />
+    <Compile Include="Views\Common\IKeyboardListener.cs" />
+    <Compile Include="Views\Common\IPageData.cs" />
+    <Compile Include="Views\Common\QueryView.cs" />
+    <Compile Include="Views\Common\SpaceSeparatorView.cs" />
+    <Compile Include="Views\Controls\ArticlePartView.cs" />
+    <Compile Include="Views\Controls\AutocorrectionBox.cs" />
+    <Compile Include="Views\Controls\CursorView.cs" />
+    <Compile Include="Views\Controls\FileSystemNodeView.cs" />
+    <Compile Include="Views\Controls\FileSystemTreeView.cs" />
+    <Compile Include="Views\Controls\FileSystemView.cs" />
+    <Compile Include="Views\Controls\MisspelledWordsSequence.cs" />
+    <Compile Include="Views\Controls\NovelView.cs" />
+    <Compile Include="Views\Controls\SearchResultsView.cs" />
+    <Compile Include="Views\Controls\SpellChecker.cs" />
+    <Compile Include="Views\Main\ActionBarView.cs" />
+    <Compile Include="Views\Controls\ArticleView.cs" />
+    <Compile Include="Controllers\MainPage.cs" />
+    <Compile Include="Extentions\ColorExtensions.cs" />
+    <Compile Include="Extentions\FrameLayoutExtensions.cs" />
+    <Compile Include="Main.cs" />
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="Views\Common\CollectionItem.cs" />
+    <Compile Include="Views\Common\CollectionView.cs" />
+    <Compile Include="Views\Main\ContentHolderView.cs" />
+    <Compile Include="Views\Common\Control.cs" />
+    <Compile Include="Views\Common\HorizontalSeparatorView.cs" />
+    <Compile Include="Views\Common\ICollectionBindable.cs" />
+    <Compile Include="Views\Common\ISelectable.cs" />
+    <Compile Include="Views\Controls\IContentView.cs" />
+    <Compile Include="Views\Common\SearchView.cs" />
+    <Compile Include="Views\Main\SearchResultItemView.cs" />
+    <Compile Include="Views\Main\SuggestionItemView.cs" />
+    <Compile Include="Views\Main\TabsCollectionView.cs" />
+    <Compile Include="Views\Main\TabView.cs" />
+    <Compile Include="Views\Common\View.cs" />
+    <Compile Include="Views\NewNodeDialog\TypeSelectDialogView.cs" />
+    <Compile Include="Views\NewNodeDialog\TypeSelectView.cs" />
+    <Compile Include="Views\NewNodeDialog\TypeView.cs" />
+    <None Include="FodyWeavers.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Info.plist">
+      <SubType>Designer</SubType>
+    </None>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <InterfaceDefinition Include="Resources\LaunchScreen.xib" />
+    <ITunesArtwork Include="iTunesArtwork" />
+    <ITunesArtwork Include="iTunesArtwork%402x" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Cirrious.FluentLayouts.Touch, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cirrious.FluentLayout.2.6.0\lib\Xamarin.iOS10\Cirrious.FluentLayouts.Touch.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PureOopAddin, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PureOopAddin.Fody.1.0.2\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10+netstandard2.0\PureOopAddin.dll</HintPath>
+    </Reference>
+    <Reference Include="PureOopAddin.Fody, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\PureOopAddin.Fody.1.0.2\lib\portable-net45+wp8+wpa81+win8+MonoAndroid10+MonoTouch10+Xamarin.iOS10+netstandard2.0\PureOopAddin.Fody.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.iOS" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Entitlements.plist" />
+    <BundleResource Include="Resources\close%402x.png" />
+    <BundleResource Include="Resources\close%403x.png" />
+    <BundleResource Include="Resources\Back%403x.png" />
+    <BundleResource Include="Resources\Back%402x.png" />
+    <BundleResource Include="Resources\Back.png" />
+    <BundleResource Include="Resources\add%403x.png" />
+    <BundleResource Include="Resources\add%402x.png" />
+    <BundleResource Include="Resources\folder%403x.png" />
+    <BundleResource Include="Resources\folder%402x.png" />
+    <BundleResource Include="Resources\poem%403x.png" />
+    <BundleResource Include="Resources\poem%402x.png" />
+    <None Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon1024.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon167.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon20.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon29.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon40.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon58.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon76.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon76@2x.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\AppIcons.appiconset\icon80.png">
+      <Visible>false</Visible>
+    </ImageAsset>
+    <ImageAsset Include="Images.xcassets\LaunchImages.launchimage\Contents.json">
+      <Visible>false</Visible>
+    </ImageAsset>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BookWiki.Core\BookWiki.Core.csproj">
+      <Project>{1b2cf424-0e54-4041-8e9e-28481fc8686e}</Project>
+      <Name>BookWiki.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WeaverFiles Include="$(SolutionDir)weavers\PureOopAddin.Fody.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <Import Project="..\packages\Fody.5.0.1\build\Fody.targets" Condition="Exists('..\packages\Fody.5.0.1\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.5.0.1\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.5.0.1\build\Fody.targets'))" />
+  </Target>
+</Project>
