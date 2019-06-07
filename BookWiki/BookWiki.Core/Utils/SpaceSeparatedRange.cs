@@ -1,8 +1,9 @@
 ﻿using System.Linq;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Utils
 {
-    public class SpaceSeparatedRange
+    public class SpaceSeparatedRange : ITextRange
     {
         private string _plainText;
         private int _startIndex;
@@ -11,8 +12,8 @@ namespace BookWiki.Core.Utils
         public SpaceSeparatedRange(string plainText, int startIndex = 0, int length = -1)
         {
             _plainText = plainText;
-            _startIndex = new Number(startIndex, 0, _plainText.Length - 1).Value;
-            _endIndex = new Number(length == -1 ? plainText.Length : startIndex + length, 0, plainText.Length - 1).Value;
+            _startIndex = new Number(startIndex, 0, _plainText.Length - 1);
+            _endIndex = new Number(length == -1 ? _plainText.Length : startIndex + length, 0, _plainText.Length - 1);
 
             if (_startIndex != 0)
             {
@@ -35,6 +36,15 @@ namespace BookWiki.Core.Utils
 
         public int EndIndex => _endIndex;
 
+        public ITextRange Substring(int offset, int length)
+        {
+            return new SubstringText(PlainText, offset, length);
+        }
+
         public int Length => _endIndex - _startIndex;
+
+        public string PlainText => _plainText.Substring(StartIndex, Length);
+
+        public int Offset => StartIndex;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BookWiki.Core.Findings;
 using BookWiki.Core.Utils.PropertyModels;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Search
 {

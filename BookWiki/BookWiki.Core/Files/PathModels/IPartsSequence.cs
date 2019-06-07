@@ -1,4 +1,6 @@
-﻿namespace BookWiki.Core.Files.PathModels
+﻿using BookWiki.Core.Utils.TextModels;
+
+namespace BookWiki.Core.Files.PathModels
 {
     public interface IPartsSequence : ISequence<ITextRange>
     {

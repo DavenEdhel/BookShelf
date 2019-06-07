@@ -145,9 +145,9 @@ namespace BookWiki.Presentation.Apple.Views.Main
                     return 1;
                 }
 
-                if (tabView.Data is IQuery)
+                if (tabView.Data is IContent)
                 {
-                    if (Data is IQuery)
+                    if (Data is IContent)
                     {
                         return Index.CompareTo(tabView.Index);
                     }
@@ -155,9 +155,9 @@ namespace BookWiki.Presentation.Apple.Views.Main
                     return -1;
                 }
 
-                if (tabView.Data is IContent)
+                if (tabView.Data is IQuery)
                 {
-                    if (Data is IContent)
+                    if (Data is IQuery)
                     {
                         return Index.CompareTo(tabView.Index);
                     }

@@ -2,6 +2,7 @@
 using System.Linq;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Utils.PropertyModels;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Files.PathModels
 {
@@ -49,6 +50,10 @@ namespace BookWiki.Core.Files.PathModels
         {
             switch (PlainText)
             {
+                case "":
+                {
+                    return NodeType.Directory;
+                }
                 case "n":
                 {
                     return NodeType.Novel;
@@ -59,7 +64,7 @@ namespace BookWiki.Core.Files.PathModels
                 }
                 default:
                 {
-                    return NodeType.Directory;
+                    return NodeType.Unknown;
                 }
             }
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using BookWiki.Core.Files.PathModels;
+using BookWiki.Core.Utils.TextModels;
 using NUnit.Framework;
 
 namespace BookWiki.Core.Tests

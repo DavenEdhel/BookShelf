@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.PathModels;
 using BookWiki.Core.Utils.PropertyModels;
 using PureOop;
 
@@ -78,7 +76,7 @@ namespace BookWiki.Core.Files.FileSystemModels
 
         public int Level { get; }
 
-        [JustOnce]
+        //[JustOnce]
         public bool IsContentFolder => Path.Extension.Type != NodeType.Directory;
 
         public void SaveUnder(IFileSystemNode parent)

@@ -64,7 +64,7 @@ namespace BookWiki.Core.Tests
             Assert.AreEqual("ticle\n", parts.ElementAt(1).Text);
         }
 
-        [Test]
+        [Test, Ignore("Obsolete")]
         public void InsertToEmptyTest()
         {
             _article = new FakeArticle(new List<ArticlePart>());

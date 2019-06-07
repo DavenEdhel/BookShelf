@@ -4,7 +4,7 @@
         <name>PureOopAddin</name>
     </assembly>
     <members>
-        <member name="T:JustOnceAttribute">
+        <member name="T:PureOop.JustOnceAttribute">
             <summary>
             Property marked with this attribute executes it's getter code only once.
             During second access it returns previously calculated value.

@@ -13,14 +13,14 @@ using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Presentation.Apple.Views.Main
 {
-    public class TabsCollectionView : View
+    public class TabCollectionView : View
     {
         private readonly ILibrary _library;
         private CollectionView _collectionView;
 
         public event Action<object> OnTabSelected = delegate {  };
 
-        public TabsCollectionView(ILibrary library)
+        public TabCollectionView(ILibrary library)
         {
             _library = library;
             Initialize();

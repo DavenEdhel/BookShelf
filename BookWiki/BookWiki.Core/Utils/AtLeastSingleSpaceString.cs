@@ -1,6 +1,7 @@
-﻿using PureOop;
+﻿using BookWiki.Core.Utils.TextModels;
+using PureOop;
 
-namespace BookWiki.Core
+namespace BookWiki.Core.Utils
 {
     public class AtLeastSingleSpaceString : IText
     {

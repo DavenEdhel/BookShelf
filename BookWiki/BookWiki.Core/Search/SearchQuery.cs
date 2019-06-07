@@ -14,13 +14,13 @@ namespace BookWiki.Core.Search
             _query = query;
         }
 
-        [JustOnce]
+        //[JustOnce]
         public string Title => _query;
 
-        [JustOnce]
+        //[JustOnce]
         public string PlainText => _query.ToLowerInvariant();
 
-        [JustOnce]
+        //[JustOnce]
         public ISequence<SearchResult> Results
         {
             get

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using BookWiki.Core.Search;
 using BookWiki.Core.Utils.PropertyModels;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Files.PathModels
 {

@@ -1,8 +1,10 @@
-﻿namespace BookWiki.Core
+﻿using BookWiki.Core.Utils.TextModels;
+
+namespace BookWiki.Core
 {
     public interface ITextInfo
     {
-        ITextRange Range { get; }
+        IRange Range { get; }
 
         TextStyle Style { get; }
     }

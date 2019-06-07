@@ -1,7 +1,6 @@
-﻿namespace BookWiki.Core
+﻿namespace BookWiki.Core.Utils.TextModels
 {
-    public interface ITextRange : IText
+    public interface ITextRange : IText, IRange
     {
-        int Offset { get; }
     }
 }

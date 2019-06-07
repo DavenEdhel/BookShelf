@@ -39,14 +39,14 @@ namespace BookWiki.Presentation.Apple.Controllers
             return this;
         }
 
-        public void Store(TabsCollectionView tabs, ActionBarView actionBar)
+        public void Store(TabCollectionView tabCollection, ActionBarView actionBar)
         {
             var userFolder = new UserFolderPath();
 
             var contents = new List<IPath>();
             var queries = new List<IQuery>();
 
-            foreach (var tab in tabs.OpenedCustomTabs)
+            foreach (var tab in tabCollection.OpenedCustomTabs)
             {
                 if (tab.Data is IQuery query)
                 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BookWiki.Core.Utils;
 using BookWiki.Presentation.Apple.Controllers;
+using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Models.HotKeys;
 using BookWiki.Presentation.Apple.Views.Common;
@@ -18,15 +19,17 @@ namespace BookWiki.Presentation.Apple.Views.Controls
     {
         private readonly SpellChecker _spellChecker;
         private readonly Action<NSRange, string> _onChosen;
+        private readonly Action _onLearned;
         private string _result;
         private CollectionItem[] _items;
 
         private const string AddToDict = "*добавить в словарь*";
 
-        public AutocorectionBoxView(SpellChecker spellChecker, Action<NSRange, string> onChosen)
+        public AutocorectionBoxView(SpellChecker spellChecker, Action<NSRange, string> onChosen, Action onLearned = null)
         {
             _spellChecker = spellChecker;
             _onChosen = onChosen;
+            _onLearned = onLearned ?? (() => {});
 
             Initialize();
         }
@@ -135,6 +138,8 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
                 Hide();
 
+                _onLearned();
+
                 return;
             }
 
@@ -149,7 +154,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         private HotKeyScheme _scheme;
         private CollectionView _suggestionsView;
 
-        public void Show(UIView parent, CGPoint position)
+        public void Show(UIView parent, CGPoint? position = null)
         {
             _keyboardListener = parent as IKeyboardListener;
 
@@ -160,7 +165,8 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
             var suggestionsSize = _suggestionsView.ChangeWidthAndLayout((float)parent.Frame.Width / 3f);
 
-            Frame = new CGRect(position, suggestionsSize);
+            this.ChangeSize(suggestionsSize.Width, suggestionsSize.Height);
+            this.PositionToCenterInside(parent);
 
             parent.Add(this);
         }

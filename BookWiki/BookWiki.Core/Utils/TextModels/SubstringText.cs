@@ -1,5 +1,6 @@
 ﻿using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.PropertyModels;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core
 {
@@ -11,7 +12,7 @@ namespace BookWiki.Core
 
         public int Offset { get; }
 
-        private int OuterGlobalOffset => _outerSubstring?.GlobalOffset.Value ?? 0;
+        private int OuterGlobalOffset => _outerSubstring?.GlobalOffset ?? 0;
 
         private int OuterLength => _outerSubstring?.Length ?? _originContent.Length;
 
@@ -20,6 +21,10 @@ namespace BookWiki.Core
         private readonly SubstringText _outerSubstring;
 
         private readonly CachedValue<string> _content;
+
+        public SubstringText(string originContent) : this(originContent, 0, originContent.Length)
+        {
+        }
 
         public SubstringText(string originContent, int offset, int length) : this (originContent, offset, length, null)
         {
@@ -34,9 +39,9 @@ namespace BookWiki.Core
 
             _content = new CachedValue<string>(() =>
             {
-                var normalizedLength = new Number(Length, 0, OuterGlobalOffset + OuterLength - GlobalOffset.Value);
+                var normalizedLength = new Number(Length, 0, OuterGlobalOffset + OuterLength - GlobalOffset);
 
-                return _originContent.Substring(GlobalOffset.Value, normalizedLength.Value);
+                return _originContent.Substring(GlobalOffset, normalizedLength);
             });
         }
 

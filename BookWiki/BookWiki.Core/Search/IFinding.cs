@@ -1,4 +1,6 @@
-﻿namespace BookWiki.Core.Findings
+﻿using BookWiki.Core.Utils.TextModels;
+
+namespace BookWiki.Core.Findings
 {
     public interface IFinding
     {

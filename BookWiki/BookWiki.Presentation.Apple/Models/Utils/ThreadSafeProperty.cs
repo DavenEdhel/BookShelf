@@ -2,6 +2,7 @@
 using BookWiki.Core;
 using CoreFoundation;
 using Foundation;
+using UIKit;
 
 namespace BookWiki.Presentation.Apple.Models.Utils
 {

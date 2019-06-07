@@ -1,4 +1,6 @@
-﻿namespace BookWiki.Core
+﻿using BookWiki.Core.Utils.TextModels;
+
+namespace BookWiki.Core
 {
     public class StringText : IText
     {

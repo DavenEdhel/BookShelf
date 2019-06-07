@@ -3,6 +3,7 @@ using System.Linq;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.Utils.PropertyModels;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Files.PathModels
 {

@@ -81,11 +81,15 @@
     <Compile Include="Models\HotKeys\Keyboard.cs" />
     <Compile Include="Models\HotKeys\KeyCombination.cs" />
     <Compile Include="Models\UserFolderPath.cs" />
+    <Compile Include="Models\Utils\NativeRange.cs" />
+    <Compile Include="Models\Utils\Range.cs" />
     <Compile Include="Models\Utils\ThreadSafeProperty.cs" />
+    <Compile Include="Views\Common\ErrorLineView.cs" />
     <Compile Include="Views\Common\IKeyboardListener.cs" />
     <Compile Include="Views\Common\IPageData.cs" />
     <Compile Include="Views\Common\QueryView.cs" />
     <Compile Include="Views\Common\SpaceSeparatorView.cs" />
+    <Compile Include="Views\Common\EditTextView.cs" />
     <Compile Include="Views\Controls\ArticlePartView.cs" />
     <Compile Include="Views\Controls\AutocorrectionBox.cs" />
     <Compile Include="Views\Controls\CursorView.cs" />
@@ -114,7 +118,7 @@
     <Compile Include="Views\Common\SearchView.cs" />
     <Compile Include="Views\Main\SearchResultItemView.cs" />
     <Compile Include="Views\Main\SuggestionItemView.cs" />
-    <Compile Include="Views\Main\TabsCollectionView.cs" />
+    <Compile Include="Views\Main\TabCollectionView.cs" />
     <Compile Include="Views\Main\TabView.cs" />
     <Compile Include="Views\Common\View.cs" />
     <Compile Include="Views\NewNodeDialog\TypeSelectDialogView.cs" />

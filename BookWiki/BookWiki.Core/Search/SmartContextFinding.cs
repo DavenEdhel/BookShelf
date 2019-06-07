@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using BookWiki.Core.Search;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Findings
 {

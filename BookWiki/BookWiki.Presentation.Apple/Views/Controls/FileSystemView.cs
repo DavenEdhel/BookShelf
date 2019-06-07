@@ -15,17 +15,17 @@ namespace BookWiki.Presentation.Apple.Views.Controls
     public class FileSystemView : View, IContentView
     {
         private readonly IFileSystemNode _node;
-        private readonly TabsCollectionView _tabsCollectionView;
+        private readonly TabCollectionView _tabCollectionView;
         private readonly ILibrary _library;
 
         private HotKeyScheme _scheme;
         private FileSystemTreeView _treeView;
         private TypeSelectDialogView _dialog;
 
-        public FileSystemView(IFileSystemNode node, TabsCollectionView tabsCollectionView, ILibrary library)
+        public FileSystemView(IFileSystemNode node, TabCollectionView tabCollectionView, ILibrary library)
         {
             _node = node;
-            _tabsCollectionView = tabsCollectionView;
+            _tabCollectionView = tabCollectionView;
             _library = library;
             Initialize();
         }
@@ -97,7 +97,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 return;
             }
 
-            _tabsCollectionView.SelectTab(_library.Load(novelPath));
+            _tabCollectionView.SelectTab(_library.Load(novelPath));
         }
 
         public void Hide()

@@ -1,4 +1,6 @@
-﻿namespace BookWiki.Core
+﻿using BookWiki.Core.Utils.TextModels;
+
+namespace BookWiki.Core
 {
     public class TextInfo : ITextInfo
     {
@@ -8,7 +10,7 @@
             Style = style;
         }
 
-        public ITextRange Range { get; }
+        public IRange Range { get; }
 
         public TextStyle Style { get; }
     }

@@ -11,8 +11,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
     {
         private readonly UITextChecker _textChecker;
         private readonly string _plainText;
-
-        private SpaceSeparatedRange _range;
+        private readonly SpaceSeparatedRange _range;
 
         public MisspelledWordsSequence(UITextChecker textChecker, string plainText, int startIndex = 0, int length = -1) : this(textChecker, plainText, new SpaceSeparatedRange(plainText, startIndex, length))
         {

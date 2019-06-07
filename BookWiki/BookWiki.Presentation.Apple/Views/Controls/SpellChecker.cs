@@ -43,13 +43,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         public ISequence<NSRange> MisspelledWords { get; }
 
-        public bool IsCursorInMisspelledWord
-        {
-            get
-            {
-                return MisspelledWords.Any(TestCursorInRange);
-            }
-        }
+        public bool IsCursorInMisspelledWord => MisspelledWords.Any(TestCursorInRange);
 
         public IEnumerable<string> Guesses
         {
@@ -59,7 +53,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 {
                     var misspelledWord = MisspelledWord;
 
-                    return _textChecker.GuessesForWordRange(misspelledWord, _plainText, "ru_RU");
+                    return _textChecker.GuessesForWordRange(misspelledWord, _plainText, "ru_RU").Take(12);
                 }
 
                 return Enumerable.Empty<string>();

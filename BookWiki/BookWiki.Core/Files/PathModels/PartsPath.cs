@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using BookWiki.Core.Utils.TextModels;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Core.Files.PathModels

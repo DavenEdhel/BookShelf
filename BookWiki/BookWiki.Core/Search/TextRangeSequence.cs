@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BookWiki.Core.Utils.PropertyModels;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Search
 {

@@ -11,17 +11,17 @@ namespace BookWiki.Presentation.Apple.Views.Controls
     public class SearchResultsView : View, IContentView
     {
         private readonly IQuery _searchQuery;
-        private readonly TabsCollectionView _tabsCollectionView;
+        private readonly TabCollectionView _tabCollectionView;
         private CollectionView _searchResultsCollection;
         private QueryView _header;
         private UILabel _progress;
 
         private int _page;
 
-        public SearchResultsView(IQuery searchQuery, TabsCollectionView tabsCollectionView)
+        public SearchResultsView(IQuery searchQuery, TabCollectionView tabCollectionView)
         {
             _searchQuery = searchQuery;
-            _tabsCollectionView = tabsCollectionView;
+            _tabCollectionView = tabCollectionView;
             Initialize();
         }
 
@@ -62,7 +62,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         private CollectionItem GetCollectionItem(SearchResult searchResult)
         {
-            var content = new SearchResultItemView(searchResult) { OnSelected = x => _tabsCollectionView.SelectTab(x) };
+            var content = new SearchResultItemView(searchResult) { OnSelected = x => _tabCollectionView.SelectTab(x) };
 
             return new CollectionItem(content, new SpaceSeparatorView(20));
         }

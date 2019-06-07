@@ -24,7 +24,7 @@ namespace BookWiki.Presentation.Apple.Controllers
 
         private Keyboard _keyboard;
 
-        private TabsCollectionView _tabsView;
+        private TabCollectionView _tabView;
         private ActionBarView _actionBarView;
         private ContentHolderView _contentHolderView;
         private NSObject _keyboardUp;
@@ -50,21 +50,21 @@ namespace BookWiki.Presentation.Apple.Controllers
             View.BackgroundColor = UIColor.White;
 
             Application.Instance.RegisterScheme(new HotKeyScheme(
-                new HotKey(new Key("y"), () => _tabsView.SelectFiles()),
-                new HotKey(new Key("u"), () => _tabsView.SelectTab(1)),
-                new HotKey(new Key("i"), () => _tabsView.SelectTab(2)),
-                new HotKey(new Key("o"), () => _tabsView.SelectTab(3)),
-                new HotKey(new Key("p"), () => _tabsView.SelectTab(4))));
+                new HotKey(new Key("y"), () => _tabView.SelectFiles()),
+                new HotKey(new Key("u"), () => _tabView.SelectTab(1)),
+                new HotKey(new Key("i"), () => _tabView.SelectTab(2)),
+                new HotKey(new Key("o"), () => _tabView.SelectTab(3)),
+                new HotKey(new Key("p"), () => _tabView.SelectTab(4))));
 
-            _tabsView = new TabsCollectionView(_library);
-            _tabsView.OnTabSelected += TabsViewOnOnTabSelected;
-            _tabsView.Initialize(_session.OpenedContentTabs.Select(path => _library.Load(path)).ToArray());
+            _tabView = new TabCollectionView(_library);
+            _tabView.OnTabSelected += TabViewOnOnTabSelected;
+            _tabView.Initialize(_session.OpenedContentTabs.Select(path => _library.Load(path)).ToArray());
 
             _contentHolderView = new ContentHolderView(() => _bottomOffset, data =>
             {
                 if (data is IFileSystemNode node)
                 {
-                    return new FileSystemView(node, _tabsView, _library);
+                    return new FileSystemView(node, _tabView, _library);
                 }
 
                 if (data is IArticle article)
@@ -81,7 +81,7 @@ namespace BookWiki.Presentation.Apple.Controllers
 
                 if (data is IQuery searchQuery)
                 {
-                    return new SearchResultsView(searchQuery, _tabsView);
+                    return new SearchResultsView(searchQuery, _tabView);
                 }
 
                 return new UIView() {BackgroundColor = UIColor.Black};
@@ -95,7 +95,7 @@ namespace BookWiki.Presentation.Apple.Controllers
             var verticalSeparator = new UIView() {BackgroundColor = UIColor.LightGray};
             var actionBarSeparator = new UIView() {BackgroundColor = UIColor.LightGray};
 
-            View.AddSubviews(_tabsView, _actionBarView, topSeparator, verticalSeparator, actionBarSeparator, _contentHolderView);
+            View.AddSubviews(_tabView, _actionBarView, topSeparator, verticalSeparator, actionBarSeparator, _contentHolderView);
 
             _layout = () =>
             {
@@ -104,15 +104,15 @@ namespace BookWiki.Presentation.Apple.Controllers
 
                 if (_actionBarView.IsPanelHidden == false)
                 {
-                    _tabsView.Hidden = false;
-                    _tabsView.ChangeWidth(200);
-                    _tabsView.ChangeHeight(View.Frame.Height - 20 - _bottomOffset);
-                    _tabsView.PositionToRight(View);
-                    _tabsView.ChangeY(topSeparator.Frame.Bottom);
+                    _tabView.Hidden = false;
+                    _tabView.ChangeWidth(200);
+                    _tabView.ChangeHeight(View.Frame.Height - 20 - _bottomOffset);
+                    _tabView.PositionToRight(View);
+                    _tabView.ChangeY(topSeparator.Frame.Bottom);
 
                     _actionBarView.ChangeY(topSeparator.Frame.Bottom);
                     _actionBarView.ChangeX(0);
-                    _actionBarView.ChangeSize(View.Frame.Width - _tabsView.Frame.Width, 50);
+                    _actionBarView.ChangeSize(View.Frame.Width - _tabView.Frame.Width, 50);
 
                     actionBarSeparator.ChangeSize(_actionBarView.Frame.Width, 1);
                     actionBarSeparator.ChangePosition(0, _actionBarView.Frame.Bottom);
@@ -123,12 +123,12 @@ namespace BookWiki.Presentation.Apple.Controllers
                     _contentHolderView.LayoutSubviews();
 
                     verticalSeparator.Hidden = false;
-                    verticalSeparator.ChangeSize(1, _tabsView.Frame.Height);
-                    verticalSeparator.ChangePosition(_tabsView.Frame.Left, topSeparator.Frame.Bottom);
+                    verticalSeparator.ChangeSize(1, _tabView.Frame.Height);
+                    verticalSeparator.ChangePosition(_tabView.Frame.Left, topSeparator.Frame.Bottom);
                 }
                 else
                 {
-                    _tabsView.Hidden = true;
+                    _tabView.Hidden = true;
 
                     _actionBarView.ChangeY(topSeparator.Frame.Bottom);
                     _actionBarView.ChangeX(0);
@@ -154,14 +154,14 @@ namespace BookWiki.Presentation.Apple.Controllers
             _layout();
         }
 
-        private void TabsViewOnOnTabSelected(object data)
+        private void TabViewOnOnTabSelected(object data)
         {
             _contentHolderView.Render(data);
         }
 
         private void SearchOnOnSearchRequested(IQuery searchQuery)
         {
-            _tabsView.ShowSearchResult(searchQuery);
+            _tabView.ShowSearchResult(searchQuery);
         }
 
         private void KeyboardIsDown(NSNotification obj)
@@ -197,7 +197,7 @@ namespace BookWiki.Presentation.Apple.Controllers
 
         public void StoreData()
         {
-            _session.Store(_tabsView, _actionBarView);
+            _session.Store(_tabView, _actionBarView);
             _library.Save();
         }
     }

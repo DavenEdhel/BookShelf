@@ -1,4 +1,5 @@
 ﻿using BookWiki.Core.Findings;
+using BookWiki.Core.Search;
 
 namespace BookWiki.Core
 {

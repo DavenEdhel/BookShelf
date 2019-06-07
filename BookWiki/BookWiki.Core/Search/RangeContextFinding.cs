@@ -1,7 +1,7 @@
-﻿using BookWiki.Core.Search;
-using BookWiki.Core.Utils;
+﻿using BookWiki.Core.Utils;
+using BookWiki.Core.Utils.TextModels;
 
-namespace BookWiki.Core.Findings
+namespace BookWiki.Core.Search
 {
     public class RangeContextFinding : Finding
     {
@@ -24,12 +24,14 @@ namespace BookWiki.Core.Findings
 
         protected override ITextRange CalculateResult()
         {
-            return _text.Substring(_findingIndex, new Number(_findingLength, 0, _findingLength - _findingIndex).Value);
+            var maxLength = new Number(_findingLength + _findingIndex, 0, _text.Length);
+
+            return _text.Substring(_findingIndex, new Number(_findingLength, 0, maxLength));
         }
 
         protected override ITextRange CalculateContext()
         {
-            return _text.Substring(new Number(_findingIndex - _contextSize, 0, _text.Length).Value, new Number(_findingLength + _contextSize * 2, 0, _text.Length).Value);
+            return _text.Substring(new Number(_findingIndex - _contextSize, 0, _text.Length), new Number(_findingLength + _contextSize * 2, 0, _text.Length));
         }
     }
 }

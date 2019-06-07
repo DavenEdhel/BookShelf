@@ -1,4 +1,5 @@
 using BookWiki.Core.Findings;
+using BookWiki.Core.Search;
 using NUnit.Framework;
 
 namespace BookWiki.Core.Tests

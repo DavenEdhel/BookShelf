@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using BookWiki.Core;
 using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.PathModels;
+using BookWiki.Core.Logging;
 using BookWiki.Core.Utils;
 using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Models.HotKeys;
 using BookWiki.Presentation.Apple.Models.Utils;
-using CoreFoundation;
+using BookWiki.Presentation.Apple.Views.Common;
 using CoreGraphics;
-using CoreText;
 using Foundation;
 using UIKit;
 
@@ -25,36 +23,35 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         private readonly ILibrary _library;
 
         private bool _wasFocused;
-        private nint _cursorPosition;
         private HotKeyScheme _viewModeScheme;
         private HotKeyScheme _editModeScheme;
-        private UITextView _content;
+        private EditTextView _content;
         private int _margin = 24;
 
         private bool _changed = false;
         private IPath _source;
 
-        private CursorView _cursor;
-
         private DeferredAction _save;
+
+        private Logger _logger = new Logger("NovelView");
 
         public NovelView(INovel novel, ILibrary library)
         {
             _novel = novel;
             _library = library;
 
-            var deactivateEditMode = new HotKey(Key.Escape, DeactivateEditMode);
-            var activateEditMode = new HotKey(Key.Enter, ActivateEditMode);
+            var deactivateEditMode = new HotKey(Key.Escape, () => _content.DeactivateEditMode());
+            var activateEditMode = new HotKey(Key.Enter, () => _content.ActivateEditMode());
             var leftTheLine = new HotKey(new Key("7"), LeftCurrentLine).WithCommand();
             var centerTheLine = new HotKey(new Key("8"), CenterCurrentLine).WithCommand();
             var rightTheLine = new HotKey(new Key("9"), RightCurrentLine).WithCommand();
             var enableJoButton = new HotKey(new Key("]"), EnableJoButton);
             var enableJoButtonUpperCase = new HotKey(new Key("]"), EnableJoButtonUpperCase).WithShift();
             var showAutocorrection = new HotKey(new KeyCombination(Key.Space, UIKeyModifierFlags.Shift), ShowAutocorrection);
-            //var moveCursorToRight = new HotKey(new Key(";"), MoveCursorToRight);
-            //var moveCursorToLeft = new HotKey(new Key("l"), MoveCursorToLeft);
+            var moveCursorToRight = new HotKey(new Key("j"), ScrollUp);
+            var moveCursorToLeft = new HotKey(new Key("k"), ScrollDown);
 
-            _viewModeScheme = new HotKeyScheme(activateEditMode);
+            _viewModeScheme = new HotKeyScheme(activateEditMode, moveCursorToLeft, moveCursorToRight);
             _editModeScheme = new HotKeyScheme(deactivateEditMode, leftTheLine, centerTheLine, rightTheLine, enableJoButton, enableJoButtonUpperCase, showAutocorrection);
 
             _save = new DeferredAction(TimeSpan.FromSeconds(10), () => _library.Update(this));
@@ -62,28 +59,40 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             Initialize();
         }
 
+        private void ScrollDown()
+        {
+            var delta = _content.Frame.Height / 2;
+
+            _content.SetContentOffset(new CGPoint(0, _content.ContentOffset.Y + delta), true);
+        }
+
+        private void ScrollUp()
+        {
+            var delta = _content.Frame.Height / 2;
+
+            _content.SetContentOffset(new CGPoint(0, _content.ContentOffset.Y - delta), true);
+        }
+
         private void ShowAutocorrection()
         {
-            var spellChecker = new SpellChecker(_content.Text, (int)CursorPosition);
+            var spellChecker = new SpellChecker(_content.Text, (int)_content.CursorPosition);
 
             if (spellChecker.IsCursorInMisspelledWord)
             {
-                var box = new AutocorectionBoxView(spellChecker, ReplaceOnCurrentCursorWith);
+                var box = new AutocorectionBoxView(spellChecker, ReplaceOnCurrentCursorWith, NewWordLearned);
 
-                box.Show(this, CursorLocation.Move(30, 30));
+                box.Show(this);
             }
+        }
+
+        private void NewWordLearned()
+        {
+            _content.CheckSpelling();
         }
 
         private void ReplaceOnCurrentCursorWith(NSRange misspelledWord, string word)
         {
-            var start = _content.GetPosition(_content.BeginningOfDocument, misspelledWord.Location);
-            var end = _content.GetPosition(start, misspelledWord.Length);
-
-            var textRange = _content.GetTextRange(start, end);
-
-            _content.ReplaceText(textRange, word);
-
-            MarkSpellingForCursorRange();
+            _content.ReplaceMisspelledWord(misspelledWord, word);
         }
 
         private void EnableJoButtonUpperCase()
@@ -101,62 +110,23 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         }
 
-        private void InitCursor()
-        {
-            //Add(_cursor);
-        }
-
-        private void ActivateEditMode()
-        {
-            _content.BecomeFirstResponder();
-
-            CursorPosition = _virtualCursorPosition;
-        }
-
-        private void DeactivateEditMode()
-        {
-            _content.ResignFirstResponder();
-        }
-
-        private int _virtualCursorPosition = 10;
-        private Timer _timer;
-
-        private void MoveCursorToRight()
-        {
-            _virtualCursorPosition += 10;
-
-            var cursorPosition = _content.GetPosition(_content.BeginningOfDocument, _virtualCursorPosition);
-
-            var cursorFrame = _content.GetCaretRectForPosition(cursorPosition);
-
-            _cursor.ChangePosition(cursorFrame.X, cursorFrame.Y);
-        }
-
-        private void MoveCursorToLeft()
-        {
-            _virtualCursorPosition -= 10;
-
-            var cursorPosition = _content.GetPosition(_content.BeginningOfDocument, _virtualCursorPosition);
-
-            var cursorFrame = _content.GetCaretRectForPosition(cursorPosition);
-
-            _cursor.ChangePosition(cursorFrame.X, cursorFrame.Y);
-        }
-
         private void Initialize()
         {
-            _content = new UITextView();
-
+            _content = new EditTextView();
+            _content.DefaultParagraph = () => new NSMutableParagraphStyle()
+            {
+                FirstLineHeadIndent = 42
+            };
             _content.Editable = true;
             _content.AllowsEditingTextAttributes = true;
             _content.ShouldChangeText += OnShouldChangeText;
             _content.Changed += ContentOnChanged;
             _content.AutocorrectionType = UITextAutocorrectionType.No;
             _content.AutocapitalizationType = UITextAutocapitalizationType.None;
-            _content.SelectionChanged += OnSelectionChanged;
             _content.ShowsVerticalScrollIndicator = false;
             _content.Font = UIFont.FromName("TimesNewRomanPSMT", 20);
             _content.ContentInset = new UIEdgeInsets(0, 0, 50, 0);
+            _content.Scrolled += ContentOnScrolled;
 
             var novelContent = new AtLeastSingleSpaceString(_novel.Content);
 
@@ -193,7 +163,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 }
             }
 
-            MarkSpelling(result);
+            result = MarkSpelling(result);
 
             _content.AttributedText = result;
 
@@ -206,11 +176,6 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             UpdatePaging();
             Add(_pageNumber);
 
-            _cursor = new CursorView();
-            InitCursor();
-
-            InitSpellchecker();
-
             Layout = () =>
             {
                 _content.ChangeSize(Frame.Width - _margin * 2, Frame.Height);
@@ -219,40 +184,37 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 _pageNumber.SetSizeThatFits();
                 _pageNumber.ChangeWidth(200);
                 _pageNumber.PositionToRightAndBottomInside(this, 5, 5);
-
-                _cursor.PositionToCenterInside(this);
             };
 
             Layout();
+        }
+
+        private void ContentOnScrolled(object sender, EventArgs e)
+        {
+            UpdatePaging();
         }
 
         private void ContentOnChanged(object sender, EventArgs e)
         {
             if (_shouldCheckSpelling)
             {
-                MarkSpellingForCursorRange();
+                _content.MarkSpellingForCursorRange();
             }
 
             _save.AttemptToRun();
 
             UpdatePaging();
-
-            ScrollToBottom();
-        }
-
-        private void ScrollToBottom()
-        {
-            //if (CursorPosition > _content.Text.Length - 300)
-            //{
-            //    _content.SetContentOffset(new CGPoint(0, _content.ContentSize.Height - _content.Frame.Height * 2 / 3), true);
-            //}
         }
 
         private void UpdatePaging()
         {
-            var p = (int)(_content.ContentSize.Height / 1120) + 1;
+            var pageSize = 1120;
 
-            _pageNumber.Text = $"{p} стр.";
+            var totalPages = (int)(_content.ContentSize.Height / pageSize) + 1;
+
+            var currentPage = (int) (_content.ContentOffset.Y / pageSize) + 1;
+
+            _pageNumber.Text = $"{currentPage} из {totalPages}";
         }
 
         private NSMutableAttributedString MarkSpelling(NSMutableAttributedString result)
@@ -269,36 +231,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             return result;
         }
 
-        private void MarkSpelling()
-        {
-            _content.AttributedText = MarkSpelling(new NSMutableAttributedString(_content.AttributedText));
-        }
-
-        private void MarkSpellingForCursorRange()
-        {
-            var range = new SpaceSeparatedRange(_content.Text, (int)CursorPosition - 50, 100);
-
-            var result = new NSMutableAttributedString(_content.AttributedText);
-
-            result.RemoveAttribute(UIStringAttributeKey.UnderlineStyle, new NSRange(range.StartIndex, range.Length));
-
-            foreach (var misspelledWord in new MisspelledWordsSequence(new UITextChecker(), _content.Text, range))
-            {
-                result.AddAttribute(UIStringAttributeKey.UnderlineStyle, NSNumber.FromInt32((int)NSUnderlineStyle.Single), misspelledWord);
-            }
-
-            _content.AttributedText = result;
-        }
-
-        private void InitSpellchecker()
-        {
-            _timer = new Timer(OnSpellCheckTimer, null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
-        }
-
-        private void OnSpellCheckTimer(object state)
-        {
-            
-        }
+        
 
         private NSMutableParagraphStyle CreateDefaultParagraph()
         {
@@ -312,123 +245,19 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             return _content.SizeThatFits(new CGSize(size.Width - _margin*2, size.Height));
         }
 
-        private void OnSelectionChanged(object sender, EventArgs e)
-        {
-            _cursorPosition = CursorPosition;
-        }
-
-        private nint CursorPosition
-        {
-            get => _content.GetOffsetFromPosition(_content.BeginningOfDocument, _content.SelectedTextRange.End);
-            set
-            {
-                var cursorPosition = _content.GetPosition(_content.BeginningOfDocument, value);
-
-                cursorPosition = cursorPosition ?? _content.GetPosition(_content.BeginningOfDocument, 0);
-
-                _content.SelectedTextRange = _content.GetTextRange(cursorPosition, cursorPosition);
-            }
-        }
-
-        private CGPoint CursorLocation
-        {
-            get
-            {
-                var cursorPosition = _content.GetPosition(_content.BeginningOfDocument, CursorPosition);
-
-                var cursorFrame = _content.GetCaretRectForPosition(cursorPosition);
-
-                return cursorFrame.Location;
-            }
-        }
-
         private void LeftCurrentLine()
         {
-            ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Left);
+            _content.ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Left);
         }
 
         private void RightCurrentLine()
         {
-            ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Right);
+            _content.ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Right);
         }
 
         private void CenterCurrentLine()
         {
-            ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Center);
-        }
-
-        private void ChangeStyle(Action changeStyle)
-        {
-            var cursorPosition = _content.GetPosition(_content.BeginningOfDocument, _cursorPosition);
-
-            changeStyle();
-
-            _changed = true;
-
-            _content.SelectedTextRange = _content.GetTextRange(cursorPosition, cursorPosition);
-
-            _content.ScrollRangeToVisible(_content.SelectedRange);
-        }
-
-        private void ChangeCurrentParagraphStyle(Action<NSMutableParagraphStyle> changeParagraphStyle)
-        {
-            ChangeStyle(() =>
-            {
-                var p = SelectedParagraph;
-
-                var result = new NSMutableAttributedString(_content.AttributedText);
-
-                result.RemoveAttribute(UIStringAttributeKey.ParagraphStyle, p);
-
-                var paragraph = CreateDefaultParagraph();
-
-                changeParagraphStyle(paragraph);
-
-                result.AddAttribute(UIStringAttributeKey.ParagraphStyle, paragraph, p);
-
-                _content.AttributedText = result;
-            });
-        }
-
-        private NSRange SelectedParagraph
-        {
-            get
-            {
-                var selectedRange = _content.SelectedRange;
-
-                var start = (int)selectedRange.Location;
-                var end = (int)selectedRange.Location;
-
-                var text = _content.Text;
-
-                start = GetStart();
-
-                for (int i = end; i < text.Length; i++)
-                {
-                    if (text[i] == '\n')
-                    {
-                        end = i;
-                        break;
-                    }
-
-                    end = i;
-                }
-
-                return new NSRange(start, end - start);
-
-                int GetStart()
-                {
-                    for (int i = new Number(start, 0, text.Length - 1).Value; i > 0; i--)
-                    {
-                        if (text[i] == '\n')
-                        {
-                            return i + 1;
-                        }
-                    }
-
-                    return 0;
-                }
-            }
+            _content.ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Center);
         }
 
         private bool _shouldCheckSpelling;
@@ -450,12 +279,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
             _wasFocused = Application.Instance.IsInEditMode;
 
-            if (Focused)
-            {
-                _cursorPosition = CursorPosition;
-            }
-
-            _content.ResignFirstResponder();
+            _content.DeactivateEditMode();
 
             Application.Instance.ModeChanged -= InstanceOnModeChanged;
         }
@@ -467,11 +291,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
             if (_wasFocused)
             {
-                _content.BecomeFirstResponder();
-
-                var cursorPosition = _content.GetPosition(_content.BeginningOfDocument, _cursorPosition);
-
-                _content.SelectedTextRange = _content.GetTextRange(cursorPosition, cursorPosition);
+                _content.ActivateEditMode();
             }
             else
             {

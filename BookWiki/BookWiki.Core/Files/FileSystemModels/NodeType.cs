@@ -2,6 +2,7 @@
 {
     public enum NodeType
     {
+        Unknown,
         Directory,
         Novel,
         Article
