@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BookWiki.Core.Files.PathModels;
+using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Core.Files.FileSystemModels
 {
@@ -31,7 +32,7 @@ namespace BookWiki.Core.Files.FileSystemModels
                 var f1 = x.Parts.First();
                 var f2 = y.Parts.First();
 
-                return f1.PlainText == f2.PlainText && f1.Offset == f2.Offset && f1.Length == f2.Length;
+                return f1.PlainText == f2.PlainText && f1.Offset == f2.Offset && f1.CastTo<IText>().Length == f2.CastTo<IText>().Length;
             }
 
             public int GetHashCode(IPath obj)

@@ -1,6 +1,7 @@
 ﻿using System;
 using BookWiki.Core;
 using BookWiki.Core.Findings;
+using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Apple.Extentions;
 using CoreGraphics;
 using Foundation;
@@ -52,13 +53,13 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             {
                 var result = new NSMutableAttributedString(_finding.Context.PlainText);
 
-                result.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(20), new NSRange(_finding.Result.Offset, _finding.Result.Length));
+                result.AddAttribute(UIStringAttributeKey.Font, UIFont.BoldSystemFontOfSize(20), new NSRange(_finding.Result.Offset, _finding.Result.Length()));
 
                 var paragraphStyle = new NSMutableParagraphStyle();
                 paragraphStyle.ParagraphSpacingBefore = 3;
                 paragraphStyle.ParagraphSpacing = 3;
                 paragraphStyle.FirstLineHeadIndent = 20;
-                result.AddAttribute(UIStringAttributeKey.ParagraphStyle, paragraphStyle, new NSRange(0, _finding.Result.Length));
+                result.AddAttribute(UIStringAttributeKey.ParagraphStyle, paragraphStyle, new NSRange(0, _finding.Result.Length()));
 
                 return result;
             }

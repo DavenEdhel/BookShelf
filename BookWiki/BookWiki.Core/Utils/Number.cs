@@ -1,5 +1,13 @@
 ﻿namespace BookWiki.Core.Utils
 {
+    public class Index
+    {
+        public Index(int index, string source)
+        {
+
+        }
+    }
+
     public class Number
     {
         private readonly int _value;
@@ -45,10 +53,7 @@
             _maximum = maximum;
         }
 
-        public Number(int index, string source) : this (index, 0, string.IsNullOrEmpty(source) ? 0 : (source.Length - 1))
-        {
-
-        }
+        
 
         public static implicit operator int(Number i)
         {

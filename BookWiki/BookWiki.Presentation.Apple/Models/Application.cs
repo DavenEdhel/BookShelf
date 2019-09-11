@@ -29,6 +29,9 @@ namespace BookWiki.Presentation.Apple.Models
         private readonly List<HotKeyScheme> _schemesForEditMode = new List<HotKeyScheme>();
         private readonly List<HotKeyScheme> _schemesForViewMode = new List<HotKeyScheme>();
 
+        private readonly List<HotKeyScheme> _pausedSchemesForEditMode = new List<HotKeyScheme>();
+        private readonly List<HotKeyScheme> _pausedSchemesForViewMode = new List<HotKeyScheme>();
+
         public static void Run(Keyboard keyboard)
         {
             Instance = new Application(keyboard);
@@ -71,6 +74,34 @@ namespace BookWiki.Presentation.Apple.Models
 
             _schemesForEditMode.Remove(scheme);
             _schemesForViewMode.Remove(scheme);
+        }
+
+        public void PauseSchemes()
+        {
+            _pausedSchemesForEditMode.AddRange(_schemesForEditMode);
+            _pausedSchemesForViewMode.AddRange(_schemesForViewMode);
+
+            _schemesForEditMode.ForEach(x => x.IsEnabled = false);
+            _schemesForViewMode.ForEach(x => x.IsEnabled = false);
+
+            _schemesForEditMode.Clear();
+            _schemesForViewMode.Clear();
+
+            _logger.Info($"Paused.");
+        }
+
+        public void ResumeSchemes()
+        {
+            _schemesForEditMode.AddRange(_pausedSchemesForEditMode);
+            _schemesForViewMode.AddRange(_pausedSchemesForViewMode);
+
+            _schemesForEditMode.ForEach(x => x.IsEnabled = IsInEditMode);
+            _schemesForViewMode.ForEach(x => x.IsEnabled = IsInEditMode == false);
+
+            _pausedSchemesForEditMode.Clear();
+            _pausedSchemesForViewMode.Clear();
+
+            _logger.Info($"Resumed.");
         }
 
         public void ToEditMode()

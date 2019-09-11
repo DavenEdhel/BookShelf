@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BookMap.Presentation.Apple;
 using BookWiki.Core.Utils;
 using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
-using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Models.HotKeys;
 using BookWiki.Presentation.Apple.Views.Common;
 using BookWiki.Presentation.Apple.Views.Main;
@@ -12,10 +12,11 @@ using CoreGraphics;
 using Foundation;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 using UIKit;
+using Application = BookWiki.Presentation.Apple.Models.Application;
 
 namespace BookWiki.Presentation.Apple.Views.Controls
 {
-    public class AutocorectionBoxView : View
+    public class SuggestionsBoxView : View
     {
         private readonly SpellChecker _spellChecker;
         private readonly Action<NSRange, string> _onChosen;
@@ -25,7 +26,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         private const string AddToDict = "*добавить в словарь*";
 
-        public AutocorectionBoxView(SpellChecker spellChecker, Action<NSRange, string> onChosen, Action onLearned = null)
+        public SuggestionsBoxView(SpellChecker spellChecker, Action<NSRange, string> onChosen, Action onLearned = null)
         {
             _spellChecker = spellChecker;
             _onChosen = onChosen;
@@ -51,6 +52,8 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 new HotKey(new Key("k"), () => TapOn(2)),
                 new HotKey(new Key("l"), () => TapOn(3)),
                 new HotKey(new Key(";"), () => TapOn(4)));
+
+            _schemeForEditMode = _scheme.Clone();
 
             var items = _spellChecker.Guesses.Select(suggestion =>
             {
@@ -150,32 +153,32 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             return;
         }
 
-        private IKeyboardListener _keyboardListener;
         private HotKeyScheme _scheme;
         private CollectionView _suggestionsView;
+        private HotKeyScheme _schemeForEditMode;
 
-        public void Show(UIView parent, CGPoint? position = null)
+        public void Show()
         {
-            _keyboardListener = parent as IKeyboardListener;
+            Application.Instance.PauseSchemes();
 
-            _keyboardListener?.Pause();
-
-            Application.Instance.RegisterSchemeForEditMode(_scheme);
+            Application.Instance.RegisterSchemeForEditMode(_schemeForEditMode);
             Application.Instance.RegisterSchemeForViewMode(_scheme);
 
-            var suggestionsSize = _suggestionsView.ChangeWidthAndLayout((float)parent.Frame.Width / 3f);
+            var rootView = AppDelegate.MainWindow.RootViewController.View;
+            var suggestionsSize = _suggestionsView.ChangeWidthAndLayout((float)rootView.Frame.Width / 3f);
 
             this.ChangeSize(suggestionsSize.Width, suggestionsSize.Height);
-            this.PositionToCenterInside(parent);
+            this.PositionToCenterInside(rootView);
 
-            parent.Add(this);
+            rootView.Add(this);
         }
 
         public void Hide()
         {
             Application.Instance.UnregisterScheme(_scheme);
+            Application.Instance.UnregisterScheme(_schemeForEditMode);
 
-            _keyboardListener?.Resume();
+            Application.Instance.ResumeSchemes();
 
             RemoveFromSuperview();
         }

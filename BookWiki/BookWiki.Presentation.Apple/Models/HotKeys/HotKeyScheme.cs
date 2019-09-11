@@ -74,5 +74,10 @@ namespace BookWiki.Presentation.Apple.Controllers
         {
             return string.Join('\n', _hotKeys.Select(x => x.ToString()));
         }
+
+        public HotKeyScheme Clone()
+        {
+            return new HotKeyScheme(_hotKeys.Select(x => x.Clone()).ToArray());
+        }
     }
 }

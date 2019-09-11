@@ -4,6 +4,7 @@
     {
         No,
         Partially,
-        Completely
+        Completely,
+        Exact
     }
 }

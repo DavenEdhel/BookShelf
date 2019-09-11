@@ -3,6 +3,6 @@
     public static class RangeOverlapExtensions
     {
         public static bool PartiallyOrCompletely(this RangeOverlap overlap) =>
-            overlap == RangeOverlap.Partially || overlap == RangeOverlap.Completely;
-    }
+            overlap == RangeOverlap.Partially || overlap == RangeOverlap.Completely || overlap == RangeOverlap.Exact;
+}
 }

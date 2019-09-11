@@ -73,5 +73,10 @@ namespace BookWiki.Presentation.Apple.Models.HotKeys
         {
             return new KeyCombination(ModifierFlags, Key.EnglishRussian[_key].KeyCommand);
         }
+
+        public KeyCombination Clone()
+        {
+            return new KeyCombination(new Key(_key.KeyCommand), ModifierFlags);
+        }
     }
 }

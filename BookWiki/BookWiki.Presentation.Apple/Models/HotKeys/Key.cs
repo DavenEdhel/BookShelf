@@ -27,7 +27,9 @@ namespace BookWiki.Presentation.Apple.Controllers
             [new Key("k")] = new Key("л"),
             [new Key("l")] = new Key("д"),
             [new Key(";")] = new Key("ж"),
-            [new Key("n")] = new Key("т")
+            [new Key("n")] = new Key("т"),
+            [new Key("s")] = new Key("ы"),
+            [new Key("r")] = new Key("к"),
         };
 
         public Key(string key)

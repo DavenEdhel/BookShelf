@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BookWiki.Core;
 using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.TextModels;
+using BookWiki.Presentation.Apple.Controllers;
+using BookWiki.Presentation.Apple.Models;
+using BookWiki.Presentation.Apple.Models.HotKeys;
 using BookWiki.Presentation.Apple.Models.Utils;
 using BookWiki.Presentation.Apple.Views.Controls;
 using CoreGraphics;
@@ -11,7 +15,7 @@ using UIKit;
 
 namespace BookWiki.Presentation.Apple.Views.Common
 {
-    public class EditTextView : UITextView
+    public class EditTextView : UITextView, IKeyboardListener
     {
         private bool _changed;
         private nint _cursorPosition;
@@ -21,12 +25,42 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         private readonly List<ErrorLineView> _errors = new List<ErrorLineView>();
 
+        private readonly HotKeyScheme _viewModeScheme;
+        private readonly HotKeyScheme _editModeScheme;
+
         public Func<NSMutableParagraphStyle> DefaultParagraph { get; set; }
 
         public EditTextView()
         {
             SelectionChanged += OnSelectionChanged;
+            Changed += OnChanged;
             DefaultParagraph = () => new NSMutableParagraphStyle();
+
+            Editable = true;
+            AllowsEditingTextAttributes = true;
+            AutocorrectionType = UITextAutocorrectionType.No;
+            AutocapitalizationType = UITextAutocapitalizationType.None;
+            ShowsVerticalScrollIndicator = false;
+            Font = UIFont.FromName("TimesNewRomanPSMT", 20);
+            ContentInset = new UIEdgeInsets(0, 0, 50, 0);
+
+            var deactivateEditMode = new HotKey(Key.Escape, DeactivateEditMode);
+            var activateEditMode = new HotKey(Key.Enter, ActivateEditMode);
+            var leftTheLine = new HotKey(new Key("7"), LeftCurrentLine).WithCommand();
+            var centerTheLine = new HotKey(new Key("8"), CenterCurrentLine).WithCommand();
+            var rightTheLine = new HotKey(new Key("9"), RightCurrentLine).WithCommand();
+            var enableJoButton = new HotKey(new Key("]"), () => InsertText("ё"));
+            var enableJoButtonUpperCase = new HotKey(new Key("]"), () => InsertText("Ё")).WithShift();
+            var showSuggestions = new HotKey(new KeyCombination(Key.Space, UIKeyModifierFlags.Control), ShowSuggestions);
+            var validate = new HotKey(new KeyCombination(new Key("r"), UIKeyModifierFlags.Control), CheckSpelling);
+
+            _viewModeScheme = new HotKeyScheme(activateEditMode, validate);
+            _editModeScheme = new HotKeyScheme(deactivateEditMode, leftTheLine, centerTheLine, rightTheLine, enableJoButton, enableJoButtonUpperCase, showSuggestions, validate);
+        }
+
+        private void OnChanged(object sender, EventArgs e)
+        {
+            MarkSpellingForCursorRange();
         }
 
         public void ReplaceMisspelledWord(NSRange misspelledWord, string word)
@@ -46,30 +80,43 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         public void CheckSpelling()
         {
-            MarkRange(new Range(Text.Length, 0), new MisspelledWordsSequence(new UITextChecker(), Text));
+            MarkRange(new Range((int)AttributedText.Length, 0), new MisspelledWordsSequence(new UITextChecker(), AttributedText.Value));
         }
 
         public void MarkSpellingForCursorRange()
         {
-            var range = new SpaceSeparatedRange(Text, (int)CursorPosition - 50, 100);
+            var range = new SpaceSeparatedRange(AttributedText.Value, (int)CursorPosition - 50, 100);
 
-            MarkRange(range, new MisspelledWordsSequence(new UITextChecker(), Text, range));
+            MarkRange(range, new MisspelledWordsSequence(new UITextChecker(), AttributedText.Value, range));
         }
 
         private void MarkRange(IRange scope, IEnumerable<NSRange> errors)
         {
-            var errorsToRemove = _errors.Where(x => x.In(scope)).ToArray();
+            var newErrorRanges = errors.Select(x => new NativeRange(x)).ToArray();
 
-            foreach (var errorLineView in errorsToRemove)
+            var displayedErrorsInScope = _errors.Where(x => x.In(scope)).ToArray();
+
+            var displayedErrorsToRemove = displayedErrorsInScope.Where(x => newErrorRanges.Any(n => x.Exact(n)) == false).ToArray();
+            var errorsToAdd = newErrorRanges.Where(x => displayedErrorsInScope.Any(e => e.Exact(x)) == false).ToArray();
+
+            foreach (var errorLineView in displayedErrorsToRemove)
             {
                 errorLineView.RemoveFromSuperview();
                 _errors.Remove(errorLineView);
             }
 
-            foreach (var nsRange in errors)
+            foreach (var range in errorsToAdd)
             {
-                var e = new ErrorLineView(nsRange, this);
+                var e = new ErrorLineView(range, this);
                 _errors.Add(e);
+            }
+        }
+
+        private void ShowRanges()
+        {
+            foreach (var errorLineView in _errors)
+            {
+                errorLineView.DumpToConsole();
             }
         }
 
@@ -198,5 +245,58 @@ namespace BookWiki.Presentation.Apple.Views.Common
                 }
             }
         }
+
+        public void ScrollDown()
+        {
+            var delta = Frame.Height / 2;
+
+            SetContentOffset(new CGPoint(0, ContentOffset.Y + delta), true);
+        }
+
+        public void ScrollUp()
+        {
+            var delta = Frame.Height / 2;
+
+            SetContentOffset(new CGPoint(0, ContentOffset.Y - delta), true);
+        }
+
+        public void ShowSuggestions()
+        {
+            var spellChecker = new SpellChecker(AttributedText.Value, (int)CursorPosition);
+
+            if (spellChecker.IsCursorInMisspelledWord)
+            {
+                new SuggestionsBoxView(spellChecker, ReplaceMisspelledWord, CheckSpelling).Show();
+            }
+        }
+
+        public void LeftCurrentLine()
+        {
+            ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Left);
+        }
+
+        public void RightCurrentLine()
+        {
+            ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Right);
+        }
+
+        public void CenterCurrentLine()
+        {
+            ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Center);
+        }
+
+        public void Pause()
+        {
+            Application.Instance.UnregisterScheme(_editModeScheme);
+            Application.Instance.UnregisterScheme(_viewModeScheme);
+        }
+
+        public void Resume()
+        {
+            Application.Instance.RegisterSchemeForEditMode(_editModeScheme);
+            Application.Instance.RegisterSchemeForViewMode(_viewModeScheme);
+        }
+
+        
     }
 }

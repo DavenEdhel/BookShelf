@@ -41,5 +41,10 @@ namespace BookWiki.Presentation.Apple.Models.HotKeys
         {
             return $"{Combination} -> Action()";
         }
+
+        public HotKey Clone()
+        {
+            return new HotKey(Combination.Clone(), action: Action);
+        }
     }
 }
