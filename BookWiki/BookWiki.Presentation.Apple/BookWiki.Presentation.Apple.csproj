@@ -85,25 +85,29 @@
     <Compile Include="Models\UserFolderPath.cs" />
     <Compile Include="Models\Utils\NativeRange.cs" />
     <Compile Include="Models\Utils\Range.cs" />
+    <Compile Include="Models\Utils\SimpleRange.cs" />
+    <Compile Include="Models\Utils\RangeExtensions.cs" />
     <Compile Include="Models\Utils\StringRange.cs" />
     <Compile Include="Models\Utils\ThreadSafeProperty.cs" />
-    <Compile Include="Views\Common\ErrorLineView.cs" />
+    <Compile Include="Views\EditText\ErrorLineView.cs" />
     <Compile Include="Views\Common\IKeyboardListener.cs" />
     <Compile Include="Views\Common\IPageData.cs" />
     <Compile Include="Views\Common\PageNumberView.cs" />
     <Compile Include="Views\Common\QueryView.cs" />
     <Compile Include="Views\Common\SpaceSeparatorView.cs" />
-    <Compile Include="Views\Common\EditTextView.cs" />
+    <Compile Include="Views\EditText\EditTextView.cs" />
+    <Compile Include="Views\EditText\TextViewErrorCollection.cs" />
     <Compile Include="Views\Controls\ArticlePartView.cs" />
-    <Compile Include="Views\Controls\SuggestionsBoxView.cs" />
-    <Compile Include="Views\Controls\CursorView.cs" />
+    <Compile Include="Views\EditText\CheckSpellingOperation.cs" />
+    <Compile Include="Views\EditText\SuggestionsBoxView.cs" />
+    <Compile Include="Views\EditText\CursorView.cs" />
     <Compile Include="Views\Controls\FileSystemNodeView.cs" />
     <Compile Include="Views\Controls\FileSystemTreeView.cs" />
     <Compile Include="Views\Controls\FileSystemView.cs" />
-    <Compile Include="Views\Controls\MisspelledWordsSequence.cs" />
+    <Compile Include="Views\EditText\MisspelledWordsSequence.cs" />
     <Compile Include="Views\Controls\NovelView.cs" />
     <Compile Include="Views\Controls\SearchResultsView.cs" />
-    <Compile Include="Views\Controls\SpellChecker.cs" />
+    <Compile Include="Views\EditText\SpellChecker.cs" />
     <Compile Include="Views\Main\ActionBarView.cs" />
     <Compile Include="Views\Controls\ArticleView.cs" />
     <Compile Include="Controllers\MainPage.cs" />
@@ -217,6 +221,7 @@
   <ItemGroup>
     <WeaverFiles Include="$(SolutionDir)weavers\PureOopAddin.Fody.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\packages\Fody.5.0.1\build\Fody.targets" Condition="Exists('..\packages\Fody.5.0.1\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

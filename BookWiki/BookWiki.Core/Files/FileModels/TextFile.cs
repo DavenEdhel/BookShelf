@@ -15,6 +15,8 @@ namespace BookWiki.Core.Files.FileModels
 
         public void Save(string content)
         {
+            Directory.CreateDirectory(new DirectoryPath(_pathToFile).FullPath);
+
             File.WriteAllText(_pathToFile.FullPath, content);
         }
 

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using BookWiki.Core;
+using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Utils;
-using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Models.HotKeys;
@@ -17,21 +16,18 @@ namespace BookWiki.Presentation.Apple.Views.Common
 {
     public class EditTextView : UITextView, IKeyboardListener
     {
-        private bool _changed;
         private nint _cursorPosition;
-        private bool _positionIsSet;
-
-        public bool WasChanged => _changed;
-
-        private readonly List<ErrorLineView> _errors = new List<ErrorLineView>();
 
         private readonly HotKeyScheme _viewModeScheme;
         private readonly HotKeyScheme _editModeScheme;
+        private readonly LifeSpellCheck _lifeSpellCheck;
 
         public Func<NSMutableParagraphStyle> DefaultParagraph { get; set; }
 
         public EditTextView()
         {
+            _lifeSpellCheck = new LifeSpellCheck(new TextViewErrorCollection(this), new CheckSpellingOperation());
+
             SelectionChanged += OnSelectionChanged;
             Changed += OnChanged;
             DefaultParagraph = () => new NSMutableParagraphStyle();
@@ -60,70 +56,19 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         private void OnChanged(object sender, EventArgs e)
         {
-            MarkSpellingForCursorRange();
-        }
-
-        public void ReplaceMisspelledWord(NSRange misspelledWord, string word)
-        {
-            var start = GetPosition(BeginningOfDocument, misspelledWord.Location);
-            var end = GetPosition(start, misspelledWord.Length);
-
-            var textRange = GetTextRange(start, end);
-
-            Modify(result =>
-            {
-                ReplaceText(textRange, word);
-            });
-
-            MarkSpellingForCursorRange();
+            _lifeSpellCheck.TextChangedAround((int)CursorPosition, Text);
         }
 
         public void CheckSpelling()
         {
-            MarkRange(new Range((int)AttributedText.Length, 0), new MisspelledWordsSequence(new UITextChecker(), AttributedText.Value));
-        }
-
-        public void MarkSpellingForCursorRange()
-        {
-            var range = new SpaceSeparatedRange(AttributedText.Value, (int)CursorPosition - 50, 100);
-
-            MarkRange(range, new MisspelledWordsSequence(new UITextChecker(), AttributedText.Value, range));
-        }
-
-        private void MarkRange(IRange scope, IEnumerable<NSRange> errors)
-        {
-            var newErrorRanges = errors.Select(x => new NativeRange(x)).ToArray();
-
-            var displayedErrorsInScope = _errors.Where(x => x.In(scope)).ToArray();
-
-            var displayedErrorsToRemove = displayedErrorsInScope.Where(x => newErrorRanges.Any(n => x.Exact(n)) == false).ToArray();
-            var errorsToAdd = newErrorRanges.Where(x => displayedErrorsInScope.Any(e => e.Exact(x)) == false).ToArray();
-
-            foreach (var errorLineView in displayedErrorsToRemove)
-            {
-                errorLineView.RemoveFromSuperview();
-                _errors.Remove(errorLineView);
-            }
-
-            foreach (var range in errorsToAdd)
-            {
-                var e = new ErrorLineView(range, this);
-                _errors.Add(e);
-            }
-        }
-
-        private void ShowRanges()
-        {
-            foreach (var errorLineView in _errors)
-            {
-                errorLineView.DumpToConsole();
-            }
+            _lifeSpellCheck.ForceSpellChecking((int) CursorPosition, Text);
         }
 
         private void OnSelectionChanged(object sender, EventArgs e)
         {
-            _positionIsSet = true;
             _cursorPosition = CursorPosition;
+
+            _lifeSpellCheck.CursorPositionChanged((int)_cursorPosition, Text);
         }
 
         public nint CursorPosition
@@ -139,18 +84,6 @@ namespace BookWiki.Presentation.Apple.Views.Common
             }
         }
 
-        public CGPoint CursorLocation
-        {
-            get
-            {
-                var cursorPosition = GetPosition(BeginningOfDocument, CursorPosition);
-
-                var cursorFrame = GetCaretRectForPosition(cursorPosition);
-
-                return cursorFrame.Location;
-            }
-        }
-
         public void Modify(Action<NSMutableAttributedString> modify)
         {
             var currentOffset = ContentOffset;
@@ -162,8 +95,6 @@ namespace BookWiki.Presentation.Apple.Views.Common
             modify(result);
 
             AttributedText = result;
-
-            _changed = true;
 
             ContentOffset = currentOffset;
 
@@ -266,7 +197,29 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
             if (spellChecker.IsCursorInMisspelledWord)
             {
-                new SuggestionsBoxView(spellChecker, ReplaceMisspelledWord, CheckSpelling).Show();
+                new SuggestionsBoxView(spellChecker,
+                        onChosen: ReplaceMisspelledWord,
+                        onLearned: async () =>
+                        {
+                            await Task.Delay(100);
+
+                            _lifeSpellCheck.ForceSpellChecking((int) CursorPosition, Text);
+                        })
+                    .Show();
+            }
+
+            async void ReplaceMisspelledWord(NSRange misspelledWord, string word)
+            {
+                var start = GetPosition(BeginningOfDocument, misspelledWord.Location);
+                var end = GetPosition(start, misspelledWord.Length);
+
+                var textRange = GetTextRange(start, end);
+
+                ReplaceText(textRange, word);
+
+                await Task.Delay(100);
+
+                _lifeSpellCheck.MisspelledWordReplaced(new NativeRange(misspelledWord), Text);
             }
         }
 

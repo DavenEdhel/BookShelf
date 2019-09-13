@@ -2,22 +2,24 @@
 using System.Collections.Generic;
 using BookWiki.Core;
 using BookWiki.Core.Utils;
+using BookWiki.Core.Utils.TextModels;
+using BookWiki.Presentation.Apple.Models.Utils;
 using Foundation;
 using UIKit;
 
 namespace BookWiki.Presentation.Apple.Views.Controls
 {
-    public class MisspelledWordsSequence : ISequence<NSRange>
+    public class MisspelledWordsSequence : ISequence<IRange>
     {
         private readonly UITextChecker _textChecker;
         private readonly string _plainText;
-        private readonly SpaceSeparatedRange _range;
+        private readonly IRange _range;
 
         public MisspelledWordsSequence(UITextChecker textChecker, string plainText, int startIndex = 0, int length = -1) : this(textChecker, plainText, new SpaceSeparatedRange(plainText, startIndex, length))
         {
         }
 
-        public MisspelledWordsSequence(UITextChecker textChecker, string plainText, SpaceSeparatedRange range)
+        public MisspelledWordsSequence(UITextChecker textChecker, string plainText, IRange range)
         {
             _textChecker = textChecker;
             _plainText = plainText;
@@ -27,16 +29,16 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             Completion = new Progress(plainText.Length);
         }
 
-        public IEnumerator<NSRange> GetEnumerator()
+        public IEnumerator<IRange> GetEnumerator()
         {
-            var position = _range.StartIndex;
+            var position = _range.Start();
 
             Completion.Change(position);
 
-            while (position < _range.EndIndex)
+            while (position < _range.End())
             {
                 var misspelled = _textChecker.RangeOfMisspelledWordInString(_plainText,
-                    new NSRange(0, _plainText.Length), position, false, "ru_RU");
+                    new NSRange(_range.Start(), _range.Length), position, false, "ru_RU");
 
                 if (misspelled.Location == NSRange.NotFound)
                 {
@@ -45,9 +47,9 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                     yield break;
                 }
 
-                yield return misspelled;
+                yield return new NativeRange(misspelled);
 
-                position = (int)misspelled.Location + (int)misspelled.Length + 1;
+                position = (int)misspelled.Location + (int)misspelled.Length;
 
                 Completion.Change(position);
             }

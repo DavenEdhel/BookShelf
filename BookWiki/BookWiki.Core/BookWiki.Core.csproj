@@ -5,6 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="MockDataModels\Format.json" />
+    <None Remove="MockDataModels\Text.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="MockDataModels\Format.json" />
+    <EmbeddedResource Include="MockDataModels\Text.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="FodyWeavers.xsd" />
   </ItemGroup>
 

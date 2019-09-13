@@ -88,6 +88,31 @@ namespace BookWiki.Core.LibraryModels
             }
         }
 
+        public void Save(IContent content)
+        {
+            lock (_changed)
+            {
+                _logger.Info($"Saving {_changed.Count} items.");
+
+                _changed.RemoveAll(x => x.Source.EqualsTo(content.Source));
+
+                if (content is INovel novel)
+                {
+                    var file = new ContentFolder(content.Source);
+                    file.Save(novel.Content);
+                    file.Save(novel.Format);
+                }
+
+                if (content is IArticle article)
+                {
+                    var file = new ContentFolder(content.Source);
+                    file.Save(article.Content);
+                }
+
+                _logger.Info("Saved.");
+            }
+        }
+
         public IContent Load(IPath novelPath)
         {
             var item = Items.FirstOrDefault(x => x.Source.EqualsTo(novelPath));

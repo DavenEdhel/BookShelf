@@ -14,30 +14,6 @@ namespace BookWiki.Core.Tests
         }
 
         [Test]
-        public void InStringRange()
-        {
-            var n = new Number(3, "abcde");
-
-            Assert.AreEqual(3, (int)n);
-        }
-
-        [Test]
-        public void OutOfRangeAbove()
-        {
-            var n = new Number(8, "abcde");
-
-            Assert.AreEqual(4, (int)n);
-        }
-
-        [Test]
-        public void OutOfRangeBelow()
-        {
-            var n = new Number(-3, "abcde");
-
-            Assert.AreEqual(0, (int)n);
-        }
-
-        [Test]
         public void GreaterThanMax()
         {
             var n = new Number(8, 0, 5);

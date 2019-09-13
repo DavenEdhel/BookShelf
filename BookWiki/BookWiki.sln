@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookWiki.Core.Tests", "Book
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordsGenerator", "WordsGenerator\WordsGenerator.csproj", "{8BAF0430-99AF-41EF-B635-579486021B93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppForDebugDiagnostic", "AppForDebugDiagnostic\AppForDebugDiagnostic.csproj", "{01787511-43C6-47DC-B717-67B0ADE521CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,16 @@ Global
 		{8BAF0430-99AF-41EF-B635-579486021B93}.Release|iPhone.Build.0 = Release|Any CPU
 		{8BAF0430-99AF-41EF-B635-579486021B93}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{8BAF0430-99AF-41EF-B635-579486021B93}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|Any CPU.ActiveCfg = Debug|iPhone
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|iPhone.Build.0 = Debug|iPhone
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|Any CPU.ActiveCfg = Release|iPhone
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|iPhone.ActiveCfg = Release|iPhone
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|iPhone.Build.0 = Release|iPhone
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

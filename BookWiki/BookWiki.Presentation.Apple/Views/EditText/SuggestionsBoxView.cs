@@ -6,6 +6,7 @@ using BookWiki.Core.Utils;
 using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Models.HotKeys;
+using BookWiki.Presentation.Apple.Models.Utils;
 using BookWiki.Presentation.Apple.Views.Common;
 using BookWiki.Presentation.Apple.Views.Main;
 using CoreGraphics;
@@ -146,7 +147,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 return;
             }
 
-            _onChosen(_spellChecker.MisspelledWord, _result);
+            _onChosen(_spellChecker.MisspelledWord.ToNsRange(), _result);
 
             Hide();
 

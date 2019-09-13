@@ -34,18 +34,7 @@ namespace BookWiki.Core.Files.FileModels
 
         public void Save(ISequence<ITextInfo> novelFormat)
         {
-            var format = novelFormat
-                .Select(x => new TextInfoDto()
-                {
-                    Offset = x.Range.Offset,
-                    Length = x.Range.Length,
-                    Style = x.Style
-                })
-                .ToArray();
-
-            var content = JsonConvert.SerializeObject(format);
-
-            _formatFile.Save(content);
+            _formatFile.Save(new TextFormat(novelFormat).ToJson());
         }
 
         public IText LoadText()
@@ -57,20 +46,7 @@ namespace BookWiki.Core.Files.FileModels
         {
             var content = _formatFile.Content;
 
-            var format = JsonConvert.DeserializeObject<TextInfoDto[]>(content) ?? new TextInfoDto[0];
-
-            var items = format.Select(x => new TextInfo(new LazySubstringText(_text, x.Offset, x.Length), x.Style));
-
-            return new EnumerableSequence<ITextInfo>(items, format.Length);
-        }
-
-        class TextInfoDto
-        {
-            public int Offset { get; set; }
-
-            public int Length { get; set; }
-
-            public TextStyle Style { get; set; }
+            return TextFormat.ParseFrom(content, _text.Value);
         }
     }
 }

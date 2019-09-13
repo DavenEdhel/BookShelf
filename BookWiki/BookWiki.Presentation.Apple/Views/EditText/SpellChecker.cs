@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BookWiki.Core;
+using BookWiki.Core.Utils.TextModels;
+using BookWiki.Presentation.Apple.Models.Utils;
 using Foundation;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 using UIKit;
@@ -21,7 +23,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             _cursorPosition = Normalize(plainText, cursorPosition);
             _textChecker = new UITextChecker();
 
-            MisspelledWords = new RunOnceSequence<NSRange>(new MisspelledWordsSequence(_textChecker, plainText));
+            MisspelledWords = new RunOnceSequence<IRange>(new MisspelledWordsSequence(_textChecker, plainText));
         }
 
         private int Normalize(string plainText, int cursor)
@@ -41,7 +43,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             return cursor;
         }
 
-        public ISequence<NSRange> MisspelledWords { get; }
+        public ISequence<IRange> MisspelledWords { get; }
 
         public bool IsCursorInMisspelledWord => MisspelledWords.Any(TestCursorInRange);
 
@@ -53,22 +55,22 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 {
                     var misspelledWord = MisspelledWord;
 
-                    return _textChecker.GuessesForWordRange(misspelledWord, _plainText, "ru_RU").Take(12);
+                    return _textChecker.GuessesForWordRange(misspelledWord.ToNsRange(), _plainText, "ru_RU").Take(12);
                 }
 
                 return Enumerable.Empty<string>();
             }
         }
 
-        public NSRange MisspelledWord => MisspelledWords.First(TestCursorInRange);
+        public IRange MisspelledWord => MisspelledWords.First(TestCursorInRange);
 
-        private bool TestCursorInRange(NSRange word) => _cursorPosition >= word.Location && _cursorPosition <= (word.Location + word.Length);
+        private bool TestCursorInRange(IRange word) => _cursorPosition >= word.Offset && _cursorPosition <= (word.Offset + word.Length);
 
         public void Learn()
         {
             var word = MisspelledWord;
 
-            UITextChecker.LearnWord(_plainText.Substring((int)word.Location, (int)word.Length).Trim());
+            UITextChecker.LearnWord(_plainText.Substring((int)word.Offset, (int)word.Length).Trim());
         }
     }
 }

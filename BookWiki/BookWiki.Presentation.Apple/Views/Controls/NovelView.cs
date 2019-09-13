@@ -116,15 +116,6 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             };
 
             Layout();
-
-            CheckSpellingAfter3Seconds();
-        }
-
-        private async void CheckSpellingAfter3Seconds()
-        {
-            await Task.Delay(TimeSpan.FromSeconds(3));
-
-            _content.CheckSpelling();
         }
 
         private NSMutableParagraphStyle CreateDefaultParagraph()

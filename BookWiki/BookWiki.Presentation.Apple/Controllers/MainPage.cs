@@ -4,6 +4,7 @@ using BookWiki.Core;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.LibraryModels;
+using BookWiki.Core.MockDataModels;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Models.HotKeys;
@@ -36,6 +37,8 @@ namespace BookWiki.Presentation.Apple.Controllers
 
         public override void ViewDidLoad()
         {
+            new LibraryInitializationOperation(new UserFolderPath()).Execute();
+
             _library = new Library(new UserFolderPath());
             _keyboard = new Keyboard(this);
             _session = new SessionContext(_library).Restore();
