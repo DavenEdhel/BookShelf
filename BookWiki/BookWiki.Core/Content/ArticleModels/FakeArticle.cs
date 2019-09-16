@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.PathModels;
 using Newtonsoft.Json;
 
 namespace BookWiki.Core.Content
@@ -14,17 +13,17 @@ namespace BookWiki.Core.Content
 
         private IView _view;
         private IText _content;
-        private IPath _source;
+        private IRelativePath _source;
 
         public string Title => (Parts.FirstOrDefault()?.Text ?? string.Empty).Replace("\n", "");
 
-        public IPath Source => _source;
+        public IRelativePath Source => _source;
 
         public IText Content => _content ?? (_content = new StringText(ToSingleString()));
 
         public FakeArticle(ArticleTitle title)
         {
-            _source = new FakePath(title.PlainText);
+            _source = new PathFake(title.PlainText);
 
             Parts = new List<ArticlePart>()
             {

@@ -12,7 +12,7 @@ namespace BookWiki.Core.Files.FileModels
 
         public static ISequence<ITextInfo> ParseFrom(string json, IText origin)
         {
-            var format = JsonConvert.DeserializeObject<TextInfoDto[]>(json) ?? new TextInfoDto[0];
+            var format = JsonConvert.DeserializeObject<Scheme[]>(json) ?? new Scheme[0];
 
             var items = format.Select(x => new TextInfo(new LazySubstringText(new CachedValue<IText>(origin), x.Offset, x.Length), x.Style));
 
@@ -26,7 +26,7 @@ namespace BookWiki.Core.Files.FileModels
 
         public string ToJson()
         {
-            var format = this.Select(x => new TextInfoDto()
+            var format = this.Select(x => new Scheme()
                 {
                     Offset = x.Range.Offset,
                     Length = x.Range.Length,
@@ -37,15 +37,6 @@ namespace BookWiki.Core.Files.FileModels
             var content = JsonConvert.SerializeObject(format);
 
             return content;
-        }
-
-        class TextInfoDto
-        {
-            public int Offset { get; set; }
-
-            public int Length { get; set; }
-
-            public TextStyle Style { get; set; }
         }
 
         public IEnumerator<ITextInfo> GetEnumerator()
@@ -59,5 +50,14 @@ namespace BookWiki.Core.Files.FileModels
         }
 
         public Progress Completion => _source.Completion;
+
+        public class Scheme
+        {
+            public int Offset { get; set; }
+
+            public int Length { get; set; }
+
+            public TextStyle Style { get; set; }
+        }
     }
 }

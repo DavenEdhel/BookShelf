@@ -1,5 +1,4 @@
 ﻿using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.PathModels;
 
 namespace BookWiki.Core
 {
@@ -9,7 +8,7 @@ namespace BookWiki.Core
 
         string Title { get; }
 
-        IPath Source { get; }
+        IRelativePath Source { get; }
 
         bool Equals(object another);
 

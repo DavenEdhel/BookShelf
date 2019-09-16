@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.Utils.PropertyModels;
@@ -8,47 +6,6 @@ using PureOop;
 
 namespace BookWiki.Core.Files.FileSystemModels
 {
-    public class ChildFileSystemNodeCollection : IEnumerable<IFileSystemNode>
-    {
-        private readonly IFileSystemNode _root;
-
-        private readonly List<IFileSystemNode> _all = new List<IFileSystemNode>();
-
-        public ChildFileSystemNodeCollection(IFileSystemNode root)
-        {
-            _root = root;
-        }
-
-        public IEnumerator<IFileSystemNode> GetEnumerator()
-        {
-            if (_all.Count > 0)
-            {
-                return _all.GetEnumerator();
-            }
-
-            _all.Add(_root);
-
-            Process(_root);
-
-            return _all.GetEnumerator();
-        }
-
-        private void Process(IFileSystemNode root)
-        {
-            _all.AddRange(root.InnerNodes);
-
-            foreach (var fileSystemNode in root.InnerNodes)
-            {
-                Process(fileSystemNode);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
     public class FileSystemNode : IFileSystemNode
     {
         private readonly string _path;
@@ -59,7 +16,7 @@ namespace BookWiki.Core.Files.FileSystemModels
         {
         }
 
-        public FileSystemNode(IFileSystemNode parent, IPath path) : this(path.FullPath, parent.Level + 1)
+        public FileSystemNode(IFileSystemNode parent, IAbsolutePath path) : this(path.FullPath, parent.Level + 1)
         {
         }
 
@@ -84,6 +41,6 @@ namespace BookWiki.Core.Files.FileSystemModels
             Directory.CreateDirectory(Path.FullPath);
         }
 
-        public IPath Path { get; } 
+        public IAbsolutePath Path { get; } 
     }
 }

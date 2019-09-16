@@ -1,29 +1,23 @@
 ﻿using System;
+using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
-using BookWiki.Core.FileSystem.PathModels;
 using BookWiki.Core.Utils.PropertyModels;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Core
 {
-    public class NovelFake : INovel
-    {
-        public IText Content { get; set; }
-        public string Title { get; set; }
-        public IPath Source { get; set; }
-        public ISequence<ITextInfo> Format { get; set; }
-    }
-
     public class Novel : INovel
     {
+        private readonly IRelativePath _novelPath;
         private readonly IProperty<IText> _text;
         private readonly IProperty<ISequence<ITextInfo>> _format;
-        private IContentFolder _contentFolder;
+        private readonly IContentFolder _contentFolder;
 
-        public Novel(IContentFolder contentFolder)
+        public Novel(IRelativePath novelPath, IRootPath root)
         {
-            _contentFolder = contentFolder;
+            _novelPath = novelPath;
+            _contentFolder = new ContentFolder(novelPath.AbsolutePath(root));
 
             _text = new CachedValue<IText>(() => _contentFolder.LoadText());
             _format = new CachedValue<ISequence<ITextInfo>>(() => new RunOnceSequence<ITextInfo>(_contentFolder.LoadFormat()));
@@ -33,7 +27,7 @@ namespace BookWiki.Core
 
         public string Title => _contentFolder.Source.Name.PlainText;
 
-        public IPath Source => _contentFolder.Source;
+        public IRelativePath Source => _novelPath;
 
         public ISequence<ITextInfo> Format => _format.Value;
     }

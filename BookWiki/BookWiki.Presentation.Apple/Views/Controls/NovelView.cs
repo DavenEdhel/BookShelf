@@ -6,6 +6,7 @@ using BookWiki.Core;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.Logging;
 using BookWiki.Core.Utils;
+using BookWiki.Core.ViewModels;
 using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Models;
@@ -28,6 +29,8 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         private HotKeyScheme _editModeScheme;
         private EditTextView _content;
         private int _margin = 24;
+
+        public bool WasFocused => _wasFocused;
 
         private Logger _logger = new Logger("NovelView");
 
@@ -131,6 +134,8 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         }
 
         private PageNumberView _pageNumber;
+        private bool _isActive;
+        public bool IsActive => _isActive;
 
         public void Hide()
         {
@@ -146,6 +151,8 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             Application.Instance.ModeChanged -= InstanceOnModeChanged;
 
             Save();
+
+            _isActive = false;
         }
 
         private void Save()
@@ -171,16 +178,37 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 _content.ResignFirstResponder();
             }
 
+            _isActive = true;
+
             Application.Instance.ModeChanged += InstanceOnModeChanged;
         }
 
         public string Title => _novel.Title;
 
-        public IPath Source => _novel.Source;
+        public IRelativePath Source => _novel.Source;
 
         public IText Content => new ThreadSafeProperty<IText>(() => new StringText(_content.Text)).Value;
 
         public ISequence<ITextInfo> Format => new ThreadSafeProperty<ISequence<ITextInfo>>(() => new ArraySequence<ITextInfo>(GetFormatting().ToArray())).Value;
+
+        public IEditorState State
+        {
+            get => new NovelViewEditorState(this, _content);
+            set
+            {
+                _content.CursorPosition = value.LastCaretPosition;
+                _content.SetContentOffset(new CGPoint(0, value.ScrollPosition), false);
+
+                if (value.IsEditing)
+                {
+                    _content.ActivateEditMode();
+                }
+                else
+                {
+                    _content.ResignFirstResponder();
+                }
+            }
+        }
 
         private IEnumerable<ITextInfo> GetFormatting()
         {

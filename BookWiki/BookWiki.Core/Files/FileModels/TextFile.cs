@@ -6,9 +6,9 @@ namespace BookWiki.Core.Files.FileModels
 {
     public class TextFile : IFile
     {
-        private readonly IPath _pathToFile;
+        private readonly IAbsolutePath _pathToFile;
 
-        public TextFile(IPath pathToFile)
+        public TextFile(IAbsolutePath pathToFile)
         {
             _pathToFile = pathToFile;
         }

@@ -7,7 +7,7 @@ namespace BookWiki.Core.Files.FileModels
     {
         private ContentFolder _contentFolder;
 
-        public NovelFolder(IPath root, string name)
+        public NovelFolder(IAbsolutePath root, string name)
         {
             var path = new FolderPath(root, new FileNameWithoutExtension(name), new Extension(NodeType.Novel));
 

@@ -7,9 +7,9 @@ namespace BookWiki.Core.MockDataModels
 {
     public class LibraryInitializationOperation
     {
-        private readonly IPath _root;
+        private readonly IRootPath _root;
 
-        public LibraryInitializationOperation(IPath root)
+        public LibraryInitializationOperation(IRootPath root)
         {
             _root = root;
         }
@@ -30,7 +30,7 @@ namespace BookWiki.Core.MockDataModels
         public static string GetContentAsString(string resourceName)
         {
             var assembly = typeof(LibraryInitializationOperation).GetTypeInfo().Assembly;
-            var contentPath = $"{assembly.GetName().Name}.MockDataModels.{resourceName}";
+            var contentPath = $"{assembly.GetName().Name}.ContentGenerator.{resourceName}";
             var stream = assembly.GetManifestResourceStream(contentPath);
             using (var streamReader = new StreamReader(stream))
             {

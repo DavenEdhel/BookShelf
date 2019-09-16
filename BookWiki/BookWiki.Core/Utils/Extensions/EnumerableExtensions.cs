@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Utils
 {
@@ -47,6 +48,27 @@ namespace BookWiki.Core.Utils
             }
 
             return 0;
+        }
+
+        public static IEnumerable<ITextRange> Substract<T>(this ITextRange[] source, ITextRange[] target)
+        {
+            var s1 = source.ToArray();
+            var s2 = target.ToArray();
+
+            var i = 0;
+
+            for (int j = 0; j < s1.Length; j++)
+            {
+                if (i < s2.Length && s1[j].PlainText ==  s2[i].PlainText)
+                {
+                    i++;
+                    continue;
+                }
+                else
+                {
+                    yield return s1[j];
+                }
+            }
         }
     }
 }

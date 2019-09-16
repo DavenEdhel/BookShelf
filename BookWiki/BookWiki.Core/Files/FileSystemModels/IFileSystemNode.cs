@@ -1,5 +1,4 @@
 ﻿using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.PathModels;
 
 namespace BookWiki.Core.Files.FileSystemModels
 {
@@ -7,7 +6,7 @@ namespace BookWiki.Core.Files.FileSystemModels
     {
         ISequence<IFileSystemNode> InnerNodes { get; }
 
-        IPath Path { get; }
+        IAbsolutePath Path { get; }
 
         bool IsContentFolder { get; }
 

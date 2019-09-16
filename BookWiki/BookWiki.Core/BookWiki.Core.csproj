@@ -5,13 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="MockDataModels\Format.json" />
-    <None Remove="MockDataModels\Text.txt" />
+    <None Remove="ContentGenerator\Format.json" />
+    <None Remove="ContentGenerator\Text.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="MockDataModels\Format.json" />
-    <EmbeddedResource Include="MockDataModels\Text.txt" />
+    <EmbeddedResource Include="ContentGenerator\Format.json" />
+    <EmbeddedResource Include="ContentGenerator\Text.txt" />
   </ItemGroup>
 
   <ItemGroup>

@@ -89,6 +89,7 @@
     <Compile Include="Models\Utils\RangeExtensions.cs" />
     <Compile Include="Models\Utils\StringRange.cs" />
     <Compile Include="Models\Utils\ThreadSafeProperty.cs" />
+    <Compile Include="Views\Controls\NovelViewEditorState.cs" />
     <Compile Include="Views\EditText\ErrorLineView.cs" />
     <Compile Include="Views\Common\IKeyboardListener.cs" />
     <Compile Include="Views\Common\IPageData.cs" />

@@ -43,7 +43,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             }
         }
 
-        public Action<IPath> OnSelected { get; set; }
+        public Action<IAbsolutePath> OnSelected { get; set; }
 
         private readonly List<CollectionItem> _collectionItems = new List<CollectionItem>();
         private TypeSelectDialogView _dialog;
@@ -51,7 +51,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         public IFileSystemNode Model => _fileSystemNode;
 
-        public FileSystemNodeView(IFileSystemNode fileSystemNode, Action<IPath> onSelected, Action disableScheme, Action enableScheme)
+        public FileSystemNodeView(IFileSystemNode fileSystemNode, Action<IAbsolutePath> onSelected, Action disableScheme, Action enableScheme)
         {
             _fileSystemNode = fileSystemNode;
             _disableScheme = disableScheme;
@@ -148,7 +148,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         }
 
 
-        private void DialogOnOnSave(IPath path, IExtension extension)
+        private void DialogOnOnSave(IAbsolutePath path, IExtension extension)
         {
             var fileSystemNode = new FileSystemNode(_fileSystemNode, path);
             fileSystemNode.SaveUnder(_fileSystemNode);

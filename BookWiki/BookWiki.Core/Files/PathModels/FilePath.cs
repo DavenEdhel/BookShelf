@@ -3,7 +3,7 @@ using BookWiki.Core.Utils.PropertyModels;
 
 namespace BookWiki.Core.Files.PathModels
 {
-    public class FilePath : IPath
+    public class FilePath : IAbsolutePath
     {
         private readonly IProperty<string> _path;
 

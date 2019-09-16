@@ -17,7 +17,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         private readonly Action _enableScheme;
         private readonly Action _disableScheme;
 
-        public event Action<IPath> Selected = delegate { };
+        public event Action<IAbsolutePath> Selected = delegate { };
 
         public FileSystemTreeView(IFileSystemNode root, Action enableScheme, Action disableScheme)
         {

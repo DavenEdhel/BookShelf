@@ -15,7 +15,7 @@ namespace BookWiki.Core.Files.FileModels
         private readonly IFile _contentFile;
         private readonly IFile _formatFile;
 
-        public ContentFolder(IPath path)
+        public ContentFolder(IAbsolutePath path)
         {
             Source = path;
 
@@ -25,7 +25,7 @@ namespace BookWiki.Core.Files.FileModels
             _text = new CachedValue<IText>(LoadText);
         }
 
-        public IPath Source { get; }
+        public IAbsolutePath Source { get; }
 
         public void Save(IText text)
         {

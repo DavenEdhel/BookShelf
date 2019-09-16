@@ -13,6 +13,8 @@ namespace BookWiki.Core.LibraryModels
 {
     public class Library : ILibrary
     {
+        private readonly IRootPath _root;
+
         private readonly Logger _logger = new Logger("Library");
 
         private readonly List<IContent> _changed;
@@ -20,8 +22,9 @@ namespace BookWiki.Core.LibraryModels
         private readonly CachedValue<IContent[]> _content;
         private Timer _autosave;
 
-        public Library(IPath root)
+        public Library(IRootPath root)
         {
+            _root = root;
             _changed = new List<IContent>();
 
             _content = new CachedValue<IContent[]>(() =>
@@ -32,7 +35,7 @@ namespace BookWiki.Core.LibraryModels
                 {
                     if (x.Extension.Type == NodeType.Novel)
                     {
-                        return (IContent)new EqualityNovel(new Novel(new ContentFolder(x)));
+                        return (IContent)new EqualityNovel(new Novel(x.RelativePath(_root), _root));
                     }
 
                     return null;
@@ -70,14 +73,14 @@ namespace BookWiki.Core.LibraryModels
                 {
                     if (content is INovel novel)
                     {
-                        var file = new ContentFolder(content.Source);
+                        var file = new ContentFolder(content.Source.AbsolutePath(_root));
                         file.Save(novel.Content);
                         file.Save(novel.Format);
                     }
 
                     if (content is IArticle article)
                     {
-                        var file = new ContentFolder(content.Source);
+                        var file = new ContentFolder(content.Source.AbsolutePath(_root));
                         file.Save(article.Content);
                     }
                 }
@@ -98,14 +101,14 @@ namespace BookWiki.Core.LibraryModels
 
                 if (content is INovel novel)
                 {
-                    var file = new ContentFolder(content.Source);
+                    var file = new ContentFolder(content.Source.AbsolutePath(_root));
                     file.Save(novel.Content);
                     file.Save(novel.Format);
                 }
 
                 if (content is IArticle article)
                 {
-                    var file = new ContentFolder(content.Source);
+                    var file = new ContentFolder(content.Source.AbsolutePath(_root));
                     file.Save(article.Content);
                 }
 
@@ -113,7 +116,7 @@ namespace BookWiki.Core.LibraryModels
             }
         }
 
-        public IContent Load(IPath novelPath)
+        public IContent Load(IRelativePath novelPath)
         {
             var item = Items.FirstOrDefault(x => x.Source.EqualsTo(novelPath));
 
@@ -122,7 +125,12 @@ namespace BookWiki.Core.LibraryModels
                 _content.Invalidate();
             }
 
-            return new EqualityNovel(new Novel(new ContentFolder(novelPath)));
+            return new EqualityNovel(new Novel(novelPath, _root));
+        }
+
+        public IContent Load(IAbsolutePath novelPath)
+        {
+            return Load(novelPath.RelativePath(_root));
         }
     }
 }

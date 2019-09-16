@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.PathModels;
 
 namespace BookWiki.Core.Files.FileSystemModels
 {
@@ -10,7 +9,7 @@ namespace BookWiki.Core.Files.FileSystemModels
     {
         private readonly string _root;
 
-        public ISequence<IPath> Contents => new ArraySequence<IPath>(GetContents().ToArray());
+        public ISequence<IAbsolutePath> Contents => new ArraySequence<IAbsolutePath>(GetContents().ToArray());
 
         public FileSystem(string root)
         {
@@ -18,7 +17,7 @@ namespace BookWiki.Core.Files.FileSystemModels
 
         }
 
-        private IEnumerable<IPath> GetContents()
+        private IEnumerable<IAbsolutePath> GetContents()
         {
             var files = Directory.GetFiles(_root, "*", SearchOption.AllDirectories);
 

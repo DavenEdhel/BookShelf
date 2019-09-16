@@ -43,7 +43,7 @@ namespace BookWiki.Core.Files.FileSystemModels
 
         public ISequence<IFileSystemNode> InnerNodes { get; }
 
-        public IPath Path { get; }
+        public IAbsolutePath Path { get; }
 
         public bool IsContentFolder { get; }
 

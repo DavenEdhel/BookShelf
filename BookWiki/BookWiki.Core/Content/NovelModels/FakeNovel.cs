@@ -1,5 +1,4 @@
 ﻿using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.PathModels;
 
 namespace BookWiki.Core
 {
@@ -31,11 +30,11 @@ namespace BookWiki.Core
 С тех пор демоны ходят злые, рогатые и хвостатые.
 ";
 
-        private IPath _source = new FakePath("1");
+        private PathFake _source = new PathFake("1");
 
         public string Title { get; } = "Сказки миров Сущего";
 
-        public IPath Source => _source;
+        public IRelativePath Source => _source;
 
         public IText Content { get; }
 

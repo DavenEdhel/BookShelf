@@ -90,7 +90,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             _treeView.SelectedContent?.ShowDialogForNovel();
         }
 
-        private void TreeViewOnSelected(IPath novelPath)
+        private void TreeViewOnSelected(IAbsolutePath novelPath)
         {
             if (novelPath.Extension.Type == NodeType.Directory)
             {

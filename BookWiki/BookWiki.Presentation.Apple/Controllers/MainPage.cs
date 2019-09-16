@@ -61,7 +61,7 @@ namespace BookWiki.Presentation.Apple.Controllers
 
             _tabView = new TabCollectionView(_library);
             _tabView.OnTabSelected += TabViewOnOnTabSelected;
-            _tabView.Initialize(_session.OpenedContentTabs.Select(path => _library.Load(path)).ToArray());
+            _tabView.Initialize(_session.OpenedContentTabs.Select(state => _library.Load(state.NovelPathToLoad)).ToArray());
 
             _contentHolderView = new ContentHolderView(() => _bottomOffset, data =>
             {
@@ -78,6 +78,13 @@ namespace BookWiki.Presentation.Apple.Controllers
                 if (data is INovel novel)
                 {
                     var novelView = new NovelView(novel, _library);
+
+                    var editorState = _session.OpenedContentTabs.FirstOrDefault(x => x.NovelPathToLoad.EqualsTo(novel.Source));
+
+                    if (editorState != null)
+                    {
+                        novelView.State = editorState;
+                    }
 
                     return novelView;
                 }
@@ -200,7 +207,7 @@ namespace BookWiki.Presentation.Apple.Controllers
 
         public void StoreData()
         {
-            _session.Store(_tabView, _actionBarView);
+            _session.Store(_tabView, _actionBarView, _contentHolderView);
             _library.Save();
         }
     }

@@ -3,6 +3,7 @@ using System.Linq;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.Utils.PropertyModels;
+using BookWiki.Core.ViewModels;
 using Newtonsoft.Json;
 
 namespace BookWiki.Core.Files.FileModels
@@ -11,25 +12,25 @@ namespace BookWiki.Core.Files.FileModels
     {
         private readonly IProperty<UserInterfaceSettings> _settings;
         private readonly IProperty<IEnumerable<string>> _queries;
-        private readonly IProperty<IEnumerable<IPath>> _contentPaths;
-        private readonly IPath _path;
+        private readonly IProperty<IEnumerable<IEditorState>> _contentPaths;
+        private readonly IAbsolutePath _path;
         private IFile _file;
 
         public IEnumerable<string> Queries => _queries.Value;
-        public IEnumerable<IPath> Contents => _contentPaths.Value;
+        public IEnumerable<IEditorState> States => _contentPaths.Value;
 
         public UserInterfaceSettings Settings => _settings.Value;
 
-        public SessionFile(IEnumerable<string> queries, IEnumerable<IPath> contentPaths, UserInterfaceSettings settings, IPath folderPath)
+        public SessionFile(IEnumerable<string> queries, IEnumerable<IEditorState> contentPaths, UserInterfaceSettings settings, IAbsolutePath folderPath)
         {
             _settings = new CachedValue<UserInterfaceSettings>(settings);
             _queries = new CachedValue<IEnumerable<string>>(queries);
-            _contentPaths = new CachedValue<IEnumerable<IPath>>(contentPaths);
+            _contentPaths = new CachedValue<IEnumerable<IEditorState>>(contentPaths);
             _path = new FilePath(folderPath, "Session.json");
             _file = new TextFile(_path);
         }
 
-        public SessionFile(IPath folderPath)
+        public SessionFile(IAbsolutePath folderPath)
         {
             _queries = new CachedValue<IEnumerable<string>>(() =>
             {
@@ -40,13 +41,13 @@ namespace BookWiki.Core.Files.FileModels
                 return dto.Queries;
             });
 
-            _contentPaths = new CachedValue<IEnumerable<IPath>>(() =>
+            _contentPaths = new CachedValue<IEnumerable<IEditorState>>(() =>
             {
                 var content = _file.Content;
 
                 var dto = JsonConvert.DeserializeObject<SessionFileStructure>(content) ?? new SessionFileStructure();
 
-                return dto.Paths.Select(x => new FolderPath(x));
+                return dto.States.Select(EditorState.Create);
             });
 
             _settings = new CachedValue<UserInterfaceSettings>(() =>
@@ -67,7 +68,7 @@ namespace BookWiki.Core.Files.FileModels
             var dto = new SessionFileStructure()
             {
                 Settings = _settings.Value,
-                Paths = Contents.Select(x => x.FullPath).ToList(),
+                States = States.Select(x => x.ToJson()).ToList(),
                 Queries = Queries.ToList()
             };
 
@@ -82,7 +83,7 @@ namespace BookWiki.Core.Files.FileModels
 
             public List<string> Queries { get; set; } = new List<string>();
 
-            public List<string> Paths { get; set; } = new List<string>();
+            public List<string> States { get; set; } = new List<string>();
         }
     }
 }

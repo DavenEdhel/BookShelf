@@ -1,5 +1,4 @@
 ﻿using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.PathModels;
 
 namespace BookWiki.Core
 {
@@ -19,7 +18,7 @@ namespace BookWiki.Core
 
         public string Title => _content.Title;
 
-        public IPath Source => _content.Source;
+        public IRelativePath Source => _content.Source;
 
         public ISequence<int> SentenceStartIndexes => _sentenceStartIndexes ?? (_sentenceStartIndexes = new RunOnceSequence<int>(new IndexSequence(Content.PlainText, '.', ',', '!')));
 

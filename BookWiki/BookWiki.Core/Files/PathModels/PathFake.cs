@@ -1,10 +1,10 @@
 ﻿namespace BookWiki.Core.Files.PathModels
 {
-    public class FakePath : IPath
+    public class PathFake : IRelativePath, IAbsolutePath, IRootPath
     {
         private readonly string _id;
 
-        public FakePath(string id)
+        public PathFake(string id)
         {
             _id = id;
         }
@@ -17,7 +17,7 @@
 
         public bool EqualsTo(IPath path)
         {
-            if (path is FakePath mockPath)
+            if (path is PathFake mockPath)
             {
                 return mockPath._id == _id;
             }

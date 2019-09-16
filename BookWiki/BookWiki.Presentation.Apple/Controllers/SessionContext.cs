@@ -2,10 +2,11 @@
 using System.Linq;
 using BookWiki.Core;
 using BookWiki.Core.Files.FileModels;
-using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.Search;
+using BookWiki.Core.ViewModels;
 using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Views;
+using BookWiki.Presentation.Apple.Views.Controls;
 using BookWiki.Presentation.Apple.Views.Main;
 
 namespace BookWiki.Presentation.Apple.Controllers
@@ -14,9 +15,9 @@ namespace BookWiki.Presentation.Apple.Controllers
     {
         private readonly ILibrary _library;
 
-        private SessionFile _file;
+        private readonly SessionFile _file;
 
-        public IEnumerable<IPath> OpenedContentTabs { get; private set; }
+        public IEnumerable<IEditorState> OpenedContentTabs { get; private set; }
 
         public IEnumerable<IQuery> OpenedQueriesTabs { get; private set; }
 
@@ -30,20 +31,16 @@ namespace BookWiki.Presentation.Apple.Controllers
 
         public SessionContext Restore()
         {
-            var ufp = new UserFolderPath();
-
-            OpenedContentTabs = _file.Contents.Select(x => new PartsPath(ufp.Parts, x.Parts));
+            OpenedContentTabs = _file.States;
             OpenedQueriesTabs = _file.Queries.Select(x => new SearchQuery(_library, x)).ToArray();
             InterfaceSettings = _file.Settings;
 
             return this;
         }
 
-        public void Store(TabCollectionView tabCollection, ActionBarView actionBar)
+        public void Store(TabCollectionView tabCollection, ActionBarView actionBar, ContentHolderView contentHolder)
         {
-            var userFolder = new UserFolderPath();
-
-            var contents = new List<IPath>();
+            var contents = new List<IEditorState>();
             var queries = new List<IQuery>();
 
             foreach (var tab in tabCollection.OpenedCustomTabs)
@@ -52,12 +49,13 @@ namespace BookWiki.Presentation.Apple.Controllers
                 {
                     queries.Add(query);
                 }
+            }
 
-                if (tab.Data is IContent content)
+            foreach (var content in contentHolder.Subviews)
+            {
+                if (content is NovelView novelView)
                 {
-                    var path = new PartsPath(content.Source.Parts.SkipWhile(x => x.PlainText != userFolder.Name.PlainText).Skip(1));
-
-                    contents.Add(path);
+                    contents.Add(novelView.State);
                 }
             }
 

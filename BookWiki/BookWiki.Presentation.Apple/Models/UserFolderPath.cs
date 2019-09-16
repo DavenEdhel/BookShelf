@@ -3,7 +3,7 @@ using BookWiki.Core.Files.PathModels;
 
 namespace BookWiki.Presentation.Apple.Models
 {
-    public class UserFolderPath : IPath
+    public class UserFolderPath : IRootPath
     {
         private readonly IPath _path;
 

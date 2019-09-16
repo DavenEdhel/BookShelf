@@ -12,13 +12,13 @@ namespace BookWiki.Presentation.Apple.Views.NewNodeDialog
 {
     public class TypeSelectDialogView : View
     {
-        private readonly IPath _rootPath;
+        private readonly IAbsolutePath _rootPath;
         private readonly Action _tearDown;
         private TypeSelectView _typeSelectView;
         private HotKeyScheme _scheme;
-        public event Action<IPath, IExtension> OnSave = delegate(IPath path, IExtension extension) {  };
+        public event Action<IAbsolutePath, IExtension> OnSave = delegate {  };
 
-        public TypeSelectDialogView(IPath rootPath, Action tearDown)
+        public TypeSelectDialogView(IAbsolutePath rootPath, Action tearDown)
         {
             _rootPath = rootPath;
             _tearDown = tearDown;

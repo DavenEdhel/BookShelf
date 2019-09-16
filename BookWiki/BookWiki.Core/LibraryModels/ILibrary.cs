@@ -10,6 +10,8 @@ namespace BookWiki.Core
 
         void Save();
 
-        IContent Load(IPath novelPath);
+        IContent Load(IRelativePath novelPath);
+
+        IContent Load(IAbsolutePath novelPath);
     }
 }

@@ -7,7 +7,7 @@ using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core.Files.PathModels
 {
-    public class FolderPath : IPath
+    public class FolderPath : IAbsolutePath, IRelativePath
     {
         private readonly string _path;
 
@@ -19,7 +19,7 @@ namespace BookWiki.Core.Files.PathModels
             Extension = new Extension(Parts);
         }
 
-        public FolderPath(IPath root, IFileName folderName, IExtension extension) : this(Path.Combine(root.FullPath, $"{folderName.PlainText}{(extension.Type != NodeType.Directory ? "." : string.Empty)}{extension.PlainText}"))
+        public FolderPath(IAbsolutePath root, IFileName folderName, IExtension extension) : this(Path.Combine(root.FullPath, $"{folderName.PlainText}{(extension.Type != NodeType.Directory ? "." : string.Empty)}{extension.PlainText}"))
         {
         }
 

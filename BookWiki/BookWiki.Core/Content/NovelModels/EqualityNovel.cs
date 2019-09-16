@@ -15,7 +15,7 @@ namespace BookWiki.Core.Content
 
         public string Title => _content.Title;
 
-        public IPath Source => _content.Source;
+        public IRelativePath Source => _content.Source;
 
         public ISequence<ITextInfo> Format => _content.Format;
 

@@ -2,13 +2,12 @@
 using System.Text;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
-using BookWiki.Core.FileSystem.PathModels;
 
 namespace BookWiki.Core
 {
     public class FakeContentFolder : IContentFolder
     {
-        public IPath Source { get; } = new FakePath("1");
+        public IAbsolutePath Source { get; } = new PathFake("1");
 
         public void Save(IText text)
         {
