@@ -8,12 +8,14 @@ using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.Logging;
 using BookWiki.Core.Utils.PropertyModels;
+using BookWiki.Presentation.Apple.Views.Controls;
 
 namespace BookWiki.Core.LibraryModels
 {
     public class Library : ILibrary
     {
         private readonly IRootPath _root;
+        private readonly Func<ISaveStatus> _getSaveStatus;
 
         private readonly Logger _logger = new Logger("Library");
 
@@ -22,9 +24,10 @@ namespace BookWiki.Core.LibraryModels
         private readonly CachedValue<IContent[]> _content;
         private Timer _autosave;
 
-        public Library(IRootPath root)
+        public Library(IRootPath root, Func<ISaveStatus> getSaveStatus)
         {
             _root = root;
+            _getSaveStatus = getSaveStatus;
             _changed = new List<IContent>();
 
             _content = new CachedValue<IContent[]>(() =>
@@ -86,6 +89,8 @@ namespace BookWiki.Core.LibraryModels
                 }
 
                 _changed.Clear();
+
+                _getSaveStatus().IsUpToDate = true;
 
                 _logger.Info("Saved.");
             }

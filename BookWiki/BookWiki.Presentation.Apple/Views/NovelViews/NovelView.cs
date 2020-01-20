@@ -23,21 +23,23 @@ namespace BookWiki.Presentation.Apple.Views.Controls
     {
         private readonly INovel _novel;
         private readonly ILibrary _library;
+        private readonly ISaveStatus _saveStatus;
 
         private bool _wasFocused;
         private HotKeyScheme _viewModeScheme;
         private HotKeyScheme _editModeScheme;
         private EditTextView _content;
-        private int _margin = 24;
+        private int _contentWidth = 776;
 
         public bool WasFocused => _wasFocused;
 
         private Logger _logger = new Logger("NovelView");
 
-        public NovelView(INovel novel, ILibrary library)
+        public NovelView(INovel novel, ILibrary library, ISaveStatus saveStatus)
         {
             _novel = novel;
             _library = library;
+            _saveStatus = saveStatus;
 
             var scrollUp = new HotKey(Key.ArrowUp, () => _content.ScrollUp());
             var scrollDown = new HotKey(Key.ArrowDown, () => _content.ScrollDown());
@@ -57,6 +59,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         private void Initialize()
         {
             _content = new EditTextView();
+            _content.Changed += ContentOnChanged;
 
             _content.DefaultParagraph = () => new NSMutableParagraphStyle()
             {
@@ -108,17 +111,53 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
             _pageNumber.BindWith(_content);
 
+            _scrollBar = new ScrollBarView(_content);
+            Add(_scrollBar);
+
             Layout = () =>
             {
-                _content.ChangeSize(Frame.Width - _margin * 2, Frame.Height);
-                _content.ChangeX(_margin);
+                if (_isScrollHidden)
+                {
+                    var margin = (Frame.Width - _contentWidth) / 2;
+                    var contentMargin = margin;
 
-                _pageNumber.SetSizeThatFits();
-                _pageNumber.ChangeWidth(200);
-                _pageNumber.PositionToRightAndBottomInside(this, 5, 5);
+                    _content.ChangeSize(_contentWidth, Frame.Height);
+                    _content.ChangeX(contentMargin);
+
+                    _pageNumber.SetSizeThatFits();
+                    _pageNumber.ChangeWidth(200);
+                    _pageNumber.PositionToRightAndBottomInside(this, 5, 5);
+
+                    _scrollBar.Hidden = true;
+                }
+                else
+                {
+                    var margin = (Frame.Width - _contentWidth) / 2;
+                    var contentMargin = (nfloat) 0.25 * margin;
+
+                    _content.ChangeSize(_contentWidth, Frame.Height);
+                    _content.ChangeX(contentMargin);
+
+                    _pageNumber.SetSizeThatFits();
+                    _pageNumber.ChangeWidth(200);
+                    _pageNumber.PositionToRightAndBottomInside(this, 5, 5);
+
+                    _scrollBar.ChangeX(_content.Frame.Right + contentMargin);
+                    _scrollBar.ChangeY(Frame.Top);
+                    _scrollBar.ChangeSize(Frame.Width - (_content.Frame.Right + contentMargin), Frame.Height - _pageNumber.Frame.Height - 5);
+                    _scrollBar.Hidden = false;
+                }
+                
             };
 
             Layout();
+
+            _saveStatus.IsUpToDate = true;
+        }
+
+        private void ContentOnChanged(object sender, EventArgs e)
+        {
+            _saveStatus.IsUpToDate = false;
         }
 
         private NSMutableParagraphStyle CreateDefaultParagraph()
@@ -130,11 +169,15 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         public override CGSize SizeThatFits(CGSize size)
         {
-            return _content.SizeThatFits(new CGSize(size.Width - _margin*2, size.Height));
+            var margin = (Frame.Width - _contentWidth) / 2;
+
+            return _content.SizeThatFits(new CGSize(size.Width - margin*2, size.Height));
         }
 
         private PageNumberView _pageNumber;
         private bool _isActive;
+        private ScrollBarView _scrollBar;
+        private bool _isScrollHidden;
         public bool IsActive => _isActive;
 
         public void Hide()
@@ -273,6 +316,13 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             }
 
             return result;
+        }
+
+        public void SetScrollVisibility(bool b)
+        {
+            _isScrollHidden = b;
+
+            Layout();
         }
     }
 }

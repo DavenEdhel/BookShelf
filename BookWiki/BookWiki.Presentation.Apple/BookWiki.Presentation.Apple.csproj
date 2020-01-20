@@ -89,11 +89,11 @@
     <Compile Include="Models\Utils\RangeExtensions.cs" />
     <Compile Include="Models\Utils\StringRange.cs" />
     <Compile Include="Models\Utils\ThreadSafeProperty.cs" />
-    <Compile Include="Views\Controls\NovelViewEditorState.cs" />
+    <Compile Include="Views\NovelViews\NovelViewEditorState.cs" />
     <Compile Include="Views\EditText\ErrorLineView.cs" />
     <Compile Include="Views\Common\IKeyboardListener.cs" />
     <Compile Include="Views\Common\IPageData.cs" />
-    <Compile Include="Views\Common\PageNumberView.cs" />
+    <Compile Include="Views\NovelViews\PageNumberView.cs" />
     <Compile Include="Views\Common\QueryView.cs" />
     <Compile Include="Views\Common\SpaceSeparatorView.cs" />
     <Compile Include="Views\EditText\EditTextView.cs" />
@@ -106,7 +106,7 @@
     <Compile Include="Views\Controls\FileSystemTreeView.cs" />
     <Compile Include="Views\Controls\FileSystemView.cs" />
     <Compile Include="Views\EditText\MisspelledWordsSequence.cs" />
-    <Compile Include="Views\Controls\NovelView.cs" />
+    <Compile Include="Views\NovelViews\NovelView.cs" />
     <Compile Include="Views\Controls\SearchResultsView.cs" />
     <Compile Include="Views\EditText\SpellChecker.cs" />
     <Compile Include="Views\Main\ActionBarView.cs" />
@@ -133,6 +133,7 @@
     <Compile Include="Views\NewNodeDialog\TypeSelectDialogView.cs" />
     <Compile Include="Views\NewNodeDialog\TypeSelectView.cs" />
     <Compile Include="Views\NewNodeDialog\TypeView.cs" />
+    <Compile Include="Views\NovelViews\ScrollBarView.cs" />
     <None Include="FodyWeavers.xsd">
       <SubType>Designer</SubType>
     </None>

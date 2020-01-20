@@ -25,13 +25,15 @@ namespace BookWiki.Presentation.Apple.Views
             Initialize();
         }
 
+        public UIView Current => _current;
+
         private void Initialize()
         {
             Layout = () =>
             {
                 if (_current != null)
                 {
-                    _current.ChangeSize(Superview.Frame.Width - 200, Frame.Height);
+                    _current.ChangeSize(Frame.Width, Frame.Height);
                     _current.PositionToCenterHorizontally(this);
 
                     _current.LayoutSubviews();

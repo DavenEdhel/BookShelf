@@ -39,7 +39,7 @@ namespace BookWiki.Presentation.Apple.Controllers
         {
             new LibraryInitializationOperation(new UserFolderPath()).Execute();
 
-            _library = new Library(new UserFolderPath());
+            _library = new Library(new UserFolderPath(), () => _actionBarView);
             _keyboard = new Keyboard(this);
             _session = new SessionContext(_library).Restore();
 
@@ -77,7 +77,8 @@ namespace BookWiki.Presentation.Apple.Controllers
 
                 if (data is INovel novel)
                 {
-                    var novelView = new NovelView(novel, _library);
+                    var novelView = new NovelView(novel, _library, _actionBarView);
+                    novelView.SetScrollVisibility(_actionBarView.IsScrollHidden);
 
                     var editorState = _session.OpenedContentTabs.FirstOrDefault(x => x.NovelPathToLoad.EqualsTo(novel.Source));
 
@@ -100,6 +101,7 @@ namespace BookWiki.Presentation.Apple.Controllers
             _actionBarView = new ActionBarView(_library, _contentHolderView, _session);
             _actionBarView.Search.OnSearchRequested += SearchOnOnSearchRequested;
             _actionBarView.SideMenuVisibilityChanged += SideMenuVisibilityChanged;
+            _actionBarView.ScrollVisibilityChanged += ScrollVisibilityChanged;
 
             var topSeparator = new UIView() {BackgroundColor = UIColor.LightGray};
             var verticalSeparator = new UIView() {BackgroundColor = UIColor.LightGray};
@@ -157,6 +159,14 @@ namespace BookWiki.Presentation.Apple.Controllers
             };
 
             _layout();
+        }
+
+        private void ScrollVisibilityChanged(bool obj)
+        {
+            if (_contentHolderView.Current is NovelView novelView)
+            {
+                novelView.SetScrollVisibility(obj);
+            }
         }
 
         private void SideMenuVisibilityChanged(bool obj)

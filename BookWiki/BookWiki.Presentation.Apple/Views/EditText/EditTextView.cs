@@ -24,6 +24,8 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         public Func<NSMutableParagraphStyle> DefaultParagraph { get; set; }
 
+        public event Action DidScrollEnd = delegate { };
+
         public EditTextView()
         {
             _lifeSpellCheck = new LifeSpellCheck(new TextViewErrorCollection(this), new CheckSpellingOperation());
@@ -52,6 +54,43 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
             _viewModeScheme = new HotKeyScheme(activateEditMode, validate);
             _editModeScheme = new HotKeyScheme(deactivateEditMode, leftTheLine, centerTheLine, rightTheLine, enableJoButton, enableJoButtonUpperCase, showSuggestions, validate);
+
+            DecelerationEnded += OnDecelerationEnded;
+            WillEndDragging += OnWillEndDragging;
+            ScrollAnimationEnded += OnScrollAnimationEnded;
+        }
+
+        private void OnScrollAnimationEnded(object sender, EventArgs e)
+        {
+            UpdateCurrentTextSpelling();
+
+            DidScrollEnd();
+        }
+
+        private void OnWillEndDragging(object sender, WillEndDraggingEventArgs e)
+        {
+            if (Decelerating == false)
+            {
+                UpdateCurrentTextSpelling();
+
+                DidScrollEnd();
+            }
+        }
+
+        private void OnDecelerationEnded(object sender, EventArgs e)
+        {
+            UpdateCurrentTextSpelling();
+
+            DidScrollEnd();
+        }
+
+        private void UpdateCurrentTextSpelling()
+        {
+            var start = GetClosestPositionToPoint(ContentOffset);
+
+            var end = GetClosestPositionToPoint(new CGPoint(ContentOffset.X, ContentOffset.Y + Frame.Height));
+
+            _lifeSpellCheck.TextChangedAround(((int)GetOffsetFromPosition(BeginningOfDocument, start) + (int)GetOffsetFromPosition(BeginningOfDocument, end))/2, Text);
         }
 
         private void OnChanged(object sender, EventArgs e)
@@ -246,6 +285,8 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         public void Resume()
         {
+            UpdateCurrentTextSpelling();
+
             Application.Instance.RegisterSchemeForEditMode(_editModeScheme);
             Application.Instance.RegisterSchemeForViewMode(_viewModeScheme);
         }

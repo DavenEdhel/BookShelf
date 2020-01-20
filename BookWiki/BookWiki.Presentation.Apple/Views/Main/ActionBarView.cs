@@ -3,12 +3,13 @@ using BookWiki.Core;
 using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Views.Common;
+using BookWiki.Presentation.Apple.Views.Controls;
 using BookWiki.Presentation.Apple.Views.Main;
 using UIKit;
 
 namespace BookWiki.Presentation.Apple.Views
 {
-    public class ActionBarView : View
+    public class ActionBarView : View, ISaveStatus
     {
         private SearchView _search;
         private readonly ILibrary _library;
@@ -18,10 +19,14 @@ namespace BookWiki.Presentation.Apple.Views
         private UIButton _hideShow;
 
         public bool IsPanelHidden { get; private set; }
+        public bool IsScrollHidden { get; private set; }
 
         public SearchView Search => _search;
 
         public Action<bool> SideMenuVisibilityChanged = delegate { };
+        public Action<bool> ScrollVisibilityChanged = delegate { };
+        private UIButton _save;
+        private UIButton _hideShowScroll;
 
         public ActionBarView(ILibrary library, ContentHolderView content, SessionContext session)
         {
@@ -34,15 +39,16 @@ namespace BookWiki.Presentation.Apple.Views
         private void Initialize()
         {
             IsPanelHidden = _session.InterfaceSettings.IsSideBarHidden;
+            IsScrollHidden = true;
 
             _search = new SearchView(_library);
             Add(_search);
 
-            var save = new UIButton(UIButtonType.RoundedRect);
-            save.SetTitleColor(UIColor.Black, UIControlState.Normal);
-            save.SetTitle("Save", UIControlState.Normal);
-            save.TouchUpInside += SaveOnTouchUpInside;
-            Add(save);
+            _save = new UIButton(UIButtonType.RoundedRect);
+            _save.SetTitleColor(UIColor.Black, UIControlState.Normal);
+            _save.SetTitle("Save", UIControlState.Normal);
+            _save.TouchUpInside += SaveOnTouchUpInside;
+            Add(_save);
 
             _hideShow = new UIButton(UIButtonType.RoundedRect);
             _hideShow.SetTitleColor(UIColor.Black, UIControlState.Normal);
@@ -50,16 +56,27 @@ namespace BookWiki.Presentation.Apple.Views
             _hideShow.TouchUpInside += HideShowOnTouchUpInside;
             Add(_hideShow);
 
+            _hideShowScroll = new UIButton(UIButtonType.RoundedRect);
+            _hideShowScroll.SetTitleColor(UIColor.Black, UIControlState.Normal);
+            _hideShowScroll.SetTitle(IsScrollHidden ? "Show" : "Hide", UIControlState.Normal);
+            _hideShowScroll.TouchUpInside += HideShowScrollOnTouchUpInside;
+            Add(_hideShowScroll);
+
             Layout = () =>
             {
                 _hideShow.SetSizeThatFits();
                 _hideShow.ChangeWidth(70);
                 _hideShow.PositionToRightAndCenterInside(this, 10);
 
-                save.SetSizeThatFits();
-                save.PositionToRightAndCenterInside(this, (int)_hideShow.Frame.Width + 20);
+                _hideShowScroll.SetSizeThatFits();
+                _hideShowScroll.ChangeWidth(70);
+                _hideShowScroll.PositionToRightAndCenterInside(this, 10);
+                _hideShowScroll.ChangeX(_hideShow.Frame.Left - 10 - _hideShowScroll.Frame.Width);
 
-                _search.ChangeSize(Frame.Width - save.Frame.Width - _hideShow.Frame.Width - 20, Frame.Height);
+                _save.SetSizeThatFits();
+                _save.PositionToRightAndCenterInside(this, (int)_hideShow.Frame.Width + 20);
+                
+                _search.ChangeSize(Frame.Width - _save.Frame.Width - _hideShow.Frame.Width - 20, Frame.Height);
                 _search.ChangePosition(10, 0);
             };
 
@@ -75,9 +92,23 @@ namespace BookWiki.Presentation.Apple.Views
             SideMenuVisibilityChanged(IsPanelHidden);
         }
 
+        private void HideShowScrollOnTouchUpInside(object sender, EventArgs e)
+        {
+            IsScrollHidden = !IsScrollHidden;
+
+            _hideShowScroll.SetTitle(IsScrollHidden ? "Show" : "Hide", UIControlState.Normal);
+
+            ScrollVisibilityChanged(IsScrollHidden);
+        }
+
         private void SaveOnTouchUpInside(object sender, EventArgs e)
         {
             _library.Save();
+        }
+
+        public bool IsUpToDate
+        {
+            set => InvokeOnMainThread(() => _save.Hidden = value);
         }
     }
 }
