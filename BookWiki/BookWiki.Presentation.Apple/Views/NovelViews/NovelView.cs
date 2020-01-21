@@ -29,7 +29,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         private HotKeyScheme _viewModeScheme;
         private HotKeyScheme _editModeScheme;
         private EditTextView _content;
-        private int _contentWidth = 776;
+        private int _contentWidth = 832;
 
         public bool WasFocused => _wasFocused;
 
