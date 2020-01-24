@@ -104,7 +104,11 @@ namespace BookWiki.Presentation.Apple.Views
 
         private void SaveOnTouchUpInside(object sender, EventArgs e)
         {
-            _library.Save();
+            if (_content.Current is INovel novel)
+            {
+                _library.Update(novel);
+                _library.Save();
+            }
         }
 
         public bool IsUpToDate

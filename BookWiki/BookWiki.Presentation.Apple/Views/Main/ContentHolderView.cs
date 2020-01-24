@@ -4,6 +4,7 @@ using System.Linq;
 using BookWiki.Core;
 using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
+using BookWiki.Presentation.Apple.Views.Controls;
 using UIKit;
 
 namespace BookWiki.Presentation.Apple.Views
@@ -16,6 +17,8 @@ namespace BookWiki.Presentation.Apple.Views
         private UIView _current;
 
         private readonly Dictionary<object, UIView> _reuseCache = new Dictionary<object, UIView>();
+
+        public NovelView[] OpenedNovels => _reuseCache.Values.Where(x => x is NovelView).Cast<NovelView>().ToArray();
 
         public ContentHolderView(Func<int> getBottomOffset, Func<object, UIView> createContent)
         {

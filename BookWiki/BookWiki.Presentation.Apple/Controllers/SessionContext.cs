@@ -49,13 +49,22 @@ namespace BookWiki.Presentation.Apple.Controllers
                 {
                     queries.Add(query);
                 }
-            }
 
-            foreach (var content in contentHolder.Subviews)
-            {
-                if (content is NovelView novelView)
+                if (tab.Data is INovel novel)
                 {
-                    contents.Add(novelView.State);
+                    var openedTab = contentHolder.OpenedNovels.FirstOrDefault(x => x.Source.EqualsTo(novel.Source));
+
+                    if (openedTab != null)
+                    {
+                        contents.Add(openedTab.State);
+                    }
+                    else
+                    {
+                        contents.Add(new MutableEditorState()
+                        {
+                            NovelPathToLoad = novel.Source
+                        });
+                    }
                 }
             }
 
