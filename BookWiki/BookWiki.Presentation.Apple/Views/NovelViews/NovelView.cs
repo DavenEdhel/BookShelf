@@ -28,6 +28,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         private bool _wasFocused;
         private HotKeyScheme _viewModeScheme;
         private HotKeyScheme _editModeScheme;
+        private HotKeyScheme _localSearchScheme;
         private EditTextView _content;
         private int _contentWidth = 832;
 
@@ -47,6 +48,22 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
             _viewModeScheme = new HotKeyScheme(scrollUp, scrollDown, save);
             _editModeScheme = new HotKeyScheme(save);
+            _localSearchScheme = new HotKeyScheme(
+                new HotKey(Key.ArrowUp, () => _currentSearch.SelectPrev()),
+                new HotKey(Key.ArrowDown, () => _currentSearch.SelectNext()),
+                new HotKey(Key.Enter, () => _currentSearch.SelectNext()),
+                new HotKey(Key.Escape, () =>
+                {
+                    _currentSearch.Remove();
+                    _currentSearch = null;
+
+                    Application.Instance.UnregisterScheme(_localSearchScheme);
+
+                    Application.Instance.RegisterSchemeForEditMode(_editModeScheme);
+                    Application.Instance.RegisterSchemeForViewMode(_viewModeScheme);
+
+                    _content.Resume();
+                }));
 
             Initialize();
         }
@@ -147,7 +164,6 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                     _scrollBar.ChangeSize(Frame.Width - (_content.Frame.Right + contentMargin), Frame.Height - _pageNumber.Frame.Height - 5);
                     _scrollBar.Hidden = false;
                 }
-                
             };
 
             Layout();
@@ -184,6 +200,10 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         {
             Application.Instance.UnregisterScheme(_editModeScheme);
             Application.Instance.UnregisterScheme(_viewModeScheme);
+            Application.Instance.UnregisterScheme(_localSearchScheme);
+
+            _currentSearch?.Remove();
+            _currentSearch = null;
 
             _wasFocused = Application.Instance.IsInEditMode;
 
@@ -323,6 +343,25 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             _isScrollHidden = b;
 
             Layout();
+        }
+
+        private LocalSearchItemCollection _currentSearch;
+
+        public void BeginSearchEnumeration()
+        {
+            _currentSearch.SelectNext();
+
+            _content.Pause();
+
+            Application.Instance.RegisterScheme(_localSearchScheme);
+        }
+
+        public void HightlightQuery(IQuery searchQuery)
+        {
+            _currentSearch?.Remove();
+
+            _currentSearch = new LocalSearchItemCollection(searchQuery, this, _content);
+            _currentSearch.Apply();
         }
     }
 }

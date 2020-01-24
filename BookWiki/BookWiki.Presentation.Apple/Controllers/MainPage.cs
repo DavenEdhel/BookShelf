@@ -99,7 +99,8 @@ namespace BookWiki.Presentation.Apple.Controllers
             });
 
             _actionBarView = new ActionBarView(_library, _contentHolderView, _session);
-            _actionBarView.Search.OnSearchRequested += SearchOnOnSearchRequested;
+            _actionBarView.Search.SearchRequested += SearchSearchRequested;
+            _actionBarView.Search.QueryChanged += SearchOnQueryChanged;
             _actionBarView.SideMenuVisibilityChanged += SideMenuVisibilityChanged;
             _actionBarView.ScrollVisibilityChanged += ScrollVisibilityChanged;
 
@@ -161,6 +162,14 @@ namespace BookWiki.Presentation.Apple.Controllers
             _layout();
         }
 
+        private void SearchOnQueryChanged()
+        {
+            if (_contentHolderView.Current is NovelView novelView)
+            {
+                novelView.HightlightQuery(_actionBarView.Search.Query);
+            }
+        }
+
         private void ScrollVisibilityChanged(bool obj)
         {
             if (_contentHolderView.Current is NovelView novelView)
@@ -179,9 +188,16 @@ namespace BookWiki.Presentation.Apple.Controllers
             _contentHolderView.Render(data);
         }
 
-        private void SearchOnOnSearchRequested(IQuery searchQuery)
+        private void SearchSearchRequested()
         {
-            _tabView.ShowSearchResult(searchQuery);
+            if (_contentHolderView.Current is NovelView novelView)
+            {
+                novelView.BeginSearchEnumeration();
+            }
+            else
+            {
+                _tabView.ShowSearchResult(_actionBarView.Search.Query);
+            }
         }
 
         private void KeyboardIsDown(NSNotification obj)

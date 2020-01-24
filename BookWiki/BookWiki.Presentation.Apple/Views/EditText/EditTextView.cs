@@ -10,6 +10,7 @@ using BookWiki.Presentation.Apple.Models.Utils;
 using BookWiki.Presentation.Apple.Views.Controls;
 using CoreGraphics;
 using Foundation;
+using Keurig.IQ.Core.CrossCutting.Extensions;
 using UIKit;
 
 namespace BookWiki.Presentation.Apple.Views.Common
@@ -58,6 +59,18 @@ namespace BookWiki.Presentation.Apple.Views.Common
             DecelerationEnded += OnDecelerationEnded;
             WillEndDragging += OnWillEndDragging;
             ScrollAnimationEnded += OnScrollAnimationEnded;
+        }
+
+        public void ScrollTo(CGRect frame, bool animated = false)
+        {
+            if (frame.Y > ContentOffset.Y && frame.Y < (ContentOffset.Y + Frame.Height*0.9))
+            {
+                return;
+            }
+
+            var offset = frame.Y - Frame.Height/2;
+
+            SetContentOffset(new CGPoint(0, offset > 0 ? offset : 0), animated);
         }
 
         private void OnScrollAnimationEnded(object sender, EventArgs e)
@@ -123,11 +136,11 @@ namespace BookWiki.Presentation.Apple.Views.Common
             }
         }
 
-        public void Modify(Action<NSMutableAttributedString> modify)
+        public async void Modify(Action<NSMutableAttributedString> modify)
         {
             var currentOffset = ContentOffset;
 
-            var caret = SelectedTextRange;
+            var cursorPosition = CursorPosition;
 
             var result = new NSMutableAttributedString(AttributedText);
 
@@ -135,9 +148,11 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
             AttributedText = result;
 
+            await Task.Delay(300);
+
             ContentOffset = currentOffset;
 
-            SelectedTextRange = caret;
+            CursorPosition = cursorPosition;
         }
 
         public void ChangeCurrentParagraphStyle(Action<NSMutableParagraphStyle> changeParagraphStyle)
@@ -267,8 +282,7 @@ namespace BookWiki.Presentation.Apple.Views.Common
             ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Left);
         }
 
-        public void RightCurrentLine()
-        {
+        public void RightCurrentLine() {
             ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Right);
         }
 

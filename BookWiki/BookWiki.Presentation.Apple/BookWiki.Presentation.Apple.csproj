@@ -51,13 +51,16 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>ARM64</MtouchArch>
-    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <CodesignKey>iPhone Developer: Alexey Rudakov (V9M7ESWT92)</CodesignKey>
+    <CodesignEntitlements>
+    </CodesignEntitlements>
+    <CodesignKey>Apple Development: Stanislau Kanaplianik (F9NG6HGN2B)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <MtouchLink>None</MtouchLink>
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignProvision>
     </CodesignProvision>
+    <CodesignExtraArgs />
+    <CodesignResourceRules />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -89,6 +92,10 @@
     <Compile Include="Models\Utils\RangeExtensions.cs" />
     <Compile Include="Models\Utils\StringRange.cs" />
     <Compile Include="Models\Utils\ThreadSafeProperty.cs" />
+    <Compile Include="Views\Common\PageSearchView.cs" />
+    <Compile Include="Views\EditText\LocalSearchResultView.cs" />
+    <Compile Include="Views\EditText\TextDecorationView.cs" />
+    <Compile Include="Views\NovelViews\LocalSearchItemCollection.cs" />
     <Compile Include="Views\NovelViews\NovelViewEditorState.cs" />
     <Compile Include="Views\EditText\ErrorLineView.cs" />
     <Compile Include="Views\Common\IKeyboardListener.cs" />

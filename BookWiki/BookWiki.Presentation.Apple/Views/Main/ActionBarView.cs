@@ -11,7 +11,7 @@ namespace BookWiki.Presentation.Apple.Views
 {
     public class ActionBarView : View, ISaveStatus
     {
-        private SearchView _search;
+        private PageSearchView _search;
         private readonly ILibrary _library;
         private readonly ContentHolderView _content;
         private readonly SessionContext _session;
@@ -21,7 +21,7 @@ namespace BookWiki.Presentation.Apple.Views
         public bool IsPanelHidden { get; private set; }
         public bool IsScrollHidden { get; private set; }
 
-        public SearchView Search => _search;
+        public PageSearchView Search => _search;
 
         public Action<bool> SideMenuVisibilityChanged = delegate { };
         public Action<bool> ScrollVisibilityChanged = delegate { };
@@ -41,7 +41,7 @@ namespace BookWiki.Presentation.Apple.Views
             IsPanelHidden = _session.InterfaceSettings.IsSideBarHidden;
             IsScrollHidden = true;
 
-            _search = new SearchView(_library);
+            _search = new PageSearchView(_library);
             Add(_search);
 
             _save = new UIButton(UIButtonType.RoundedRect);
@@ -74,9 +74,10 @@ namespace BookWiki.Presentation.Apple.Views
                 _hideShowScroll.ChangeX(_hideShow.Frame.Left - 10 - _hideShowScroll.Frame.Width);
 
                 _save.SetSizeThatFits();
-                _save.PositionToRightAndCenterInside(this, (int)_hideShow.Frame.Width + 20);
+                _save.PositionToRightAndCenterInside(this, 10);
+                _save.ChangeX(_hideShowScroll.Frame.Left - 10 - _save.Frame.Width);
                 
-                _search.ChangeSize(Frame.Width - _save.Frame.Width - _hideShow.Frame.Width - 20, Frame.Height);
+                _search.ChangeSize(Frame.Width - _hideShowScroll.Frame.Left - 20, Frame.Height);
                 _search.ChangePosition(10, 0);
             };
 

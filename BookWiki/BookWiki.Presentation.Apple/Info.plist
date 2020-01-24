@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>Book Wiki</string>
+	<string>Test Book Wiki</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.daven.bookshelf</string>
+	<string>com.daven.BookWikiTest</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>

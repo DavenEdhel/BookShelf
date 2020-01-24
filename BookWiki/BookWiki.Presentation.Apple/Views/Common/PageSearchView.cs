@@ -5,18 +5,21 @@ using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Models.HotKeys;
-using UIKit;
 
 namespace BookWiki.Presentation.Apple.Views.Common
 {
-    public class SearchView : View
+    public class PageSearchView : View
     {
         private readonly ILibrary _library;
         private QueryView _input;
 
-        public event Action<IQuery> OnSearchRequested = delegate {  };
+        public event Action SearchRequested = delegate { };
 
-        public SearchView(ILibrary library)
+        public event Action QueryChanged = delegate           { };
+
+        public IQuery Query => new EqualityQuery(new SearchQuery(_library, _input.QueryAsText));
+        
+        public PageSearchView(ILibrary library)
         {
             _library = library;
             Initialize();
@@ -28,11 +31,12 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
             Application.Instance.RegisterSchemeForEditMode(
                 new HotKeyScheme(
-                    new HotKey(new Key("f"), StartFocus).WithCommand(),
+                    new HotKey(new Key("f"), StartFocus).WithControl(),
                     new HotKey(Key.Escape, LeaveFocus),
-                    new HotKey(Key.Enter, MakeSearch).WithCommand()));
+                    new HotKey(Key.Enter, MakeSearch).WithControl()));
 
             _input = new QueryView(_library);
+            _input.Changed += InputOnChanged;
             _input.ShouldBecomeFirstResponderOnClick = true;
             Add(_input);
 
@@ -45,13 +49,21 @@ namespace BookWiki.Presentation.Apple.Views.Common
             Layout();
         }
 
+        private void InputOnChanged()
+        {
+            QueryChanged();
+        }
+
         private void MakeSearch()
         {
+            if (_input.IsFirstResponder == false)
+            {
+                return;
+            }
+
             _input.ResignFirstResponder();
 
-            OnSearchRequested(new EqualityQuery(new SearchQuery(_library, _input.QueryAsText)));
-
-            // return search results correctly from query
+            SearchRequested();
         }
 
         private void LeaveFocus()

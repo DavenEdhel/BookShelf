@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using BookWiki.Core.Findings;
+using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Core
 {
@@ -26,12 +27,19 @@ namespace BookWiki.Core
 
         public IEnumerator<IFinding> GetEnumerator()
         {
+            if (string.IsNullOrWhiteSpace(_query.PlainText))
+            {
+                Completion.MarkCompleted();
+
+                yield break;
+            }
+
             var lastIndex = 0;
             int findingIndex;
 
             do
             {
-                findingIndex = _content.IndexOf(_query.PlainText, lastIndex, StringComparison.Ordinal);
+                findingIndex = _content.IndexOf(_query.PlainText, lastIndex, StringComparison.InvariantCultureIgnoreCase);
 
                 if (findingIndex != -1)
                 {

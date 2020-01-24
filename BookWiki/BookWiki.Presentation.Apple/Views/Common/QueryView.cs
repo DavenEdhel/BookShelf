@@ -13,10 +13,13 @@ namespace BookWiki.Presentation.Apple.Views.Common
         private UITextView _input;
 
         public event Action Clicked = delegate { };
+        public event Action Changed = delegate { };
 
         public bool ShouldBecomeFirstResponderOnClick { get; set; } = true;
 
         public string QueryAsText => _input.Text;
+
+        public override bool IsFirstResponder => _input.IsFirstResponder;
 
         public QueryView(ILibrary library) : this(new EqualityQuery(new SearchQuery(library, "")))
         {
@@ -37,6 +40,7 @@ namespace BookWiki.Presentation.Apple.Views.Common
             _input.Font = UIFont.BoldSystemFontOfSize(20);
             _input.AutocapitalizationType = UITextAutocapitalizationType.None;
             _input.Text = _query.Title;
+            _input.Changed += InputOnChanged;
             Add(_input);
 
             Layout = () =>
@@ -56,6 +60,11 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
                 Clicked();
             }));
+        }
+
+        private void InputOnChanged(object sender, EventArgs e)
+        {
+            Changed();
         }
 
         public override bool ResignFirstResponder()
