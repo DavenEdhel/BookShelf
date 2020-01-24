@@ -103,7 +103,7 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
             var end = GetClosestPositionToPoint(new CGPoint(ContentOffset.X, ContentOffset.Y + Frame.Height));
 
-            _lifeSpellCheck.TextChangedAround(((int)GetOffsetFromPosition(BeginningOfDocument, start) + (int)GetOffsetFromPosition(BeginningOfDocument, end))/2, Text);
+            _lifeSpellCheck.TextChangedAround(((int)GetOffsetFromPosition(BeginningOfDocument, start) + (int)GetOffsetFromPosition(BeginningOfDocument, end)) / 2, Text);
         }
 
         private void OnChanged(object sender, EventArgs e)

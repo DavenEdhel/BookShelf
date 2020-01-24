@@ -12,10 +12,11 @@ namespace BookWiki.Presentation.Apple.Views.Common
     {
         private readonly ILibrary _library;
         private QueryView _input;
+        private HotKeyScheme _editingScheme;
 
         public event Action SearchRequested = delegate { };
 
-        public event Action QueryChanged = delegate           { };
+        public event Action QueryChanged = delegate { };
 
         public IQuery Query => new EqualityQuery(new SearchQuery(_library, _input.QueryAsText));
         
@@ -32,12 +33,15 @@ namespace BookWiki.Presentation.Apple.Views.Common
             Application.Instance.RegisterSchemeForEditMode(
                 new HotKeyScheme(
                     new HotKey(new Key("f"), StartFocus).WithControl(),
-                    new HotKey(Key.Escape, LeaveFocus),
-                    new HotKey(Key.Enter, MakeSearch).WithControl()));
+                    new HotKey(Key.Escape, LeaveFocus)));
+
+            _editingScheme = new HotKeyScheme(new HotKey(Key.Enter, MakeSearch));
 
             _input = new QueryView(_library);
             _input.Changed += InputOnChanged;
             _input.ShouldBecomeFirstResponderOnClick = true;
+            _input.OnFocused += InputOnFocused;
+            _input.OnFocusLeaved += InputOnOnFocusLeaved;
             Add(_input);
 
             Layout = () =>
@@ -47,6 +51,16 @@ namespace BookWiki.Presentation.Apple.Views.Common
             };
 
             Layout();
+        }
+
+        private void InputOnOnFocusLeaved()
+        {
+            Application.Instance.UnregisterScheme(_editingScheme);
+        }
+
+        private void InputOnFocused()
+        {
+            Application.Instance.RegisterSchemeForEditMode(_editingScheme);
         }
 
         private void InputOnChanged()

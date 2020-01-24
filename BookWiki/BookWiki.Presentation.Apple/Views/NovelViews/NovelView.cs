@@ -347,8 +347,13 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         private LocalSearchItemCollection _currentSearch;
 
-        public void BeginSearchEnumeration()
+        public void BeginSearchEnumeration(IQuery searchQuery)
         {
+            if (_currentSearch == null)
+            {
+                HightlightQuery(searchQuery);
+            }
+
             _currentSearch.SelectNext();
 
             _content.Pause();

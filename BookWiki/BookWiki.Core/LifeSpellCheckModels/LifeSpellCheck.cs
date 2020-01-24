@@ -10,6 +10,8 @@ namespace BookWiki.Core.LifeSpellCheckModels
         private readonly IErrorsCollection _errorsCollection;
         private readonly ISpellChecker _spellChecker;
         private const int HalfOfRange = 1000;
+        private string _lastCheckedText = string.Empty;
+        private int _lastCheckedIndex = 0;
 
         private int _lastCheckCursorPosition;
 
@@ -21,6 +23,11 @@ namespace BookWiki.Core.LifeSpellCheckModels
 
         public void TextChangedAround(int index, string newText)
         {
+            if (IsNeedToCheck(index, newText) == false)
+            {
+                return;
+            }
+
             _lastCheckCursorPosition = index;
 
             _errorsCollection.RemoveAll();
@@ -31,6 +38,9 @@ namespace BookWiki.Core.LifeSpellCheckModels
             {
                 _errorsCollection.Add(misspelledWord);
             }
+
+            _lastCheckedIndex = index;
+            _lastCheckedText = newText;
         }
 
         public void MisspelledWordReplaced(IRange oldWord, string newText)
@@ -49,6 +59,21 @@ namespace BookWiki.Core.LifeSpellCheckModels
             {
                 TextChangedAround(newCursorPosition, text);
             }
+        }
+
+        private bool IsNeedToCheck(int index, string newText)
+        {
+            if (newText != _lastCheckedText)
+            {
+                return true;
+            }
+
+            if (Math.Abs(index - _lastCheckedIndex) > HalfOfRange)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

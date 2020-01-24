@@ -14,6 +14,8 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         public event Action Clicked = delegate { };
         public event Action Changed = delegate { };
+        public event Action OnFocused = delegate { };
+        public event Action OnFocusLeaved = delegate { };
 
         public bool ShouldBecomeFirstResponderOnClick { get; set; } = true;
 
@@ -41,6 +43,8 @@ namespace BookWiki.Presentation.Apple.Views.Common
             _input.AutocapitalizationType = UITextAutocapitalizationType.None;
             _input.Text = _query.Title;
             _input.Changed += InputOnChanged;
+            _input.Started += InputOnStarted;
+            _input.Ended += InputOnEnded;
             Add(_input);
 
             Layout = () =>
@@ -60,6 +64,16 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
                 Clicked();
             }));
+        }
+
+        private void InputOnEnded(object sender, EventArgs e)
+        {
+            OnFocusLeaved();
+        }
+
+        private void InputOnStarted(object sender, EventArgs e)
+        {
+            OnFocused();
         }
 
         private void InputOnChanged(object sender, EventArgs e)

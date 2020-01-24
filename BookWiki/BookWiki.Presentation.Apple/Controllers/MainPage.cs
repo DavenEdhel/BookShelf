@@ -192,7 +192,7 @@ namespace BookWiki.Presentation.Apple.Controllers
         {
             if (_contentHolderView.Current is NovelView novelView)
             {
-                novelView.BeginSearchEnumeration();
+                novelView.BeginSearchEnumeration(_actionBarView.Search.Query);
             }
             else
             {
