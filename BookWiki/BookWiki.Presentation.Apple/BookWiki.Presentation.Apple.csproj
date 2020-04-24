@@ -87,8 +87,6 @@
     <Compile Include="Models\HotKeys\KeyCombination.cs" />
     <Compile Include="Models\UserFolderPath.cs" />
     <Compile Include="Models\Utils\NativeRange.cs" />
-    <Compile Include="Models\Utils\Range.cs" />
-    <Compile Include="Models\Utils\SimpleRange.cs" />
     <Compile Include="Models\Utils\RangeExtensions.cs" />
     <Compile Include="Models\Utils\StringRange.cs" />
     <Compile Include="Models\Utils\ThreadSafeProperty.cs" />

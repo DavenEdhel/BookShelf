@@ -14,6 +14,11 @@ namespace BookWiki.Presentation.Apple.Models.Utils
             return $"[{range.Start()},{range.End()}]";
         }
 
+        public static IText GetPlainText(this IRange range, IText text)
+        {
+            return text.Substring(range.Offset, range.Length);
+        }
+
         public static RangeOverlap In(this IRange range, IRange outerRange)
         {
             if (range.Start() == outerRange.Start() && range.End() == outerRange.End())
@@ -39,7 +44,7 @@ namespace BookWiki.Presentation.Apple.Models.Utils
 
         public static bool In(this int x, IRange range)
         {
-            if (x >= range.Offset && x <= range.End())
+            if (x >= range.Start() && x <= range.End())
             {
                 return true;
             }

@@ -7,5 +7,7 @@ namespace BookWiki.Core
         IRange Range { get; }
 
         TextStyle Style { get; }
+
+        // todo[sk]: get html extension
     }
 }
