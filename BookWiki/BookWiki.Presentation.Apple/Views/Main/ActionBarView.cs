@@ -16,17 +16,17 @@ namespace BookWiki.Presentation.Apple.Views
         private readonly ContentHolderView _content;
         private readonly SessionContext _session;
 
-        private UIButton _hideShow;
-
-        public bool IsPanelHidden { get; private set; }
-        public bool IsScrollHidden { get; private set; }
-
+        private BooleanStatesView _hideShow;
+        
         public PageSearchView Search => _search;
 
-        public Action<bool> SideMenuVisibilityChanged = delegate { };
-        public Action<bool> ScrollVisibilityChanged = delegate { };
         private UIButton _save;
-        private UIButton _hideShowScroll;
+        private BooleanStatesView _hideShowScroll;
+        private SeveralStatesView _changePagingMode;
+
+        public SeveralStatesView PageMode => _changePagingMode;
+        public BooleanStatesView PanelState => _hideShow;
+        public BooleanStatesView ScrollState => _hideShowScroll;
 
         public ActionBarView(ILibrary library, ContentHolderView content, SessionContext session)
         {
@@ -38,9 +38,6 @@ namespace BookWiki.Presentation.Apple.Views
 
         private void Initialize()
         {
-            IsPanelHidden = _session.InterfaceSettings.IsSideBarHidden;
-            IsScrollHidden = true;
-
             _search = new PageSearchView(_library);
             Add(_search);
 
@@ -50,56 +47,43 @@ namespace BookWiki.Presentation.Apple.Views
             _save.TouchUpInside += SaveOnTouchUpInside;
             Add(_save);
 
-            _hideShow = new UIButton(UIButtonType.RoundedRect);
-            _hideShow.SetTitleColor(UIColor.Black, UIControlState.Normal);
-            _hideShow.SetTitle(_session.InterfaceSettings.IsSideBarHidden ? "Show" : "Hide", UIControlState.Normal);
-            _hideShow.TouchUpInside += HideShowOnTouchUpInside;
+            _hideShow = new BooleanStatesView(on: "Panel", off: "No Panel");
+            _hideShow.IsOff = _session.InterfaceSettings.IsSideBarHidden;
             Add(_hideShow);
 
-            _hideShowScroll = new UIButton(UIButtonType.RoundedRect);
-            _hideShowScroll.SetTitleColor(UIColor.Black, UIControlState.Normal);
-            _hideShowScroll.SetTitle(IsScrollHidden ? "Show" : "Hide", UIControlState.Normal);
-            _hideShowScroll.TouchUpInside += HideShowScrollOnTouchUpInside;
+            _hideShowScroll = new BooleanStatesView(on: "Scroll", off: "No Scroll");
+            _hideShowScroll.IsOff = _session.InterfaceSettings.IsScrollHidden;
             Add(_hideShowScroll);
+
+            _changePagingMode = new SeveralStatesView(PageNumberView.PageModes);
+            _changePagingMode.CurrentIndex = _session.InterfaceSettings.PageModeIndex;
+            Add(_changePagingMode);
 
             Layout = () =>
             {
-                _hideShow.SetSizeThatFits();
+                _hideShow.ChangeHeight(Frame.Height);
                 _hideShow.ChangeWidth(70);
                 _hideShow.PositionToRightAndCenterInside(this, 10);
 
-                _hideShowScroll.SetSizeThatFits();
+                _hideShowScroll.ChangeHeight(Frame.Height);
                 _hideShowScroll.ChangeWidth(70);
                 _hideShowScroll.PositionToRightAndCenterInside(this, 10);
                 _hideShowScroll.ChangeX(_hideShow.Frame.Left - 10 - _hideShowScroll.Frame.Width);
 
+                _changePagingMode.ChangeHeight(Frame.Height);
+                _changePagingMode.ChangeWidth(70);
+                _changePagingMode.PositionToRightAndCenterInside(this, 10);
+                _changePagingMode.ChangeX(_hideShowScroll.Frame.Left - 10 - _changePagingMode.Frame.Width);
+
                 _save.SetSizeThatFits();
                 _save.PositionToRightAndCenterInside(this, 10);
-                _save.ChangeX(_hideShowScroll.Frame.Left - 10 - _save.Frame.Width);
+                _save.ChangeX(_changePagingMode.Frame.Left - 10 - _save.Frame.Width);
                 
                 _search.ChangeSize(Frame.Width - _hideShowScroll.Frame.Left - 20, Frame.Height);
                 _search.ChangePosition(10, 0);
             };
 
             Layout();
-        }
-
-        private void HideShowOnTouchUpInside(object sender, EventArgs e)
-        {
-            IsPanelHidden = !IsPanelHidden;
-
-            _hideShow.SetTitle(IsPanelHidden ? "Show" : "Hide", UIControlState.Normal);
-
-            SideMenuVisibilityChanged(IsPanelHidden);
-        }
-
-        private void HideShowScrollOnTouchUpInside(object sender, EventArgs e)
-        {
-            IsScrollHidden = !IsScrollHidden;
-
-            _hideShowScroll.SetTitle(IsScrollHidden ? "Show" : "Hide", UIControlState.Normal);
-
-            ScrollVisibilityChanged(IsScrollHidden);
         }
 
         private void SaveOnTouchUpInside(object sender, EventArgs e)

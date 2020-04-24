@@ -13,6 +13,9 @@ namespace BookWiki.Presentation.Apple.Controllers
         public static readonly Key Escape = new Key(UIKeyCommand.Escape);
         public static readonly Key ArrowDown = new Key(UIKeyCommand.DownArrow);
         public static readonly Key ArrowUp = new Key(UIKeyCommand.UpArrow);
+        public static readonly Key ArrowLeft = new Key(UIKeyCommand.LeftArrow);
+        public static readonly Key ArrowRight = new Key(UIKeyCommand.RightArrow);
+        public static readonly Key Tab = new Key("\t");
 
         public static readonly Dictionary<Key, Key> EnglishRussian = new Dictionary<Key, Key>()
         {
@@ -30,6 +33,15 @@ namespace BookWiki.Presentation.Apple.Controllers
             [new Key("n")] = new Key("т"),
             [new Key("s")] = new Key("ы"),
             [new Key("r")] = new Key("к"),
+            [new Key("z")] = new Key("я"),
+            [new Key("a")] = new Key("ф"),
+            [new Key("q")] = new Key("й"),
+            [new Key("/")] = new Key("."),
+            [new Key("'")] = new Key("э"),
+            [new Key(".")] = new Key("ю"),
+            [new Key(",")] = new Key("б"),
+            [new Key("l")] = new Key("ж"),
+
         };
 
         public Key(string key)
@@ -43,6 +55,7 @@ namespace BookWiki.Presentation.Apple.Controllers
         }
 
         public NSString KeyCommand { get; }
+        
 
         public override string ToString()
         {

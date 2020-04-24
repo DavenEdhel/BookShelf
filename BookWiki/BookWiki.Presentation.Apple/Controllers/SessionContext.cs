@@ -68,7 +68,12 @@ namespace BookWiki.Presentation.Apple.Controllers
                 }
             }
 
-            var file = new SessionFile(queries.Select(x => x.PlainText), contents, new UserInterfaceSettings() { IsSideBarHidden = actionBar.IsPanelHidden }, new UserFolderPath());
+            var file = new SessionFile(queries.Select(x => x.PlainText), contents, new UserInterfaceSettings()
+            {
+                IsSideBarHidden = actionBar.PanelState.IsOff,
+                IsScrollHidden = actionBar.ScrollState.IsOff,
+                PageModeIndex = actionBar.PageMode.CurrentIndex
+            }, new UserFolderPath());
 
             file.Save();
         }

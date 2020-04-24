@@ -6,10 +6,13 @@ using BookWiki.Core;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.Utils;
+using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Models;
+using BookWiki.Presentation.Apple.Models.HotKeys;
 using BookWiki.Presentation.Apple.Views.Common;
 using Keurig.IQ.Core.CrossCutting.Extensions;
+using UIKit;
 
 namespace BookWiki.Presentation.Apple.Views.Main
 {
@@ -17,18 +20,38 @@ namespace BookWiki.Presentation.Apple.Views.Main
     {
         private readonly ILibrary _library;
         private CollectionView _collectionView;
+        private int _previousSelectedTabIndex = 0;
 
         public event Action<object> OnTabSelected = delegate {  };
+
+        private HotKeyScheme _scheme;
+        private HotKeyScheme _schemeView;
 
         public TabCollectionView(ILibrary library)
         {
             _library = library;
             Initialize();
+
+            _scheme = new HotKeyScheme(new HotKey(new KeyCombination(Key.Tab, UIKeyModifierFlags.Control), SelectPreviousTab));
+            _schemeView = new HotKeyScheme(new HotKey(new KeyCombination(Key.Tab, UIKeyModifierFlags.Control), SelectPreviousTab));
+            Application.Instance.RegisterSchemeForEditMode(_scheme);
+            Application.Instance.RegisterSchemeForViewMode(_schemeView); 
+        }
+
+        private void SelectPreviousTab()
+        {
+            if (_previousSelectedTabIndex < 0)
+            {
+                return;
+            }
+
+            SelectTab(_previousSelectedTabIndex);
         }
 
         private void Initialize()
         {
             _collectionView = new CollectionView();
+            _collectionView.Selecting += CollectionViewOnSelecting;
             Add(_collectionView);
 
             Layout = () =>
@@ -38,6 +61,11 @@ namespace BookWiki.Presentation.Apple.Views.Main
             };
 
             Layout();
+        }
+
+        private void CollectionViewOnSelecting()
+        {
+            _previousSelectedTabIndex = GetSelectedTabIndex();
         }
 
         public void Initialize(IContent[] articles)
@@ -62,12 +90,12 @@ namespace BookWiki.Presentation.Apple.Views.Main
 
         public void SelectFiles()
         {
-            _collectionView.Select(_collectionView[0]);
+            SelectAndGetPreviousSelected(_collectionView[0]);
         }
 
         public void SelectTab(int number)
         {
-            _collectionView.Select(_collectionView[number]);
+            SelectAndGetPreviousSelected(_collectionView[number]);
         }
 
         public void SelectTab(string title)
@@ -77,7 +105,7 @@ namespace BookWiki.Presentation.Apple.Views.Main
 
             if (item != null)
             {
-                _collectionView.Select(item);
+                SelectAndGetPreviousSelected(item);
             }
         }
 
@@ -87,7 +115,7 @@ namespace BookWiki.Presentation.Apple.Views.Main
 
             if (item != null)
             {
-                _collectionView.Select(item);
+                SelectAndGetPreviousSelected(item);
             }
             else
             {
@@ -97,8 +125,18 @@ namespace BookWiki.Presentation.Apple.Views.Main
 
                 _collectionView.Add(item);
 
-                _collectionView.Select(item);
+                SelectAndGetPreviousSelected(item);
             }
+        }
+
+        private void SelectAndGetPreviousSelected(CollectionItem item)
+        {
+            _collectionView.Select(item);
+        }
+
+        private int GetSelectedTabIndex()
+        {
+            return _collectionView.Items.IndexOf(x => x.Content is ISelectable selectable && selectable.IsSelected);
         }
 
         public void ShowSearchResult(IQuery searchQuery)
@@ -109,7 +147,7 @@ namespace BookWiki.Presentation.Apple.Views.Main
 
             _collectionView.Add(item);
 
-            _collectionView.Select(item);
+            SelectAndGetPreviousSelected(item);
         }
 
         public IEnumerable<TabView> OpenedCustomTabs

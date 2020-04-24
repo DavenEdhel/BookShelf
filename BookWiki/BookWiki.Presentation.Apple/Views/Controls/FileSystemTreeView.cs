@@ -6,6 +6,7 @@ using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.Utils;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Views.Common;
+using BookWiki.Presentation.Apple.Views.Main;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Presentation.Apple.Views.Controls
@@ -13,14 +14,16 @@ namespace BookWiki.Presentation.Apple.Views.Controls
     public class FileSystemTreeView : View
     {
         private CollectionView _filePaths;
+        private readonly TabCollectionView _tabs;
         private IFileSystemNode _root;
         private readonly Action _enableScheme;
         private readonly Action _disableScheme;
 
         public event Action<IAbsolutePath> Selected = delegate { };
 
-        public FileSystemTreeView(IFileSystemNode root, Action enableScheme, Action disableScheme)
+        public FileSystemTreeView(TabCollectionView tabs, IFileSystemNode root, Action enableScheme, Action disableScheme)
         {
+            _tabs = tabs;
             _root = root;
             _enableScheme = enableScheme;
             _disableScheme = disableScheme;
@@ -32,7 +35,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             _filePaths = new CollectionView();
             Add(_filePaths);
 
-            _filePaths.AddRangeWithoutAnimation(new CollectionItem(new FileSystemNodeView(_root, path => Selected(path), _disableScheme, _enableScheme), new HorizontalSeparatorView()));
+            _filePaths.AddRangeWithoutAnimation(new CollectionItem(new FileSystemNodeView(_tabs, _root, path => Selected(path), _disableScheme, _enableScheme), new HorizontalSeparatorView()));
 
             Layout = () =>
             {

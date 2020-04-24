@@ -13,5 +13,6 @@ namespace BookWiki.Core.Files.FileSystemModels
         int Level { get; }
 
         void SaveUnder(IFileSystemNode parent);
+        
     }
 }

@@ -48,13 +48,17 @@ namespace BookWiki.Presentation.Apple.Views.Common
             var leftTheLine = new HotKey(new Key("7"), LeftCurrentLine).WithCommand();
             var centerTheLine = new HotKey(new Key("8"), CenterCurrentLine).WithCommand();
             var rightTheLine = new HotKey(new Key("9"), RightCurrentLine).WithCommand();
+            var leftTheLine2 = new HotKey(new Key(","), LeftCurrentLine).WithControl();
+            var centerTheLine2 = new HotKey(new Key("."), CenterCurrentLine).WithControl();
+            var rightTheLine2 = new HotKey(new Key("/"), RightCurrentLine).WithControl();
             var enableJoButton = new HotKey(new Key("]"), () => InsertText("ё"));
             var enableJoButtonUpperCase = new HotKey(new Key("]"), () => InsertText("Ё")).WithShift();
-            var showSuggestions = new HotKey(new KeyCombination(Key.Space, UIKeyModifierFlags.Control), ShowSuggestions);
+            var showSuggestions = new HotKey(new KeyCombination(new Key("z"), UIKeyModifierFlags.Control), ShowSuggestions);
+            var addToDictionary = new HotKey(new KeyCombination(new Key("q"), UIKeyModifierFlags.Control), AddToDictionaryImmediately);
             var validate = new HotKey(new KeyCombination(new Key("r"), UIKeyModifierFlags.Control), CheckSpelling);
 
             _viewModeScheme = new HotKeyScheme(activateEditMode, validate);
-            _editModeScheme = new HotKeyScheme(deactivateEditMode, leftTheLine, centerTheLine, rightTheLine, enableJoButton, enableJoButtonUpperCase, showSuggestions, validate);
+            _editModeScheme = new HotKeyScheme(deactivateEditMode, leftTheLine, centerTheLine, rightTheLine, leftTheLine2, centerTheLine2, rightTheLine2, enableJoButton, enableJoButtonUpperCase, showSuggestions, validate, addToDictionary);
 
             DecelerationEnded += OnDecelerationEnded;
             WillEndDragging += OnWillEndDragging;
@@ -133,6 +137,22 @@ namespace BookWiki.Presentation.Apple.Views.Common
                 cursorPosition = cursorPosition ?? GetPosition(BeginningOfDocument, 0);
 
                 SelectedTextRange = GetTextRange(cursorPosition, cursorPosition);
+            }
+        }
+
+        public string SelectedText
+        {
+            get
+            {
+                var start = (int)GetOffsetFromPosition(BeginningOfDocument, SelectedTextRange.Start);
+                var end = (int)GetOffsetFromPosition(BeginningOfDocument, SelectedTextRange.End);
+
+                if (start == end)
+                {
+                    return string.Empty;
+                }
+
+                return Text.Substring(start, end - start);
             }
         }
 
@@ -277,6 +297,17 @@ namespace BookWiki.Presentation.Apple.Views.Common
             }
         }
 
+        public async void AddToDictionaryImmediately()
+        {
+            var spellChecker = new SpellChecker(AttributedText.Value, (int)CursorPosition);
+
+            spellChecker.Learn();
+
+            await Task.Delay(100);
+
+            _lifeSpellCheck.ForceSpellChecking((int) CursorPosition, Text);
+        }
+
         public void LeftCurrentLine()
         {
             ChangeCurrentParagraphStyle(x => x.Alignment = UITextAlignment.Left);
@@ -305,6 +336,9 @@ namespace BookWiki.Presentation.Apple.Views.Common
             Application.Instance.RegisterSchemeForViewMode(_viewModeScheme);
         }
 
-        
+        public void SelectTextRange(int nextFinding, int selectedTextLength)
+        {
+            SelectedRange = new NSRange(nextFinding, selectedTextLength);
+        }
     }
 }

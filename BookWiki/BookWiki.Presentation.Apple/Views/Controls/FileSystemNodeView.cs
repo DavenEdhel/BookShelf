@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using BookMap.Presentation.Apple;
+using BookWiki.Core;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Presentation.Apple.Extentions;
+using BookWiki.Presentation.Apple.Models;
 using BookWiki.Presentation.Apple.Views.Common;
+using BookWiki.Presentation.Apple.Views.Main;
 using BookWiki.Presentation.Apple.Views.NewNodeDialog;
 using CoreGraphics;
 using Keurig.IQ.Core.CrossCutting.Extensions;
@@ -15,6 +18,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 {
     public class FileSystemNodeView : Control, IComparable, ICollectionBindable, ISelectable
     {
+        private readonly TabCollectionView _tabs;
         private readonly IFileSystemNode _fileSystemNode;
         private readonly Action _disableScheme;
         private readonly Action _enableScheme;
@@ -51,8 +55,9 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         public IFileSystemNode Model => _fileSystemNode;
 
-        public FileSystemNodeView(IFileSystemNode fileSystemNode, Action<IAbsolutePath> onSelected, Action disableScheme, Action enableScheme)
+        public FileSystemNodeView(TabCollectionView tabs, IFileSystemNode fileSystemNode, Action<IAbsolutePath> onSelected, Action disableScheme, Action enableScheme)
         {
+            _tabs = tabs;
             _fileSystemNode = fileSystemNode;
             _disableScheme = disableScheme;
             _enableScheme = enableScheme;
@@ -108,7 +113,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
             TouchUpInside += OnTouchUpInside;
 
-            Toggle(toClose: false);
+            Toggle(toClose: _fileSystemNode.SubitemsArePresentInNavigationPanel(new UserFolderPath(), _tabs.OpenedCustomTabs.Select(x => x.Data as IContent).Where(x => x != null)) == false);
         }
 
         private void AddButtonOnTouchUpInside(object sender, EventArgs e)
@@ -153,7 +158,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             var fileSystemNode = new FileSystemNode(_fileSystemNode, path);
             fileSystemNode.SaveUnder(_fileSystemNode);
 
-            var item = new CollectionItem(new FileSystemNodeView(fileSystemNode, OnSelected, _disableScheme, _enableScheme), new HorizontalSeparatorView());
+            var item = new CollectionItem(new FileSystemNodeView(_tabs, fileSystemNode, OnSelected, _disableScheme, _enableScheme), new HorizontalSeparatorView());
             _collectionView.Add(item, animated: true);
             _collectionItems.Add(item);
         }
@@ -189,7 +194,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
             {
                 foreach (var fileSystemNode in _fileSystemNode.InnerNodes)
                 {
-                    var item = new CollectionItem(new FileSystemNodeView(fileSystemNode, OnSelected, _disableScheme, _enableScheme), new HorizontalSeparatorView());
+                    var item = new CollectionItem(new FileSystemNodeView(_tabs, fileSystemNode, OnSelected, _disableScheme, _enableScheme), new HorizontalSeparatorView());
                     _collectionItems.Add(item);
 
                     _collectionView?.Add(item, animated: true);

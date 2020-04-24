@@ -9,6 +9,8 @@ namespace BookWiki.Presentation.Apple.Models.Utils
 
         public static int End(this IRange range) => range.Offset + range.Length;
 
+        public static int Middle(this IRange range) => range.Start() + (range.End() - range.Start()) / 2;
+
         public static string ToFormattedString(this IRange range)
         {
             return $"[{range.Start()},{range.End()}]";

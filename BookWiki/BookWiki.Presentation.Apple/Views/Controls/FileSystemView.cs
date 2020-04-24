@@ -39,7 +39,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 new HotKey(Key.ArrowDown, Down),
                 new HotKey(Key.Enter, Tap));
 
-            _treeView = new FileSystemTreeView(_node, Show, Hide);
+            _treeView = new FileSystemTreeView(_tabCollectionView, _node, Show, Hide);
             _treeView.Selected += TreeViewOnSelected;
 
             Add(_treeView);

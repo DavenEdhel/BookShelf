@@ -93,6 +93,8 @@
     <Compile Include="Views\Common\PageSearchView.cs" />
     <Compile Include="Views\EditText\LocalSearchResultView.cs" />
     <Compile Include="Views\EditText\TextDecorationView.cs" />
+    <Compile Include="Views\Main\BooleanStatesView.cs" />
+    <Compile Include="Views\Main\SeveralStatesView.cs" />
     <Compile Include="Views\NovelViews\LocalSearchItemCollection.cs" />
     <Compile Include="Views\NovelViews\NovelViewEditorState.cs" />
     <Compile Include="Views\EditText\ErrorLineView.cs" />

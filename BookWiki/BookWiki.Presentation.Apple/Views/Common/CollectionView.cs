@@ -17,6 +17,9 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         public bool IsOrderingEnabled { get; set; } = true;
 
+        public event Action Selected = delegate { };
+        public event Action Selecting = delegate { };
+
         public CollectionView()
         {
             Initialize();
@@ -203,6 +206,8 @@ namespace BookWiki.Presentation.Apple.Views.Common
                 return;
             }
 
+            Selecting();
+
             foreach (var collectionItem in _collectionItems)
             {
                 if (collectionItem.Content is ISelectable selectable)
@@ -215,6 +220,8 @@ namespace BookWiki.Presentation.Apple.Views.Common
             {
                 selectableItem.IsSelected = true;
             }
+
+            Selected();
         }
 
         private void AddViews(CollectionItem collectionItem)

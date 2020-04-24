@@ -77,8 +77,9 @@ namespace BookWiki.Presentation.Apple.Controllers
 
                 if (data is INovel novel)
                 {
-                    var novelView = new NovelView(novel, _library, _actionBarView);
-                    novelView.SetScrollVisibility(_actionBarView.IsScrollHidden);
+                    var novelView = new NovelView(novel, _library, _actionBarView, _actionBarView);
+                    novelView.SetScrollVisibility(_actionBarView.ScrollState.IsOff);
+                    novelView.SetPageMode(_actionBarView.PageMode.Current);
 
                     var editorState = _session.OpenedContentTabs.FirstOrDefault(x => x.NovelPathToLoad.EqualsTo(novel.Source));
 
@@ -101,12 +102,15 @@ namespace BookWiki.Presentation.Apple.Controllers
             _actionBarView = new ActionBarView(_library, _contentHolderView, _session);
             _actionBarView.Search.SearchRequested += SearchSearchRequested;
             _actionBarView.Search.QueryChanged += SearchOnQueryChanged;
-            _actionBarView.SideMenuVisibilityChanged += SideMenuVisibilityChanged;
-            _actionBarView.ScrollVisibilityChanged += ScrollVisibilityChanged;
+            _actionBarView.PanelState.Changed += SideMenuVisibilityChanged;
+            _actionBarView.ScrollState.Changed += ScrollVisibilityChanged;
+            _actionBarView.PageMode.Changed += PageModeOnChanged;
 
             var topSeparator = new UIView() {BackgroundColor = UIColor.LightGray};
             var verticalSeparator = new UIView() {BackgroundColor = UIColor.LightGray};
             var actionBarSeparator = new UIView() {BackgroundColor = UIColor.LightGray};
+
+            _tabView.SelectTab(0);
 
             View.AddSubviews(_tabView, _actionBarView, topSeparator, verticalSeparator, actionBarSeparator, _contentHolderView);
 
@@ -115,7 +119,25 @@ namespace BookWiki.Presentation.Apple.Controllers
                 topSeparator.ChangeSize(View.Frame.Width, 1);
                 topSeparator.ChangePosition(0, 20);
 
-                if (_actionBarView.IsPanelHidden == false)
+                if (_actionBarView.PanelState.IsOff)
+                {
+                    _tabView.Hidden = true;
+
+                    _actionBarView.ChangeY(topSeparator.Frame.Bottom);
+                    _actionBarView.ChangeX(0);
+                    _actionBarView.ChangeSize(View.Frame.Width, 50);
+
+                    actionBarSeparator.ChangeSize(_actionBarView.Frame.Width, 1);
+                    actionBarSeparator.ChangePosition(0, _actionBarView.Frame.Bottom);
+
+                    _contentHolderView.ChangeY(actionBarSeparator.Frame.Bottom);
+                    _contentHolderView.ChangeX(0);
+                    _contentHolderView.ChangeSize(_actionBarView.Frame.Width, View.Frame.Height - _actionBarView.Frame.Bottom - _bottomOffset);
+                    _contentHolderView.LayoutSubviews();
+
+                    verticalSeparator.Hidden = true;
+                }
+                else
                 {
                     _tabView.Hidden = false;
                     _tabView.ChangeWidth(200);
@@ -139,27 +161,17 @@ namespace BookWiki.Presentation.Apple.Controllers
                     verticalSeparator.ChangeSize(1, _tabView.Frame.Height);
                     verticalSeparator.ChangePosition(_tabView.Frame.Left, topSeparator.Frame.Bottom);
                 }
-                else
-                {
-                    _tabView.Hidden = true;
-
-                    _actionBarView.ChangeY(topSeparator.Frame.Bottom);
-                    _actionBarView.ChangeX(0);
-                    _actionBarView.ChangeSize(View.Frame.Width, 50);
-
-                    actionBarSeparator.ChangeSize(_actionBarView.Frame.Width, 1);
-                    actionBarSeparator.ChangePosition(0, _actionBarView.Frame.Bottom);
-
-                    _contentHolderView.ChangeY(actionBarSeparator.Frame.Bottom);
-                    _contentHolderView.ChangeX(0);
-                    _contentHolderView.ChangeSize(_actionBarView.Frame.Width, View.Frame.Height - _actionBarView.Frame.Bottom - _bottomOffset);
-                    _contentHolderView.LayoutSubviews();
-
-                    verticalSeparator.Hidden = true;
-                }
             };
 
             _layout();
+        }
+
+        private void PageModeOnChanged()
+        {
+            if (_contentHolderView.Current is NovelView novelView)
+            {
+                novelView.SetPageMode(_actionBarView.PageMode.Current);
+            }
         }
 
         private void SearchOnQueryChanged()
@@ -170,15 +182,15 @@ namespace BookWiki.Presentation.Apple.Controllers
             }
         }
 
-        private void ScrollVisibilityChanged(bool obj)
+        private void ScrollVisibilityChanged()
         {
             if (_contentHolderView.Current is NovelView novelView)
             {
-                novelView.SetScrollVisibility(obj);
+                novelView.SetScrollVisibility(_actionBarView.ScrollState.IsOff);
             }
         }
 
-        private void SideMenuVisibilityChanged(bool obj)
+        private void SideMenuVisibilityChanged()
         {
             _layout();
         }

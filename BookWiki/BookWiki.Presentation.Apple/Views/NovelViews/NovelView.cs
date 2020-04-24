@@ -24,6 +24,7 @@ namespace BookWiki.Presentation.Apple.Views.Controls
         private readonly INovel _novel;
         private readonly ILibrary _library;
         private readonly ISaveStatus _saveStatus;
+        private readonly ActionBarView _actionBarView;
 
         private bool _wasFocused;
         private HotKeyScheme _viewModeScheme;
@@ -36,18 +37,24 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         private Logger _logger = new Logger("NovelView");
 
-        public NovelView(INovel novel, ILibrary library, ISaveStatus saveStatus)
+        public NovelView(INovel novel, ILibrary library, ISaveStatus saveStatus, ActionBarView actionBarView)
         {
             _novel = novel;
             _library = library;
             _saveStatus = saveStatus;
+            _actionBarView = actionBarView;
 
             var scrollUp = new HotKey(Key.ArrowUp, () => _content.ScrollUp());
             var scrollDown = new HotKey(Key.ArrowDown, () => _content.ScrollDown());
             var save = new HotKey(new KeyCombination(new Key("s"), UIKeyModifierFlags.Control), () => Save());
+            var nextRightItem = new HotKey(new KeyCombination(Key.ArrowRight, UIKeyModifierFlags.Control), NextRightItem);
+            var prevRightItem = new HotKey(new KeyCombination(Key.ArrowLeft, UIKeyModifierFlags.Control), PrevRightItem);
+            var nextCenterItem = new HotKey(new KeyCombination(Key.ArrowDown, UIKeyModifierFlags.Control), NextCenterItem);
+            var prevCenterItem = new HotKey(new KeyCombination(Key.ArrowUp, UIKeyModifierFlags.Control), PrevCenterItem);
+            var findNextSelected = new HotKey(new KeyCombination(Key.Enter, UIKeyModifierFlags.Control), FindNextSelected);
 
             _viewModeScheme = new HotKeyScheme(scrollUp, scrollDown, save);
-            _editModeScheme = new HotKeyScheme(save);
+            _editModeScheme = new HotKeyScheme(save, nextRightItem, prevRightItem, nextCenterItem, prevCenterItem, findNextSelected);
             _localSearchScheme = new HotKeyScheme(
                 new HotKey(Key.ArrowUp, () => _currentSearch.SelectPrev()),
                 new HotKey(Key.ArrowDown, () => _currentSearch.SelectNext()),
@@ -66,6 +73,118 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 }));
 
             Initialize();
+        }
+
+        private void FindNextSelected()
+        {
+            var selectedText = _content.SelectedText;
+
+            if (string.IsNullOrWhiteSpace(selectedText))
+            {
+                return;
+            }
+
+            var nextFinding = _content.Text.IndexOf(selectedText, (int)_content.CursorPosition, StringComparison.InvariantCultureIgnoreCase);
+
+            if (nextFinding <= 0)
+            {
+                nextFinding = _content.Text.IndexOf(selectedText, 0, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            _content.CursorPosition = nextFinding;
+            _content.SelectTextRange(nextFinding, selectedText.Length);
+        }
+
+        private void PrevCenterItem()
+        {
+            var formatting = GetFormatting().ToArray();
+
+            var nextItem = formatting
+                               .Where(x => x.Range.Length > 1)
+                               .Where(x => x.Style == TextStyle.Centered)
+                               .OrderByDescending(x => x.Range.Offset)
+                               .FirstOrDefault(x => x.Range.End() < _content.CursorPosition)
+                           ?? formatting
+                               .Where(x => x.Range.Length > 1)
+                               .Where(x => x.Style == TextStyle.Centered)
+                               .OrderByDescending(x => x.Range.Offset)
+                               .FirstOrDefault();
+
+            if (nextItem != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Item found " + nextItem.Range.Offset);
+
+                _content.CursorPosition = nextItem.Range.Middle();
+            }
+        }
+
+        private void NextCenterItem()
+        {
+            var formatting = GetFormatting().ToArray();
+
+            var nextItem = formatting
+                               .Where(x => x.Range.Length > 1)
+                               .Where(x => x.Style == TextStyle.Centered)
+                               .OrderBy(x => x.Range.Offset)
+                               .FirstOrDefault(x => x.Range.Start() > _content.CursorPosition)
+                           ?? formatting
+                               .Where(x => x.Range.Length > 1)
+                               .Where(x => x.Style == TextStyle.Centered)
+                               .OrderBy(x => x.Range.Offset)
+                               .FirstOrDefault();
+
+            if (nextItem != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Item found " + nextItem.Range.Offset);
+
+                _content.CursorPosition = nextItem.Range.Middle();
+            }
+        }
+
+        private void PrevRightItem()
+        {
+            var formatting = GetFormatting().ToArray();
+
+            var nextItem = formatting
+                               .Where(x => x.Range.Length > 1)
+                               .Where(x => x.Style == TextStyle.Right)
+                               .OrderByDescending(x => x.Range.Offset)
+                               .FirstOrDefault(x => x.Range.End() < _content.CursorPosition)
+                           ?? formatting
+                               .Where(x => x.Range.Length > 1)
+                               .Where(x => x.Style == TextStyle.Right)
+                               .OrderByDescending(x => x.Range.Offset)
+                               .FirstOrDefault();
+
+            if (nextItem != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Item found " + nextItem.Range.Offset);
+
+                _content.CursorPosition = nextItem.Range.Middle();
+            }
+        }
+
+        private void NextRightItem()
+        {
+            var formatting = GetFormatting().ToArray();
+
+            var nextItem = formatting
+                               .Where(x => x.Range.Length > 1)
+                               .Where(x => x.Style == TextStyle.Right)
+                               .OrderBy(x => x.Range.Offset)
+                               .FirstOrDefault(x => x.Range.Start() > _content.CursorPosition)
+                           ?? formatting
+                               .Where(x => x.Range.Length > 1)
+                               .Where(x => x.Style == TextStyle.Right)
+                               .OrderBy(x => x.Range.Offset)
+                               .FirstOrDefault();
+
+            if (nextItem != null)
+            {
+                System.Diagnostics.Debug.WriteLine("Item found " + nextItem.Range.Offset);
+
+                _content.CursorPosition = nextItem.Range.Middle();
+            }
         }
 
         private void InstanceOnModeChanged(bool obj)
@@ -241,6 +360,9 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 _content.ResignFirstResponder();
             }
 
+            SetScrollVisibility(_actionBarView.ScrollState.IsOff);
+            SetPageMode(_actionBarView.PageMode.Current);
+
             _isActive = true;
 
             Application.Instance.ModeChanged += InstanceOnModeChanged;
@@ -367,6 +489,11 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
             _currentSearch = new LocalSearchItemCollection(searchQuery, this, _content);
             _currentSearch.Apply();
+        }
+
+        public void SetPageMode(string pageModeCurrent)
+        {
+            _pageNumber.SetPageMode(pageModeCurrent);
         }
     }
 }
