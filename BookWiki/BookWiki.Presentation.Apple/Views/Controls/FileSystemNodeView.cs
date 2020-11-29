@@ -101,11 +101,12 @@ namespace BookWiki.Presentation.Apple.Views.Controls
                 var margin = (Frame.Height - _expandButton.Frame.Height) / 2;
                 _expandButton.ChangePosition(margin + _marginLeft, margin);
 
-                _label.SetSizeThatFits(Frame.Width - _marginLeft - 35 - _expandButton.Frame.Width - 5);
+                _label.SetSizeThatFits(Frame.Width - _marginLeft - Frame.Height * 2 - _expandButton.Frame.Width - 5);
                 _label.ChangeY(_margin);
                 _label.ChangeX(_expandButton.Frame.Right + 10);
 
-                _addButton.SetSizeThatFits();
+                _addButton.ChangeHeight(Frame.Height);
+                _addButton.ChangeWidth(Frame.Height * 2);
                 _addButton.PositionToRightAndCenterInside(this, _margin);
             };
 

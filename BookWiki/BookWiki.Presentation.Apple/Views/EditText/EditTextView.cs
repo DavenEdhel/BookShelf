@@ -129,7 +129,15 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         public nint CursorPosition
         {
-            get => GetOffsetFromPosition(BeginningOfDocument, SelectedTextRange.End);
+            get
+            {
+                if (SelectedTextRange != null)
+                {
+                    return GetOffsetFromPosition(BeginningOfDocument, SelectedTextRange.End);
+                }
+
+                return 0;
+            }
             set
             {
                 var cursorPosition = GetPosition(BeginningOfDocument, value);

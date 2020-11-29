@@ -14,10 +14,10 @@ namespace BookWiki.HtmlConverter
     {
         static void Main(string[] args)
         {
-            var versionNumber = 23;
+            var versionNumber = 43;
 
             Console.WriteLine("Enter novel path:");
-            var novelPath = $@"C:\Users\Stanislau_Kanapliani\iCloudDrive\Book Wiki\Book Wiki {versionNumber}\Рассказы\Вторжение\Выжить"; //Console.ReadLine();
+            var novelPath = $@"C:\Users\Stanislau_Kanapliani\iCloudDrive\Book Wiki\Book Wiki {versionNumber}\Рассказы\Важные дела"; //Console.ReadLine();
 
             var files = Directory.EnumerateDirectories(novelPath, "*.n");
 

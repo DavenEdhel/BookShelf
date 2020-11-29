@@ -1,5 +1,4 @@
 ﻿using BookWiki.Core.Utils.TextModels;
-using PureOop;
 
 namespace BookWiki.Core.Utils
 {
@@ -8,7 +7,6 @@ namespace BookWiki.Core.Utils
         private readonly IText _text;
         private readonly string _plainText;
 
-        [JustOnce]
         private string SourceText => _plainText ?? _text.PlainText;
 
         public ITextRange Substring(int offset, int length)
@@ -21,10 +19,8 @@ namespace BookWiki.Core.Utils
             return new SubstringText(PlainText, offset, length);
         }
 
-        [JustOnce]
         public int Length => PlainText.Length;
 
-        [JustOnce]
         public string PlainText
         {
             get

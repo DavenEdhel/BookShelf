@@ -2,7 +2,6 @@
 using System.Linq;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.Utils.PropertyModels;
-using PureOop;
 
 namespace BookWiki.Core.Files.FileSystemModels
 {
@@ -33,7 +32,6 @@ namespace BookWiki.Core.Files.FileSystemModels
 
         public int Level { get; }
 
-        //[JustOnce]
         public bool IsContentFolder => Path.Extension.Type != NodeType.Directory;
 
         public void SaveUnder(IFileSystemNode parent)

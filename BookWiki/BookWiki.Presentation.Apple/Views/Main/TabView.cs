@@ -13,11 +13,13 @@ namespace BookWiki.Presentation.Apple.Views.Main
         private readonly string _title;
         private UILabel _label;
         private int _margin;
-        private int _marginLeft = 15;
+        private int _marginLeft = 10;
         private CollectionView _collectionView;
         private CollectionItem _collectionItem;
         private UIButton _close;
+        
         private bool _isDeletable = true;
+        private UIFont _font = null;
 
         public object Data { get; }
 
@@ -30,6 +32,7 @@ namespace BookWiki.Presentation.Apple.Views.Main
             Data = article;
             Index = index;
             _title = article.Title;
+            _font = UIFont.SystemFontOfSize(12);
             Initialize();
         }
 
@@ -85,6 +88,10 @@ namespace BookWiki.Presentation.Apple.Views.Main
             _label = new UILabel();
             _label.Lines = 0;
             _label.Text = _title;
+            if (_font != null)
+            {
+                _label.Font = _font;
+            }
             Add(_label);
 
             _close = new UIButton(UIButtonType.Custom);
@@ -95,14 +102,15 @@ namespace BookWiki.Presentation.Apple.Views.Main
 
             Layout = () =>
             {
-                _margin = 10;
+                _margin = 12;
 
-                _label.SetSizeThatFits(Frame.Width - _margin - _marginLeft - 35);
+                _label.SetSizeThatFits(Frame.Width - _marginLeft - 50);
                 _label.ChangeY(_margin);
                 _label.ChangeX(_marginLeft);
 
-                _close.SetSizeThatFits();
-                _close.PositionToRightAndCenterInside(this, _margin);
+                _close.ChangeHeight(50);
+                _close.ChangeWidth(50);
+                _close.PositionToRightAndCenterInside(this);
             };
 
             Layout();
@@ -125,7 +133,7 @@ namespace BookWiki.Presentation.Apple.Views.Main
 
         public override CGSize SizeThatFits(CGSize size)
         {
-            var x = _label.SizeThatFits(new CGSize(size.Width - _margin - _marginLeft - 35, nfloat.MaxValue));
+            var x = _label.SizeThatFits(new CGSize(size.Width - _marginLeft - 50, nfloat.MaxValue));
 
             return new CGSize(size.Width, x.Height + _margin * 2);
         }

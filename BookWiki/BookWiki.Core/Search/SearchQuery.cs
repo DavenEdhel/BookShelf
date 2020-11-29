@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using PureOop;
 
 namespace BookWiki.Core.Search
 {
@@ -14,13 +13,10 @@ namespace BookWiki.Core.Search
             _query = query;
         }
 
-        //[JustOnce]
         public string Title => _query;
 
-        //[JustOnce]
         public string PlainText => _query.ToLowerInvariant();
 
-        //[JustOnce]
         public ISequence<SearchResult> Results
         {
             get

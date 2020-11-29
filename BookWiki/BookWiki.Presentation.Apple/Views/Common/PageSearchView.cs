@@ -65,7 +65,10 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         private void InputOnChanged()
         {
-            QueryChanged();
+            if (_input.QueryAsText.Length > 3)
+            {
+                QueryChanged();
+            }
         }
 
         private void MakeSearch()
@@ -77,7 +80,10 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
             _input.ResignFirstResponder();
 
-            SearchRequested();
+            if (_input.QueryAsText.Length > 3)
+            {
+                SearchRequested();
+            }
         }
 
         private void LeaveFocus()

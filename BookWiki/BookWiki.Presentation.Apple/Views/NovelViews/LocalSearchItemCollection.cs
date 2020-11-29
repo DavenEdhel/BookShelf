@@ -40,28 +40,37 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         public void SelectNext()
         {
-            _previous = _currentSelected;
-            _currentSelected = (_currentSelected + 1) % _results.Count;
+            if (_results.Count > 0)
+            {
+                _previous = _currentSelected;
+                _currentSelected = (_currentSelected + 1) % _results.Count;
 
-            SelectCurrent();
+                SelectCurrent();
+            }
         }
 
         public void SelectPrev()
         {
-            _previous = _currentSelected;
-            _currentSelected = (_currentSelected - 1 + _results.Count) % _results.Count;
+            if (_results.Count > 0)
+            {
+                _previous = _currentSelected;
+                _currentSelected = (_currentSelected - 1 + _results.Count) % _results.Count;
+            }
         }
 
         private void SelectCurrent()
         {
-            if (_previous != -1)
+            if (_results.Count > 0)
             {
-                _results[_previous].IsSelected = false;
+                if (_previous != -1)
+                {
+                    _results[_previous].IsSelected = false;
+                }
+
+                _results[_currentSelected].IsSelected = true;
+
+                _textView.ScrollTo(_results[_currentSelected].Frame, animated: true);
             }
-
-            _results[_currentSelected].IsSelected = true;
-
-            _textView.ScrollTo(_results[_currentSelected].Frame, animated: true);
         }
     }
 }
