@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Linq;
+using BookWiki.Core.Logging;
 
 namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 {
     public class WordsSubset : IWordCollection
     {
+        private readonly Logger _logger = new Logger(nameof(WordsSubset));
+
         private static int ToIndex(char c)
         {
             switch (c)
@@ -124,7 +127,14 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 
             if (index == -1)
             {
-                return null;
+                _logger.Info($"Ignore {letter} because it is not from dictionary.");
+
+                return new AllWordsSubset();
+            }
+
+            if (index == 6)
+            {
+                return _characters[6] ?? _characters[5];
             }
 
             return _characters[index];

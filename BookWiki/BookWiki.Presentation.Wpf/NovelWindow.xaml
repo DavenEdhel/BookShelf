@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
         <ScrollViewer VerticalScrollBarVisibility="Visible" Name="Scroll" ScrollChanged="Scroll_OnScrollChanged">
             <Grid>
-                <RichTextBox TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" Name="Rtb" HorizontalContentAlignment="Right">
+                <RichTextBox TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
                     <RichTextBox.Resources>
                         <Style TargetType="{x:Type Paragraph}">
                             <Setter Property="Margin" Value="0"/>

@@ -17,6 +17,8 @@ using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.LifeSpellCheckModels;
+using BookWiki.Core.Logging;
+using BookWiki.Core.Search;
 using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models;
@@ -38,6 +40,8 @@ namespace BookWiki.Presentation.Wpf
         private IRelativePath _currentlyLoaded = null;
         private LifeSpellCheckV2 _lifeSpellCheck;
 
+        private readonly Logger _logger = new Logger(nameof(NovelWindow));
+
         public NovelWindow(IRelativePath novel)
         {
             InitializeComponent();
@@ -46,7 +50,7 @@ namespace BookWiki.Presentation.Wpf
             Rtb.FontSize = 16;
             Rtb.Language = XmlLanguage.GetLanguage("ru");
 
-            _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new RussianDictionarySpellChecker(BookShelf.Instance.Lex));
+            _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary));
 
             LoadContent(novel);
 
@@ -211,7 +215,7 @@ namespace BookWiki.Presentation.Wpf
                 {
                     Width = x2.X - x1.X,
                     Height = 1,
-                    Stroke = Brushes.LightSeaGreen,
+                    Stroke = Brushes.LightCoral,
                     Stretch = Stretch.Fill
                 };
 
@@ -313,6 +317,47 @@ namespace BookWiki.Presentation.Wpf
             if (_pageMode == PageCount)
             {
                 UpdatePagingForPages();
+            }
+        }
+
+        private void LearnNewWordFromCursor(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Q && e.KeyboardDevice.Modifiers == ModifierKeys.Control)
+            {
+                var cursorOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
+
+                var substrings = new PunctuationSeparatedEnumeration(Rtb.Document, Rtb.CaretPosition.Paragraph).ToArray();
+
+                var selectedSubstring = substrings.FirstOrDefault(x => cursorOffset >= x.StartIndex && cursorOffset < x.EndIndex);
+
+                if (selectedSubstring != null)
+                {
+                    if (new SpellCheckV2(BookShelf.Instance.Dictionary).IsCorrect(selectedSubstring.Text) == false)
+                    {
+                        BookShelf.Instance.Dictionary.Learn(selectedSubstring.Text);
+                    }
+                }
+            }
+        }
+
+        private void Rtb_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.D2 && e.KeyboardDevice.Modifiers == ModifierKeys.Shift)
+            {
+                var text = new TextRange(Rtb.Document.ContentStart, Rtb.CaretPosition).Text;
+
+                var closings = new IndexSequenceV2(text, '»').SelfOrEmpty();
+                var openings = new IndexSequenceV2(text, '«').SelfOrEmpty();
+
+                var toInsert = closings.Count() < openings.Count() ? "»" : "«";
+
+                var currentCaretPosition = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
+
+                Rtb.Selection.Start.InsertTextInRun(toInsert);
+
+                Rtb.CaretPosition = Rtb.Document.ContentStart.GetPositionAtOffset(currentCaretPosition + 1);
+
+                e.Handled = true;
             }
         }
     }

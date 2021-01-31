@@ -141,7 +141,7 @@ namespace BookWiki.Core.Tests
 
             await lex.Load();
 
-            var spellCheck = new RussianDictionarySpellChecker(lex);
+            var spellCheck = new SpellCheckV2(lex);
 
             Claim.False(spellCheck.IsCorrect("‡‡"));
             Claim.True(spellCheck.IsCorrect("‡·"));

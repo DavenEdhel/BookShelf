@@ -14,7 +14,7 @@ namespace BookWiki.Presentation.Wpf
 
         public IRootPath RootPath { get; }
 
-        public IWordCollection Lex { get; }
+        public IMutableWordCollection Dictionary { get; }
 
         public BookShelf()
         {
@@ -22,10 +22,10 @@ namespace BookWiki.Presentation.Wpf
 
             Root = new FileSystemNode(RootPath.FullPath);
 
-            var lex = new WordCollectionFromLex("Russian.lex");
+            var lex = new WordCollectionFromLex(new FolderPath("Russian.lex").AbsolutePath(RootPath).FullPath);
             lex.Load();
 
-            Lex = lex;
+            Dictionary = lex;
         }
     }
 }

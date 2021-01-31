@@ -1,17 +1,22 @@
 ﻿using System;
-using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using BookWiki.Core.Logging;
 
 namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 {
-    public class WordCollectionFromLex : IWordCollection
+    public class WordCollectionFromLex : IMutableWordCollection
     {
+        private const int _customWordsStartedFrom = 585005;
+
         private readonly string _lexPath;
+
+        private readonly object _criticalSection = new object();
 
         private WordsSubset _root;
 
         private Logger _logger = new Logger("Lex");
+
         private readonly IFileProvider _fileProvider;
 
         public WordCollectionFromLex(string lexPath, IFileProvider fileProvider = null)
@@ -24,17 +29,21 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
         {
             return Task.Run(() =>
             {
-                _logger.Info($"Started loading {DateTime.Now.ToLongTimeString()}");
+                lock (_criticalSection)
+                {
+                    _logger.Info($"Started loading {DateTime.Now.ToLongTimeString()}");
 
-                var all = _fileProvider.ReadAllLines(_lexPath);
+                    var all = _fileProvider.ReadAllLines(_lexPath);
 
-                _root = new WordsSubset(0, all);
+                    var root = new WordsSubset(0, all);
 
-                IsLoaded = true;
+                    _root = root;
 
-                _logger.Info($"Ended loading {DateTime.Now.ToLongTimeString()}");
+                    IsLoaded = true;
+
+                    _logger.Info($"Ended loading {DateTime.Now.ToLongTimeString()}");    
+                }
             });
-
         }
 
         public bool IsFinalWord { get; } = false;
@@ -47,33 +56,35 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
         {
             return _root.GetWordsWithLetterInPosition(letter);
         }
-    }
 
-    public interface IFileProvider
-    {
-        string[] ReadAllLines(string filePath);
-    }
-
-    public class FileSystemApiProvider : IFileProvider
-    {
-        public string[] ReadAllLines(string filePath)
+        public Task Learn(string newWord)
         {
-            return File.ReadAllLines(filePath);
-        }
-    }
+            return Task.Run(() =>
+            {
+                lock (_criticalSection)
+                {
+                    _logger.Info($"Started learning {DateTime.Now.ToLongTimeString()}");
 
-    public class FakeFileProvider : IFileProvider
-    {
-        private readonly string[] _toProvide;
+                    var all = _fileProvider.ReadAllLines(_lexPath).ToList();
 
-        public FakeFileProvider(string[] toProvide)
-        {
-            _toProvide = toProvide;
-        }
+                    newWord = newWord.ToLower();
 
-        public string[] ReadAllLines(string filePath)
-        {
-            return _toProvide;
+                    if (all.Contains(newWord))
+                    {
+                        return;
+                    }
+
+                    _fileProvider.Append(_lexPath, newWord);
+
+                    all.Add(newWord);
+
+                    var root = new WordsSubset(0, all.ToArray());
+
+                    _root = root;
+
+                    _logger.Info($"Ended learning {DateTime.Now.ToLongTimeString()}");
+                }
+            });
         }
     }
 }
