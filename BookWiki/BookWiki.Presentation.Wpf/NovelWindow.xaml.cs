@@ -17,6 +17,7 @@ using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.LifeSpellCheckModels;
+using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
@@ -45,14 +46,18 @@ namespace BookWiki.Presentation.Wpf
             Rtb.FontSize = 16;
             Rtb.Language = XmlLanguage.GetLanguage("ru");
 
-            _lifeSpellCheck = new LifeSpellCheckV2(Rtb.Document, this, new RussianDictionarySpellChecker());
+            _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new RussianDictionarySpellChecker(BookShelf.Instance.Lex));
 
             LoadContent(novel);
+
+            UpdatePaging();
         }
 
         private void Content_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             _lifeSpellCheck.TextChangedInside(Rtb.CaretPosition.Paragraph);
+
+            UpdatePaging();
         }
 
         private async void SpellCheckButton(object sender, RoutedEventArgs e)
@@ -210,7 +215,7 @@ namespace BookWiki.Presentation.Wpf
                     Stretch = Stretch.Fill
                 };
 
-                Canvas.SetTop(r, x1.Bottom);
+                Canvas.SetTop(r, x1.Bottom - 3);
                 Canvas.SetLeft(r, x1.X);
 
                 SpellCheckBox.Children.Add(r);
@@ -220,6 +225,95 @@ namespace BookWiki.Presentation.Wpf
         public void RemoveAll()
         {
             SpellCheckBox.Children.Clear();
+        }
+
+        private void SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            _lifeSpellCheck.CursorPositionChanged();
+        }
+
+        public const string PageCount = "Pages";
+        public const string AuthorLists = "ALs";
+        public const string Characters = "Chars";
+        public const string NotDiplay = "No Pages";
+
+        public static readonly string[] PageModes = new string[]
+        {
+            PageCount, AuthorLists, Characters, NotDiplay
+        };
+
+        private string _pageMode = PageCount;
+
+        private int Length => new TextRange(Rtb.Document.ContentStart, Rtb.Document.ContentEnd).Text.Length;
+
+        private void UpdatePagingForAuthorLists()
+        {
+            var listSize = 40000;
+
+            var als = (double)Length / (double)listSize;
+
+            Pages.Text = $"{als:##.000} а.л.";
+        }
+
+        private void UpdatePagingForChars()
+        {
+            var ks = Length / 1000f;
+
+            Pages.Text = $"{ks:###.0}k";
+        }
+
+        private void UpdatePagingForPages()
+        {
+            var pageSize = 1120;
+
+            var totalPages = (int)(Rtb.ActualHeight / pageSize) + 1;
+
+            var currentPage = (int)(Scroll.ContentVerticalOffset / pageSize) + 1;
+
+            Pages.Text = $"{currentPage} из {totalPages}";
+        }
+
+        private void UpdatePaging()
+        {
+            if (_pageMode == PageCount)
+            {
+                UpdatePagingForPages();
+            }
+
+            if (_pageMode == NotDiplay)
+            {
+                UpdatePagingForNotDisplay();
+            }
+
+            if (_pageMode == AuthorLists)
+            {
+                UpdatePagingForAuthorLists();
+            }
+
+            if (_pageMode == Characters)
+            {
+                UpdatePagingForChars();
+            }
+        }
+
+        private void UpdatePagingForNotDisplay()
+        {
+            Pages.Text = "None";
+        }
+
+        private void ChangeMode(object sender, MouseButtonEventArgs e)
+        {
+            _pageMode = PageModes[(PageModes.IndexOf(x => x == _pageMode) + 1) % PageModes.Length];
+
+            UpdatePaging();
+        }
+
+        private void Scroll_OnScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (_pageMode == PageCount)
+            {
+                UpdatePagingForPages();
+            }
         }
     }
 }

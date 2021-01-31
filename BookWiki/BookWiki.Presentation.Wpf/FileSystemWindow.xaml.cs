@@ -42,7 +42,7 @@ namespace BookWiki.Presentation.Wpf
         {
             InitializeComponent();
 
-            new NovelWindow(_fabel).Show();
+            new NovelWindow(_summerNight).Show();
         }
 
         private void Content_OnTextChanged(object sender, TextChangedEventArgs e)

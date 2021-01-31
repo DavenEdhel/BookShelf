@@ -11,12 +11,12 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="20"></RowDefinition>
         </Grid.RowDefinitions>
-        <ScrollViewer VerticalScrollBarVisibility="Visible">
+        <ScrollViewer VerticalScrollBarVisibility="Visible" Name="Scroll" ScrollChanged="Scroll_OnScrollChanged">
             <Grid>
-                <RichTextBox TextChanged="Content_OnTextChanged" Name="Rtb" HorizontalContentAlignment="Right">
+                <RichTextBox TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" Name="Rtb" HorizontalContentAlignment="Right">
                     <RichTextBox.Resources>
                         <Style TargetType="{x:Type Paragraph}">
-                            <Setter Property="Margin" Value="10, 0, 0, 0"/>
+                            <Setter Property="Margin" Value="0"/>
                             <Setter Property="TextIndent" Value="30"/>
                         </Style>
                     </RichTextBox.Resources>
@@ -37,6 +37,7 @@
             <Button Click="ToLeft">To Center</Button>
             <Button Click="ToCenter">To Center</Button>
             <Button Click="ToRight">To Right</Button>
+            <TextBlock MouseUp="ChangeMode" Name="Pages"></TextBlock>
         </StackPanel>
     </Grid>
 </Window>

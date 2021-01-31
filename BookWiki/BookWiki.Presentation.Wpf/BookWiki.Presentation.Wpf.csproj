@@ -78,7 +78,9 @@
     <Compile Include="Models\InlineFromRichTextBoxInline.cs" />
     <Compile Include="Models\ParagraphFromBlock.cs" />
     <Compile Include="Models\RootPath.cs" />
+    <Compile Include="Models\SpellCheckModels\FlowDocumentExtensions.cs" />
     <Compile Include="Models\SpellCheckModels\LifeSpellCheckV2.cs" />
+    <Compile Include="Models\SpellCheckModels\PunctuationSeparatedEnumeration.cs" />
     <Compile Include="NovelWindow.xaml.cs">
       <DependentUpon>NovelWindow.xaml</DependentUpon>
     </Compile>
