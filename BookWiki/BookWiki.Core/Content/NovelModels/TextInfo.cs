@@ -4,7 +4,7 @@ namespace BookWiki.Core
 {
     public class TextInfo : ITextInfo
     {
-        public TextInfo(ITextRange range, TextStyle style)
+        public TextInfo(IRange range, TextStyle style)
         {
             Range = range;
             Style = style;

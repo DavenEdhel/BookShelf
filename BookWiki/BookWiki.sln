@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppForDebugDiagnostic", "Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookWiki.HtmlConverter", "BookWiki.HtmlConverter\BookWiki.HtmlConverter.csproj", "{97CC32BC-B085-40B8-8675-2F5A76FC5829}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookWiki.Presentation.Wpf", "BookWiki.Presentation.Wpf\BookWiki.Presentation.Wpf.csproj", "{68EB607E-4834-4C29-AAFA-7B613DA1B027}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,18 @@ Global
 		{97CC32BC-B085-40B8-8675-2F5A76FC5829}.Release|iPhone.Build.0 = Release|Any CPU
 		{97CC32BC-B085-40B8-8675-2F5A76FC5829}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{97CC32BC-B085-40B8-8675-2F5A76FC5829}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Release|iPhone.Build.0 = Release|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{68EB607E-4834-4C29-AAFA-7B613DA1B027}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

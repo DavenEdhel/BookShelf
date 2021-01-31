@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using BookWiki.Core.Utils;
+using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Apple.Models.Utils;
 
 namespace BookWiki.Core

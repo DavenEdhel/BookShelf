@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using BookWiki.Core.Utils.TextModels;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 
@@ -13,7 +12,7 @@ namespace BookWiki.Core.Utils
 
         public PunctuationSeparatedRange(string plainText, int startIndex = 0, int length = -1)
         {
-            var punctuation = new Char[] {' ', '.', ',', '!', '?', ';', ':', '\n'};
+            var punctuation = TextParts.NotALetterOrNumber;
 
             _plainText = plainText;
             _startIndex = new Number(startIndex, 0, _plainText.Length - 1);

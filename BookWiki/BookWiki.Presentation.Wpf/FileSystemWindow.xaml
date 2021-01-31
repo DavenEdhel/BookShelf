@@ -1,0 +1,43 @@
+﻿<Window x:Class="BookWiki.Presentation.Wpf.FileSystemWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
+        xmlns:system="clr-namespace:System;assembly=System"
+        mc:Ignorable="d"
+        Title="File System" Height="800" Width="680">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Visible">
+            <Grid>
+                <RichTextBox TextChanged="Content_OnTextChanged" Name="Rtb" HorizontalContentAlignment="Right">
+                    <RichTextBox.Resources>
+                        <Style TargetType="{x:Type Paragraph}">
+                            <Setter Property="Margin" Value="10, 0, 0, 0"/>
+                            <Setter Property="TextIndent" Value="30"/>
+                        </Style>
+                    </RichTextBox.Resources>
+                </RichTextBox>
+                <Canvas Name="SpellCheckBox">
+                    <Rectangle Stroke="Blue" Stretch="Fill" Canvas.Top="10" Canvas.Left="0" Width="50" Height="1"/>
+                </Canvas>
+            </Grid>
+        </ScrollViewer>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <TextBox Name="Start" Width="50"></TextBox>
+            <TextBox Name="End" Width="50"></TextBox>
+            <Button Click="SpellCheckButton">Spellcheck</Button>
+            <Button Click="Save">Save</Button>
+            <Button Click="LoadContent">Load</Button>
+            <Button Click="LoadContent2">Load2</Button>
+            <Button Click="LoadContent3">Load3</Button>
+            <Button Click="ToLeft">To Center</Button>
+            <Button Click="ToCenter">To Center</Button>
+            <Button Click="ToRight">To Right</Button>
+        </StackPanel>
+    </Grid>
+</Window>
