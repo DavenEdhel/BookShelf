@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using BookWiki.Core;
 using BookWiki.Core.Files.FileModels;
@@ -18,7 +13,6 @@ using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Logging;
-using BookWiki.Core.Search;
 using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models;
@@ -32,19 +26,18 @@ namespace BookWiki.Presentation.Wpf
     /// </summary>
     public partial class NovelWindow : Window, IErrorsCollectionV2
     {
-        // todo: life replace " with «»
-
-        private IRelativePath _fabel = new FolderPath(@"Рассказы\Сказки\Сказка 1. Рога, копыта да хвосты.n");
-        private IRelativePath _aboutTime = new FolderPath(@"Материалы\Письмена Атлины\Книга 6. Время.n");
-        private IRelativePath _summerNight = new FolderPath(@"Рассказы\Идеи\Летняя Ночь.n");
-        private IRelativePath _currentlyLoaded = null;
-        private LifeSpellCheckV2 _lifeSpellCheck;
-
+        private readonly IRelativePath _novel;
+        private readonly LifeSpellCheckV2 _lifeSpellCheck;
         private readonly Logger _logger = new Logger(nameof(NovelWindow));
+
+        public IRelativePath Novel => _novel;
 
         public NovelWindow(IRelativePath novel)
         {
+            _novel = novel;
             InitializeComponent();
+
+            Title = novel.Name.PlainText + (novel.Parts.Count() > 1 ? (" << " + novel.Parts.Reverse().Skip(1).First().PlainText) : "");
 
             Rtb.FontFamily = new FontFamily("Times New Roman");
             Rtb.FontSize = 16;
@@ -67,7 +60,6 @@ namespace BookWiki.Presentation.Wpf
         private async void SpellCheckButton(object sender, RoutedEventArgs e)
         {
             var startOfInline = Rtb.Document.Blocks.FirstBlock.CastTo<Paragraph>().Inlines.FirstInline.ContentStart;
-            
 
             for (int i = 0; i < 1000; i++)
             {
@@ -102,28 +94,29 @@ namespace BookWiki.Presentation.Wpf
 
         private void Save(object sender, RoutedEventArgs e)
         {
+            Save();
+        }
+
+        public void Save()
+        {
             var c = new DocumentFlowContentFromRichTextBox(Rtb);
 
             var formattedContent = new FormattedContentFromDocumentFlow(c);
 
-            var file = new ContentFolder(_currentlyLoaded.AbsolutePath(BookShelf.Instance.RootPath));
+            var file = new ContentFolder(_novel.AbsolutePath(BookShelf.Instance.RootPath));
             file.Save(formattedContent);
         }
 
         private void LoadContent(object sender, RoutedEventArgs e)
         {
-            LoadContent(_fabel);
         }
 
         private void LoadContent2(object sender, RoutedEventArgs e)
         {
-            LoadContent(_aboutTime);
         }
 
         private void LoadContent(IRelativePath path)
         {
-            _currentlyLoaded = path;
-
             var novel = new Novel(path, BookShelf.Instance.RootPath);
 
             var rtf = new DocumentFlowContentFromTextAndFormat(novel);
@@ -171,7 +164,6 @@ namespace BookWiki.Presentation.Wpf
 
         private void LoadContent3(object sender, RoutedEventArgs e)
         {
-            LoadContent(_summerNight);
         }
 
         private void ToRight(object sender, RoutedEventArgs e)

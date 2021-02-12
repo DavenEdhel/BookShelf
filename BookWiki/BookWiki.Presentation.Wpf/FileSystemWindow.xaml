@@ -5,27 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
         xmlns:system="clr-namespace:System;assembly=System"
+        xmlns:views="clr-namespace:BookWiki.Presentation.Wpf.Views"
         mc:Ignorable="d"
-        Title="File System" Height="800" Width="680">
+        Title="Книжная Полка" Height="800" Width="680">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="20"></RowDefinition>
         </Grid.RowDefinitions>
-        <ScrollViewer VerticalScrollBarVisibility="Visible">
-            <Grid>
-                <RichTextBox TextChanged="Content_OnTextChanged" Name="Rtb" HorizontalContentAlignment="Right">
-                    <RichTextBox.Resources>
-                        <Style TargetType="{x:Type Paragraph}">
-                            <Setter Property="Margin" Value="10, 0, 0, 0"/>
-                            <Setter Property="TextIndent" Value="30"/>
-                        </Style>
-                    </RichTextBox.Resources>
-                </RichTextBox>
-                <Canvas Name="SpellCheckBox">
-                    <Rectangle Stroke="Blue" Stretch="Fill" Canvas.Top="10" Canvas.Left="0" Width="50" Height="1"/>
-                </Canvas>
-            </Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Visible" Name="FileSystemScroll">
+            
         </ScrollViewer>
         <StackPanel Grid.Row="1" Orientation="Horizontal">
             <TextBox Name="Start" Width="50"></TextBox>

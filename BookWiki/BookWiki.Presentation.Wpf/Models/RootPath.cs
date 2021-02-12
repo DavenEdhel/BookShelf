@@ -1,4 +1,6 @@
-﻿using BookWiki.Core.Files.PathModels;
+﻿using System.IO;
+using BookWiki.Core.Files.PathModels;
+using Newtonsoft.Json;
 
 namespace BookWiki.Presentation.Wpf.Models
 {
@@ -6,9 +8,9 @@ namespace BookWiki.Presentation.Wpf.Models
     {
         private readonly IPath _path;
 
-        public RootPath()
+        public RootPath(string path)
         {
-            _path = new FolderPath(@"C:\Work\Projects\BookShelf\BookWiki\BookWiki.Presentation.Wpf\bin\Debug\Book Wiki 4");
+            _path = new FolderPath(path);
         }
 
         public IFileName Name => _path.Name;
