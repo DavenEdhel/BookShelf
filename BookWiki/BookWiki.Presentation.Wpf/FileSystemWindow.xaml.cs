@@ -34,80 +34,43 @@ namespace BookWiki.Presentation.Wpf
     /// </summary>
     public partial class FileSystemWindow : Window
     {
+        private bool _closeRequested = false;
+        private bool _doNotStoreSession = false;
 
         public FileSystemWindow()
         {
             InitializeComponent();
-
-            //new NovelWindow(_summerNight).Show();
 
             FileSystemScroll.Content = new FileSystemView(BookShelf.Instance.Root);
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            foreach (Window currentWindow in Application.Current.Windows)
+            if (!_closeRequested)
             {
-                if (currentWindow is NovelWindow novelWindow)
+                _closeRequested = true;
+
+                if (_doNotStoreSession == false)
                 {
-                    try
-                    {
-                        novelWindow.Save();
+                    BookShelf.Instance.StoreSession();
 
-                        novelWindow.Close();
-                    }
-                    catch (Exception exception)
-                    {
-                        MessageBox.Show($"Something went wrong with {novelWindow.Novel.Name}", exception.ToString());
-                    }
+                    _doNotStoreSession = true;
                 }
+
+                BookShelf.Instance.CloseAllAsync();
+
+                e.Cancel = true;
+                base.OnClosing(e);
             }
-
-            base.OnClosing(e);
+            else
+            {
+                base.OnClosing(e);
+            }
         }
 
-        private async void SpellCheckButton(object sender, RoutedEventArgs e)
+        public void Restore()
         {
-            
-        }
-
-        private void Save(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void LoadContent(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void LoadContent2(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void LoadContent(IRelativePath path)
-        {
-            
-        }
-
-        private void LoadContent3(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void ToRight(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void ToLeft(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void ToCenter(object sender, RoutedEventArgs e)
-        {
-            
+            _closeRequested = false;
         }
     }
 }

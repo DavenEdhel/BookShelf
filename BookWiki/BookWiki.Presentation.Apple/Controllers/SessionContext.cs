@@ -11,7 +11,7 @@ using BookWiki.Presentation.Apple.Views.Main;
 
 namespace BookWiki.Presentation.Apple.Controllers
 {
-    public class SessionContext
+    public class SessionContext : ISessionContext
     {
         private readonly ILibrary _library;
 

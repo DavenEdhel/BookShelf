@@ -13,5 +13,11 @@ namespace BookWiki.Presentation.Wpf
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnActivated(EventArgs e)
+        {
+            BookShelf.Instance.RestoreLastSession();
+
+            base.OnActivated(e);
+        }
     }
 }

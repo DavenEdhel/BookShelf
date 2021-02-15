@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using BookWiki.Core.Files.FileModels;
 using UIKit;
 
 namespace BookWiki.Presentation.Apple.Views.Common
@@ -8,17 +9,7 @@ namespace BookWiki.Presentation.Apple.Views.Common
     {
         private UITextView _textView;
 
-        public const string Pages = "Pages";
-        public const string AuthorLists = "ALs";
-        public const string Characters = "Chars";
-        public const string NotDiplay = "No Pages";
-
-        public static readonly string[] PageModes = new string[]
-        {
-            Pages, AuthorLists, Characters, NotDiplay
-        };
-
-        private string _pageMode = Pages;
+        private string _pageMode = PageNumber.Pages;
 
         public PageNumberView()
         {
@@ -67,22 +58,22 @@ namespace BookWiki.Presentation.Apple.Views.Common
 
         private void UpdatePaging()
         {
-            if (_pageMode == Pages)
+            if (_pageMode == PageNumber.Pages)
             {
                 UpdatePagingForPages();
             }
 
-            if (_pageMode == NotDiplay)
+            if (_pageMode == PageNumber.NotDiplay)
             {
                 UpdatePagingForNotDisplay();
             }
 
-            if (_pageMode == AuthorLists)
+            if (_pageMode == PageNumber.AuthorLists)
             {
                 UpdatePagingForAuthorLists();
             }
 
-            if (_pageMode == Characters)
+            if (_pageMode == PageNumber.Characters)
             {
                 UpdatePagingForChars();
             }

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 

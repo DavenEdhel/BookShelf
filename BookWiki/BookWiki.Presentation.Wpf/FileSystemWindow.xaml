@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
         xmlns:system="clr-namespace:System;assembly=System"
         xmlns:views="clr-namespace:BookWiki.Presentation.Wpf.Views"
-        mc:Ignorable="d"
+        mc:Ignorable="d" ResizeMode="CanMinimize"
         Title="Книжная Полка" Height="800" Width="680">
     <Grid>
         <Grid.RowDefinitions>
@@ -16,17 +16,5 @@
         <ScrollViewer VerticalScrollBarVisibility="Visible" Name="FileSystemScroll">
             
         </ScrollViewer>
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <TextBox Name="Start" Width="50"></TextBox>
-            <TextBox Name="End" Width="50"></TextBox>
-            <Button Click="SpellCheckButton">Spellcheck</Button>
-            <Button Click="Save">Save</Button>
-            <Button Click="LoadContent">Load</Button>
-            <Button Click="LoadContent2">Load2</Button>
-            <Button Click="LoadContent3">Load3</Button>
-            <Button Click="ToLeft">To Center</Button>
-            <Button Click="ToCenter">To Center</Button>
-            <Button Click="ToRight">To Right</Button>
-        </StackPanel>
     </Grid>
 </Window>

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -12,8 +13,6 @@ namespace BookWiki.Presentation.Wpf.Views
         private IFileSystemNode _node;
         private readonly TextBlock _expandButtonText;
         private StackPanel _childItems;
-        private StackPanel _newItemPanel;
-        private TextBox _newItemText;
         private int _offset = 20;
 
         public FileSystemView(IFileSystemNode node)
@@ -62,6 +61,15 @@ namespace BookWiki.Presentation.Wpf.Views
             _childItems.Orientation = Orientation.Vertical;
             Children.Add(_childItems);
 
+            if (_node.IsContentFolder == false)
+            {
+                var shouldBeOpened = BookShelf.Instance.Session.OpenedContentTabs.Any(x => x.NovelPathToLoad.Contains(_node.Path.RelativePath(BookShelf.Instance.RootPath)));
+
+                if (shouldBeOpened)
+                {
+                    Expand();
+                }
+            }
         }
 
         private void FileNodeNameOnMouseUp(object sender, MouseButtonEventArgs e)
@@ -71,7 +79,7 @@ namespace BookWiki.Presentation.Wpf.Views
                 var contentWindow = new NewContentWindow();
                 if (contentWindow.ShowDialog() == true)
                 {
-                    var node = new FileSystemNode(_node, new FolderPath(BookShelf.Instance.RootPath, new FileName(contentWindow.ContentName.Text), contentWindow.Extension));
+                    var node = new FileSystemNode(_node, new FolderPath(_node.Path, new FileName(contentWindow.ContentName.Text), contentWindow.Extension));
                     node.SaveUnder(_node);
 
                     _node = new FileSystemNode(_node.Path.FullPath);
@@ -82,7 +90,7 @@ namespace BookWiki.Presentation.Wpf.Views
             }
             else
             {
-                new NovelWindow(_node.Path.RelativePath(BookShelf.Instance.RootPath)).Show();
+                BookShelf.Instance.Open(_node.Path.RelativePath(BookShelf.Instance.RootPath));
             }
         }
 

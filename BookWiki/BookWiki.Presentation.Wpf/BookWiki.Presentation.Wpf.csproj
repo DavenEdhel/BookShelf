@@ -59,6 +59,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\AppConfig.cs" />
+    <Compile Include="Models\EditorState.cs" />
+    <Compile Include="Models\PageConfig.cs" />
+    <Compile Include="Models\ScreensStateDto.cs" />
+    <Compile Include="Models\ScreenState.cs" />
+    <Compile Include="Models\SessionContext.cs" />
     <Compile Include="NewContentWindow.xaml.cs">
       <DependentUpon>NewContentWindow.xaml</DependentUpon>
     </Compile>

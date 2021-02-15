@@ -1,5 +1,6 @@
 ﻿using System;
 using BookWiki.Core;
+using BookWiki.Core.Files.FileModels;
 using BookWiki.Presentation.Apple.Controllers;
 using BookWiki.Presentation.Apple.Extentions;
 using BookWiki.Presentation.Apple.Views.Common;
@@ -55,7 +56,7 @@ namespace BookWiki.Presentation.Apple.Views
             _hideShowScroll.IsOff = _session.InterfaceSettings.IsScrollHidden;
             Add(_hideShowScroll);
 
-            _changePagingMode = new SeveralStatesView(PageNumberView.PageModes);
+            _changePagingMode = new SeveralStatesView(PageNumber.PageModes);
             _changePagingMode.CurrentIndex = _session.InterfaceSettings.PageModeIndex;
             Add(_changePagingMode);
 

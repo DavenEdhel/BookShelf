@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,25 +32,117 @@ namespace BookWiki.Presentation.Wpf
         private readonly IRelativePath _novel;
         private readonly LifeSpellCheckV2 _lifeSpellCheck;
         private readonly Logger _logger = new Logger(nameof(NovelWindow));
+        private bool _isChanged = false;
+        private bool _canBeClosed = false;
+        private bool _requestToClose = false;
+        private CancellationTokenSource _token;
+
+        public bool ClosingFailed { get; set; } = false;
 
         public IRelativePath Novel => _novel;
 
-        public NovelWindow(IRelativePath novel)
+        public NovelWindow(Novel novel)
         {
-            _novel = novel;
+            BookShelf.Instance.PageConfig.Changed += PageConfigOnChanged;
+
+            _novel = novel.Source;
             InitializeComponent();
 
-            Title = novel.Name.PlainText + (novel.Parts.Count() > 1 ? (" << " + novel.Parts.Reverse().Skip(1).First().PlainText) : "");
+            Title = novel.Source.Name.PlainText + (novel.Source.Parts.Count() > 1 ? (" << " + novel.Source.Parts.Reverse().Skip(1).First().PlainText) : "");
 
             Rtb.FontFamily = new FontFamily("Times New Roman");
-            Rtb.FontSize = 16;
+            Rtb.FontSize = 18;
             Rtb.Language = XmlLanguage.GetLanguage("ru");
+            Rtb.BorderThickness = new Thickness(0, 0, 0, 0);
 
             _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary));
 
             LoadContent(novel);
 
+            PageConfigOnChanged(BookShelf.Instance.PageConfig.Current);
+
+            _token = new CancellationTokenSource();
+            RunAutosave();
+        }
+
+        public NovelWindow(IRelativePath novel) : this(new Novel(novel, BookShelf.Instance.RootPath))
+        {
+            
+        }
+
+        private async Task RunAutosave()
+        {
+            while (true)
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(30), _token.Token);
+                }
+                catch (Exception e)
+                {
+                }
+
+                if (_requestToClose)
+                {
+                    if (Save())
+                    {
+                        BookShelf.Instance.PageConfig.Changed -= PageConfigOnChanged;
+
+                        _canBeClosed = true;
+
+                        Dispatcher.InvokeAsync(Close);
+
+                        ClosingFailed = false;
+
+                        return;
+                    }
+                    else
+                    {
+                        _token = new CancellationTokenSource();
+
+                        _requestToClose = false;
+
+                        ClosingFailed = true;
+                    }
+                }
+                else
+                {
+                    if (Save())
+                    {
+                        SaveButton.Visibility = Visibility.Hidden;
+                    }
+                }
+            }
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            _requestToClose = true;
+
+            _token.Cancel();
+
+            if (_canBeClosed == false)
+            {
+                e.Cancel = true;
+            }
+
+            base.OnClosing(e);
+        }
+
+        private void PageConfigOnChanged(UserInterfaceSettings obj)
+        {
+            _pageMode = PageNumber.PageModes[obj.PageModeIndex];
             UpdatePaging();
+
+            if (IsSpellcheckOn() != obj.IsSpellCheckOn)
+            {
+                ToggleSpellcheck();
+            }
+
+            if (IsScrollVisible() != !obj.IsScrollHidden)
+            {
+                ToggleScroll();
+            }
         }
 
         private void Content_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -55,70 +150,38 @@ namespace BookWiki.Presentation.Wpf
             _lifeSpellCheck.TextChangedInside(Rtb.CaretPosition.Paragraph);
 
             UpdatePaging();
+
+            _isChanged = true;
+
+            SaveButton.Visibility = Visibility.Visible;
         }
 
-        private async void SpellCheckButton(object sender, RoutedEventArgs e)
+        public bool Save()
         {
-            var startOfInline = Rtb.Document.Blocks.FirstBlock.CastTo<Paragraph>().Inlines.FirstInline.ContentStart;
-
-            for (int i = 0; i < 1000; i++)
+            try
             {
-                // Content.GetPositionFromPoint()
-                var position = Rtb.CaretPosition.GetCharacterRect(LogicalDirection.Forward);
-
-                var start = i;
-                //var end = int.Parse(End.Text);
-
-                var x1 = Rtb.Document.ContentStart.GetPositionAtOffset(start).GetCharacterRect(LogicalDirection.Forward);
-                var x2 = Rtb.Document.ContentStart.GetPositionAtOffset(start + 1).GetCharacterRect(LogicalDirection.Forward);
-
-                if (x2.X > x1.X)
+                lock (this)
                 {
-                    var r = new Rectangle()
-                    {
-                        Width = x2.X - x1.X,
-                        Height = 1,
-                        Stroke = Brushes.LightSeaGreen,
-                        Stretch = Stretch.Fill
-                    };
+                    var c = new DocumentFlowContentFromRichTextBox(Rtb);
 
-                    Canvas.SetTop(r, x1.Bottom);
-                    Canvas.SetLeft(r, x1.X);
+                    var formattedContent = new FormattedContentFromDocumentFlow(c);
 
-                    SpellCheckBox.Children.Add(r);
+                    var file = new ContentFolder(_novel.AbsolutePath(BookShelf.Instance.RootPath));
+                    file.Save(formattedContent);
                 }
 
-                await Task.Delay(1000);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.ToString(), $"Something went wrong with {Novel.Name.PlainText}");
+
+                return false;
             }
         }
 
-        private void Save(object sender, RoutedEventArgs e)
+        private void LoadContent(Novel novel)
         {
-            Save();
-        }
-
-        public void Save()
-        {
-            var c = new DocumentFlowContentFromRichTextBox(Rtb);
-
-            var formattedContent = new FormattedContentFromDocumentFlow(c);
-
-            var file = new ContentFolder(_novel.AbsolutePath(BookShelf.Instance.RootPath));
-            file.Save(formattedContent);
-        }
-
-        private void LoadContent(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void LoadContent2(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void LoadContent(IRelativePath path)
-        {
-            var novel = new Novel(path, BookShelf.Instance.RootPath);
-
             var rtf = new DocumentFlowContentFromTextAndFormat(novel);
 
             Rtb.Document.Blocks.Clear();
@@ -160,10 +223,9 @@ namespace BookWiki.Presentation.Wpf
 
                 Rtb.Document.Blocks.Add(paragraph);
             }
-        }
 
-        private void LoadContent3(object sender, RoutedEventArgs e)
-        {
+            _isChanged = false;
+            SaveButton.Visibility = Visibility.Hidden;
         }
 
         private void ToRight(object sender, RoutedEventArgs e)
@@ -228,17 +290,7 @@ namespace BookWiki.Presentation.Wpf
             _lifeSpellCheck.CursorPositionChanged();
         }
 
-        public const string PageCount = "Pages";
-        public const string AuthorLists = "ALs";
-        public const string Characters = "Chars";
-        public const string NotDiplay = "No Pages";
-
-        public static readonly string[] PageModes = new string[]
-        {
-            PageCount, AuthorLists, Characters, NotDiplay
-        };
-
-        private string _pageMode = PageCount;
+        private string _pageMode = PageNumber.Pages;
 
         private int Length => new TextRange(Rtb.Document.ContentStart, Rtb.Document.ContentEnd).Text.Length;
 
@@ -260,7 +312,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void UpdatePagingForPages()
         {
-            var pageSize = 1120;
+            var pageSize = 1020;
 
             var totalPages = (int)(Rtb.ActualHeight / pageSize) + 1;
 
@@ -271,22 +323,22 @@ namespace BookWiki.Presentation.Wpf
 
         private void UpdatePaging()
         {
-            if (_pageMode == PageCount)
+            if (_pageMode == PageNumber.Pages)
             {
                 UpdatePagingForPages();
             }
 
-            if (_pageMode == NotDiplay)
+            if (_pageMode == PageNumber.NotDiplay)
             {
                 UpdatePagingForNotDisplay();
             }
 
-            if (_pageMode == AuthorLists)
+            if (_pageMode == PageNumber.AuthorLists)
             {
                 UpdatePagingForAuthorLists();
             }
 
-            if (_pageMode == Characters)
+            if (_pageMode == PageNumber.Characters)
             {
                 UpdatePagingForChars();
             }
@@ -299,14 +351,16 @@ namespace BookWiki.Presentation.Wpf
 
         private void ChangeMode(object sender, MouseButtonEventArgs e)
         {
-            _pageMode = PageModes[(PageModes.IndexOf(x => x == _pageMode) + 1) % PageModes.Length];
+            _pageMode = PageNumber.PageModes[(PageNumber.PageModes.IndexOf(x => x == _pageMode) + 1) % PageNumber.PageModes.Length];
 
             UpdatePaging();
+
+            BookShelf.Instance.PageConfig.SetDisplayMode(_pageMode);
         }
 
         private void Scroll_OnScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (_pageMode == PageCount)
+            if (_pageMode == PageNumber.Pages)
             {
                 UpdatePagingForPages();
             }
@@ -334,6 +388,59 @@ namespace BookWiki.Presentation.Wpf
 
         private void Rtb_OnKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.W && e.KeyboardDevice.Modifiers == ModifierKeys.Control)
+            {
+                BookShelf.Instance.ShowFileSystem();
+
+                e.Handled = true;
+            }
+
+            if (e.Key == Key.S && e.KeyboardDevice.Modifiers == ModifierKeys.Control)
+            {
+                Save();
+
+                SaveButton.Visibility = Visibility.Hidden;
+
+                e.Handled = true;
+            }
+
+            if (e.KeyboardDevice.IsKeyDown(Key.LeftAlt))
+            {
+                if (e.KeyboardDevice.IsKeyDown(Key.Right))
+                {
+                    if (e.KeyboardDevice.IsKeyDown(Key.LeftShift))
+                    {
+                        Rtb.Selection.Select(Rtb.Selection.Start, GetThisLineEnd());
+
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        Rtb.CaretPosition = GetThisLineEnd();
+
+                        e.Handled = true;
+                    }
+                }
+
+                if (e.KeyboardDevice.IsKeyDown(Key.Left))
+                {
+                    if (e.KeyboardDevice.IsKeyDown(Key.LeftShift))
+                    {
+                        Rtb.Selection.Select(Rtb.CaretPosition.GetLineStartPosition(0), Rtb.Selection.End);
+
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        Rtb.CaretPosition = Rtb.CaretPosition.GetLineStartPosition(0);
+
+                        e.Handled = true;
+                    }
+                }
+
+                
+            }
+
             if (e.Key == Key.D2 && e.KeyboardDevice.Modifiers == ModifierKeys.Shift)
             {
                 var text = new TextRange(Rtb.Document.ContentStart, Rtb.CaretPosition).Text;
@@ -343,13 +450,160 @@ namespace BookWiki.Presentation.Wpf
 
                 var toInsert = closings.Count() < openings.Count() ? "»" : "«";
 
-                var currentCaretPosition = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
-
-                Rtb.Selection.Start.InsertTextInRun(toInsert);
-
-                Rtb.CaretPosition = Rtb.Document.ContentStart.GetPositionAtOffset(currentCaretPosition + 1);
+                Insert(toInsert);
 
                 e.Handled = true;
+            }
+        }
+
+        TextPointer GetLineEnd(TextPointer position)
+        {
+            var isEof = position.GetLineStartPosition(1) == null;
+
+            if (isEof)
+            {
+                return Rtb.Document.ContentEnd;
+            }
+
+            var currentLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(position.GetLineStartPosition(0));
+            var nextLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(position.GetLineStartPosition(1));
+
+            for (int i = nextLineOffset; i > currentLineOffset; i--)
+            {
+                var possibleEol = Rtb.Document.ContentStart.GetPositionAtOffset(i);
+
+                var offsetToCheck = Rtb.Document.ContentStart.GetOffsetToPosition(possibleEol.GetLineStartPosition(0));
+
+                if (currentLineOffset == offsetToCheck)
+                {
+                    return possibleEol;
+                }
+            }
+
+            return null;
+        }
+
+        TextPointer GetThisLineEnd()
+        {
+            var isEof = Rtb.CaretPosition.GetLineStartPosition(1) == null;
+
+            if (isEof)
+            {
+                return Rtb.Document.ContentEnd;
+            }
+
+            var currentLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition.GetLineStartPosition(0));
+            var nextLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition.GetLineStartPosition(1));
+
+            for (int i = nextLineOffset; i > currentLineOffset; i--)
+            {
+                var possibleEol = Rtb.Document.ContentStart.GetPositionAtOffset(i);
+
+                var offsetToCheck = Rtb.Document.ContentStart.GetOffsetToPosition(possibleEol.GetLineStartPosition(0));
+
+                if (currentLineOffset == offsetToCheck)
+                {
+                    return possibleEol;
+                }
+            }
+
+            return null;
+        }
+
+        private void Insert(string toInsert)
+        {
+            var currentCaretPosition = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
+
+            Rtb.Selection.Start.InsertTextInRun(toInsert);
+
+            Rtb.CaretPosition = Rtb.Document.ContentStart.GetPositionAtOffset(currentCaretPosition + 1);
+        }
+
+        private void ScrollSwitch(object sender, RoutedEventArgs e)
+        {
+            ToggleScroll();
+
+            BookShelf.Instance.PageConfig.SetScrollVisibility(ScrollSwitchButton.Content.ToString() == "Scroll Visible");
+        }
+
+        private void ToggleScroll()
+        {
+            if (IsScrollVisible())
+            {
+                ScrollSwitchButton.Content = "Scroll Hidden";
+
+                Scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+
+                Rtb.Margin = new Thickness(0, 0, 17, 0);
+            }
+            else
+            {
+                ScrollSwitchButton.Content = "Scroll Visible";
+
+                Scroll.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+
+                Rtb.Margin = new Thickness(0, 0, 0, 0);
+            }
+        }
+
+        private bool IsScrollVisible()
+        {
+            return ScrollSwitchButton.Content.ToString() == "Scroll Visible";
+        }
+
+        private void SpellcheckSwitch(object sender, RoutedEventArgs e)
+        {
+            ToggleSpellcheck();
+
+            BookShelf.Instance.PageConfig.SetSpellcheckAvailability(SpellcheckSwitchButton.Content.ToString() == "Spellcheck On");
+        }
+
+        private void ToggleSpellcheck()
+        {
+            if (IsSpellcheckOn())
+            {
+                SpellcheckSwitchButton.Content = "Spellcheck Off";
+
+                _lifeSpellCheck.IsEnabled = false;
+            }
+            else
+            {
+                SpellcheckSwitchButton.Content = "Spellcheck On";
+
+                _lifeSpellCheck.IsEnabled = true;
+
+                _lifeSpellCheck.CursorPositionChanged();
+            }
+        }
+
+        private bool IsSpellcheckOn()
+        {
+            return SpellcheckSwitchButton.Content.ToString() == "Spellcheck On";
+        }
+
+        private void SaveContent(object sender, RoutedEventArgs e)
+        {
+            Save();
+
+            SaveButton.Visibility = Visibility.Hidden;
+        }
+
+        private void Rtb_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Back)
+            {
+                if (Rtb.CaretPosition.IsAtLineStartPosition)
+                {
+                    var previousLine = GetLineEnd(Rtb.CaretPosition.GetLineStartPosition(-1));
+
+                    Rtb.Selection.Select(previousLine.GetInsertionPosition(LogicalDirection.Backward), Rtb.CaretPosition);
+
+                    Rtb.Selection.Text = "";
+
+                    Rtb.CaretPosition = Rtb.Selection.End;
+
+                    e.Handled = true;
+                }
             }
         }
     }

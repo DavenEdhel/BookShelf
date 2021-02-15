@@ -21,6 +21,24 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
         private const int HalfOfRange = 1000;
         private Logger _logger = new Logger(nameof(LifeSpellCheckV2));
         private bool _skipCursorCheck = false;
+        private bool _isEnabled = true;
+
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                _isEnabled = value;
+
+                if (_isEnabled == false)
+                {
+                    _lastCheckedIndex = Int32.MinValue / 2;
+                    _skipCursorCheck = false;
+
+                    _errorsCollection.RemoveAll();
+                }
+            }
+        }
 
         public LifeSpellCheckV2(RichTextBox rtb, IErrorsCollectionV2 errorsCollection, ISpellCheckerV2 spellChecker)
         {
@@ -32,6 +50,11 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 
         public void TextChangedInside(Paragraph p)
         {
+            if (IsEnabled == false)
+            {
+                return;
+            }
+
             if (p == null)
             {
                 return;
@@ -50,6 +73,11 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 
         public void CursorPositionChanged()
         {
+            if (IsEnabled == false)
+            {
+                return;
+            }
+
             if (_skipCursorCheck)
             {
                 _logger.Info("Cursor check skipped");

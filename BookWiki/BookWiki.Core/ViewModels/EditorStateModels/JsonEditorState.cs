@@ -1,4 +1,7 @@
-﻿using BookWiki.Core.Files.PathModels;
+﻿using System.Globalization;
+using System.IO;
+using System.Text;
+using BookWiki.Core.Files.PathModels;
 using Newtonsoft.Json;
 
 namespace BookWiki.Core.ViewModels
@@ -44,7 +47,25 @@ namespace BookWiki.Core.ViewModels
             public bool IsEditing { get; set; }
         }
 
-        public IRelativePath NovelPathToLoad => new FolderPath(_json.NovelPathToLoad);
+        public IRelativePath NovelPathToLoad
+        {
+            get
+            {
+                string correctPath;
+
+                if (Path.DirectorySeparatorChar == '/')
+                {
+                    correctPath = _json.NovelPathToLoad.Replace('\\', Path.DirectorySeparatorChar);
+                }
+                else
+                {
+                    correctPath = _json.NovelPathToLoad.Replace('/', Path.DirectorySeparatorChar);
+                }
+
+                return new FolderPath(correctPath);
+            }
+        }
+
         public int ScrollPosition => _json.ScrollPosition;
         public int LastCaretPosition => _json.LastCaretPosition;
         public bool IsEditing => _json.IsEditing;
