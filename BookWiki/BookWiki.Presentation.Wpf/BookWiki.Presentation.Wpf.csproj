@@ -24,6 +24,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +35,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>BigIcon.ico</ApplicationIcon>
@@ -60,12 +64,32 @@
     </ApplicationDefinition>
     <Compile Include="Models\AppConfig.cs" />
     <Compile Include="Models\EditorState.cs" />
+    <Compile Include="Models\KeyProcessorModels\KeyProcessor.cs" />
+    <Compile Include="Models\NovelTitle.cs" />
     <Compile Include="Models\PageConfig.cs" />
+    <Compile Include="Models\QuickNavigationModels\LifeSearchEngine.cs" />
+    <Compile Include="Models\QuickNavigationModels\QuickNavigationProcessor.cs" />
+    <Compile Include="Models\QuickNavigationModels\SearchByFileEngine.cs" />
     <Compile Include="Models\ScreensStateDto.cs" />
     <Compile Include="Models\ScreenState.cs" />
     <Compile Include="Models\SessionContext.cs" />
+    <Compile Include="Models\Utilities\DependenciesContainerExtensions.cs" />
+    <Compile Include="Models\Utilities\DependenciesContainer.cs" />
+    <Compile Include="Models\Utilities\EventBase.cs" />
+    <Compile Include="Models\Utilities\FailSafeOperation.cs" />
+    <Compile Include="Models\Utilities\IEvent.cs" />
+    <Compile Include="Models\Utilities\InMainThreadOperation.cs" />
+    <Compile Include="Models\Utilities\IOperation.cs" />
+    <Compile Include="Models\Utilities\IThreadInvoker.cs" />
+    <Compile Include="Models\Utilities\Operation.cs" />
+    <Compile Include="Models\Utilities\OperationExtensions.cs" />
+    <Compile Include="Models\Utilities\ThreadInvoker.cs" />
+    <Compile Include="Models\Utilities\ThreadSafeList.cs" />
     <Compile Include="NewContentWindow.xaml.cs">
       <DependentUpon>NewContentWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="QuickNavigationWindow.xaml.cs">
+      <DependentUpon>QuickNavigationWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FileSystemView.cs" />
     <Page Include="FileSystemWindow.xaml">
@@ -87,6 +111,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="NovelWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="QuickNavigationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -121,6 +149,7 @@
     <None Include="AppConfig.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="BookWiki.Presentation.Wpf.ruleset" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -146,5 +175,6 @@
   <ItemGroup>
     <Resource Include="BigIcon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -79,8 +79,7 @@ namespace BookWiki.Presentation.Wpf.Views
                 var contentWindow = new NewContentWindow();
                 if (contentWindow.ShowDialog() == true)
                 {
-                    var node = new FileSystemNode(_node, new FolderPath(_node.Path, new FileName(contentWindow.ContentName.Text), contentWindow.Extension));
-                    node.SaveUnder(_node);
+                    BookShelf.Instance.Save(_node, new FileName(contentWindow.ContentName.Text), contentWindow.Extension);
 
                     _node = new FileSystemNode(_node.Path.FullPath);
 

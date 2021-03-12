@@ -19,6 +19,7 @@ using BookWiki.Core.Logging;
 using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models;
+using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 
@@ -27,7 +28,7 @@ namespace BookWiki.Presentation.Wpf
     /// <summary>
     /// Interaction logic for NovelWindow.xaml
     /// </summary>
-    public partial class NovelWindow : Window, IErrorsCollectionV2
+    public partial class NovelWindow : Window, IErrorsCollectionV2, IHighlightCollection
     {
         private readonly IRelativePath _novel;
         private readonly LifeSpellCheckV2 _lifeSpellCheck;
@@ -36,6 +37,7 @@ namespace BookWiki.Presentation.Wpf
         private bool _canBeClosed = false;
         private bool _requestToClose = false;
         private CancellationTokenSource _token;
+        private LifeSearchEngine _lifeSearchEngine;
 
         public bool ClosingFailed { get; set; } = false;
 
@@ -48,7 +50,7 @@ namespace BookWiki.Presentation.Wpf
             _novel = novel.Source;
             InitializeComponent();
 
-            Title = novel.Source.Name.PlainText + (novel.Source.Parts.Count() > 1 ? (" << " + novel.Source.Parts.Reverse().Skip(1).First().PlainText) : "");
+            Title = new NovelTitle(novel.Source).PlainText;
 
             Rtb.FontFamily = new FontFamily("Times New Roman");
             Rtb.FontSize = 18;
@@ -56,6 +58,7 @@ namespace BookWiki.Presentation.Wpf
             Rtb.BorderThickness = new Thickness(0, 0, 0, 0);
 
             _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary));
+            _lifeSearchEngine = new LifeSearchEngine(Rtb, this, SearchBox, Scroll);
 
             LoadContent(novel);
 
@@ -437,8 +440,6 @@ namespace BookWiki.Presentation.Wpf
                         e.Handled = true;
                     }
                 }
-
-                
             }
 
             if (e.Key == Key.D2 && e.KeyboardDevice.Modifiers == ModifierKeys.Shift)
@@ -590,21 +591,105 @@ namespace BookWiki.Presentation.Wpf
 
         private void Rtb_OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            {
+                e.Handled = true;
+                return;
+            }
+
             if (e.Key == Key.Back)
             {
                 if (Rtb.CaretPosition.IsAtLineStartPosition)
                 {
-                    var previousLine = GetLineEnd(Rtb.CaretPosition.GetLineStartPosition(-1));
+                    if (string.IsNullOrWhiteSpace(Rtb.Selection.Text))
+                    {
+                        var previousEnd = Rtb.CaretPosition.GetLineStartPosition(-1);
 
-                    Rtb.Selection.Select(previousLine.GetInsertionPosition(LogicalDirection.Backward), Rtb.CaretPosition);
+                        if (previousEnd != null)
+                        {
+                            var previousLine = GetLineEnd(previousEnd);
 
-                    Rtb.Selection.Text = "";
+                            Rtb.Selection.Select(previousLine.GetInsertionPosition(LogicalDirection.Backward), Rtb.CaretPosition);
 
-                    Rtb.CaretPosition = Rtb.Selection.End;
+                            Rtb.Selection.Text = "";
 
-                    e.Handled = true;
+                            Rtb.CaretPosition = Rtb.Selection.End;
+
+                            e.Handled = true;
+                        }
+                    }
                 }
             }
+        }
+
+        private void NovelWindow_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            {
+                e.Handled = true;
+                return;
+            }
+
+            if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) && e.KeyboardDevice.IsKeyDown(Key.F))
+            {
+                SearchBox.Focus();
+                return;
+            }
+        }
+
+        private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            {
+                e.Handled = true;
+                return;
+            }
+        }
+
+        private void OnSearchKeyDown(object sender, KeyEventArgs e)
+        {
+            
+        }
+
+        public void Highlight(ISubstring toHighlight, bool specialStyle)
+        {
+            var x1 = Rtb.Document.ContentStart.GetPositionAtOffset(toHighlight.StartIndex).GetCharacterRect(LogicalDirection.Forward);
+            var x2 = Rtb.Document.ContentStart.GetPositionAtOffset(toHighlight.EndIndex).GetCharacterRect(LogicalDirection.Forward);
+
+            if (x2.X > x1.X)
+            {
+                var r = new Rectangle()
+                {
+                    Width = x2.X - x1.X,
+                    Height = Math.Abs(x1.Top - x1.Bottom),
+                    Stroke = specialStyle ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.LightBlue),
+                    Stretch = Stretch.Fill,
+                    Fill = new SolidColorBrush(Color.FromArgb(60, Colors.LightBlue.R, Colors.LightBlue.G, Colors.LightBlue.B)),
+                };
+
+                Canvas.SetTop(r, x1.Top);
+                Canvas.SetLeft(r, x1.X);
+
+                HighlightBox.Children.Add(r);
+            }
+        }
+
+        public void ScrollTo(ISubstring toScroll)
+        {
+            var x1 = Rtb.Document.ContentStart.GetPositionAtOffset(toScroll.StartIndex).GetCharacterRect(LogicalDirection.Forward);
+            var x2 = Rtb.Document.ContentStart.GetPositionAtOffset(toScroll.EndIndex).GetCharacterRect(LogicalDirection.Forward);
+
+            if (x1.Top > Scroll.VerticalOffset && x2.Top < (Scroll.VerticalOffset + Scroll.ActualHeight - 50))
+            {
+                return;
+            }
+
+            Scroll.ScrollToVerticalOffset(x1.Top - Scroll.ActualHeight / 2);
+        }
+
+        public void ClearHighlighting()
+        {
+            HighlightBox.Children.Clear();
         }
     }
 }

@@ -72,5 +72,13 @@ namespace BookWiki.Presentation.Wpf
         {
             _closeRequested = false;
         }
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            {
+                return;
+            }
+        }
     }
 }

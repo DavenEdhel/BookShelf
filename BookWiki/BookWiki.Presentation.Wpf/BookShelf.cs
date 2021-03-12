@@ -10,9 +10,11 @@ using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Presentation.Wpf.Models;
+using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using Newtonsoft.Json;
 using Exception = System.Exception;
+using BookWiki.Presentation.Wpf.Models.KeyProcessorModels;
 
 namespace BookWiki.Presentation.Wpf
 {
@@ -69,6 +71,10 @@ namespace BookWiki.Presentation.Wpf
             PageConfig = new PageConfig(Session);
         }
 
+        public KeyProcessor KeyProcessor { get; } = new KeyProcessor();
+
+        public SearchByFileEngine Search { get; } = new SearchByFileEngine();
+
         public SessionContext Session { get; }
 
         public IFileSystemNode Root { get; }
@@ -96,12 +102,25 @@ namespace BookWiki.Presentation.Wpf
             _sessionRestored = true;
         }
 
+        public void Save(IFileSystemNode parentNode, FileName fileName, IExtension extension)
+        {
+            var node = new FileSystemNode(parentNode, new FolderPath(parentNode.Path, fileName, extension));
+            node.SaveUnder(parentNode);
+
+            Search.InvalidateCache();
+        }
+
         public void Open(IRelativePath novel)
         {
             var novelView = OpenedNovels.FirstOrDefault(x => x.Novel.EqualsTo(novel));
 
             if (novelView != null)
             {
+                if (novelView.WindowState == WindowState.Minimized)
+                {
+                    novelView.WindowState = WindowState.Normal;
+                }
+
                 novelView.Activate();
             }
             else
@@ -177,6 +196,11 @@ namespace BookWiki.Presentation.Wpf
             {
                 if (currentWindow is FileSystemWindow fs)
                 {
+                    if (currentWindow.WindowState == WindowState.Minimized)
+                    {
+                        currentWindow.WindowState = WindowState.Normal;
+                    }
+
                     fs.Activate();
                 }
             }
