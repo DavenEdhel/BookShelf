@@ -28,7 +28,7 @@ namespace BookMap.Presentation.Apple.Controllers
 
         public override void ViewDidLoad()
         {
-            _mapProvider = new MapProvider();
+            _mapProvider = new MapProvider(new ImageFactory());
             _mapProvider.MapChanged += MapProviderOnMapChanged;
 
             _coordinateSystem = new CoordinateSystem();

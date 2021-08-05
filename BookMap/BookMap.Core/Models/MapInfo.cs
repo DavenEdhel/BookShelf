@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UIKit;
 
 namespace BookMap.Presentation.Apple.Services
 {
@@ -11,14 +10,14 @@ namespace BookMap.Presentation.Apple.Services
 
         public BrushInfo[] Brushes { get; set; } = new BrushInfo[8]
         {
-            new BrushInfo(10, UIColor.Green),
-            new BrushInfo(3, UIColor.Black),
-            new BrushInfo(1, UIColor.White),
-            new BrushInfo(20, UIColor.Blue),
-            new BrushInfo(10, UIColor.Green),
-            new BrushInfo(3, UIColor.Black),
-            new BrushInfo(1, UIColor.White),
-            new BrushInfo(10, UIColor.Green)
+            new BrushInfo(10, "#00FF00"),
+            new BrushInfo(3, "#000000"),
+            new BrushInfo(1, "#FFFFFF"),
+            new BrushInfo(20, "#FFFFFF"),
+            new BrushInfo(10, "#FFFFFF"),
+            new BrushInfo(3, "#FFFFFF"),
+            new BrushInfo(1, "#FFFFFF"),
+            new BrushInfo(10, "#FFFFFF")
         };
 
         public bool ShowPalette { get; set; } = true;

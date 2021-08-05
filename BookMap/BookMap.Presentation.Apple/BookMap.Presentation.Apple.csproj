@@ -66,20 +66,10 @@
     <Compile Include="Extentions\ImageHelper.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="Models\BoundsDouble.cs" />
-    <Compile Include="Models\CoordinateSystem.cs" />
-    <Compile Include="Models\FrameDouble.cs" />
-    <Compile Include="Models\ImagePosition.cs" />
-    <Compile Include="Models\PointDouble2D.cs" />
-    <Compile Include="Models\SessionModels\Session.cs" />
-    <Compile Include="Models\SessionModels\SessionDto.cs" />
-    <Compile Include="Services\Bookmark.cs" />
-    <Compile Include="Services\BrushInfo.cs" />
-    <Compile Include="Services\FileSystemService.cs" />
-    <Compile Include="Services\ImageCache.cs" />
-    <Compile Include="Services\ImageItem.cs" />
-    <Compile Include="Services\MapInfo.cs" />
-    <Compile Include="Services\MapProvider.cs" />
+    <Compile Include="Services\ImageFactory.cs" />
+    <Compile Include="Services\IosBrushInfo.cs" />
+    <Compile Include="Services\IosImage.cs" />
+    <Compile Include="Services\IosImageExtensions.cs" />
     <Compile Include="Views\AddBookmarkView.cs" />
     <Compile Include="Views\AddNewMapView.cs" />
     <Compile Include="Views\BackgroundStrategy.cs" />
@@ -165,6 +155,11 @@
       <Visible>false</Visible>
     </ImageAsset>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\BookMap.Core\BookMap.Core.csproj">
+      <Project>{5adb9b04-22bd-40e9-9adb-17b06f0ded4d}</Project>
+      <Name>BookMap.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

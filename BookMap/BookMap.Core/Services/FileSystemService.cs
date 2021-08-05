@@ -3,26 +3,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Foundation;
+using BookMap.Core.Models;
 using Newtonsoft.Json;
-using UIKit;
 
 namespace BookMap.Presentation.Apple.Services
 {
     public class FileSystemService
     {
+        public static string DirectoryPath { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+        private readonly IImageFactory _imageFactory;
         private readonly List<ImageItem> _modifiedItems = new List<ImageItem>();
 
         public string MapName { get; private set; }
 
-        public FileSystemService()
+        public FileSystemService(IImageFactory imageFactory)
         {
+            _imageFactory = imageFactory;
             RunAutosave();
         }
 
         public static void CreateNewMap(string mapName)
         {
-            var dirPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var dirPath = DirectoryPath;
 
             var newPath = Path.Combine(dirPath, mapName);
 
@@ -31,7 +34,7 @@ namespace BookMap.Presentation.Apple.Services
 
         public static IEnumerable<string> GetMapNames()
         {
-            var dirPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var dirPath = DirectoryPath;
 
             foreach (var dir in Directory.EnumerateDirectories(dirPath))
             {
@@ -90,17 +93,17 @@ namespace BookMap.Presentation.Apple.Services
             }
         }
 
-        public Task<UIImage> TryLoadFromFileSystem(string imageName)
+        public Task<IImage> TryLoadFromFileSystem(string imageName)
         {
             if (MapName == null || imageName == null)
             {
-                return Task.FromResult((UIImage)null);
+                return Task.FromResult((IImage)null);
             }
 
             return LoadFromFileSystemAsync(imageName);
         }
 
-        private Task<UIImage> LoadFromFileSystemAsync(string imageName)
+        private Task<IImage> LoadFromFileSystemAsync(string imageName)
         {
             EnsureMapCreated(MapName);
 
@@ -108,27 +111,12 @@ namespace BookMap.Presentation.Apple.Services
 
             if (File.Exists(filePath) == false)
             {
-                return Task.FromResult((UIImage) null);
+                return Task.FromResult((IImage) null);
             }
 
             return Task.Run(() =>
             {
-                try
-                {
-                    var fileImage = UIImage.FromFile(filePath);
-
-                    var memoryImage = UIImage.FromImage(fileImage.CGImage);
-
-                    fileImage.Dispose();
-
-                    return memoryImage;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
-                
+                return _imageFactory.LoadFrom(filePath);
             });
         }
 
@@ -146,7 +134,7 @@ namespace BookMap.Presentation.Apple.Services
 
         private string GetPath(params string[] parts)
         {
-            var dirPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var dirPath = DirectoryPath;
 
             var partsList = new List<string>();
             partsList.Add(dirPath);
@@ -163,9 +151,7 @@ namespace BookMap.Presentation.Apple.Services
 
                 foreach (var modifiedItem in _modifiedItems)
                 {
-                    var copiedImage = UIImage.FromImage(modifiedItem.Image.CGImage);
-
-                    result.Add(new ImageItem() {Image = copiedImage, Name = modifiedItem.Name});
+                    result.Add(new ImageItem() {Image = modifiedItem.Image.Copy(), Name = modifiedItem.Name});
                 }
 
                 _modifiedItems.Clear();
@@ -174,26 +160,11 @@ namespace BookMap.Presentation.Apple.Services
             }
         }
 
-        public void Modify(UIImage oldImage, UIImage newImage, string name)
+        public void Modify(IImage oldImage, IImage newImage, string name)
         {
             lock (this)
             {
-                var old = _modifiedItems.FirstOrDefault(x => x.Image == oldImage);
-                if (old != null)
-                {
-                    _modifiedItems.Remove(old);
-                }
-
-                var newItem = new ImageItem() { Image = newImage, Name = name };
-                _modifiedItems.Add(newItem);
-            }
-        }
-
-        public void Modify(UIImage newImage, string name)
-        {
-            lock (this)
-            {
-                var old = _modifiedItems.FirstOrDefault(x => x.Name == name);
+                var old = _modifiedItems.FirstOrDefault(x => x.Image.EqualsTo(oldImage));
                 if (old != null)
                 {
                     _modifiedItems.Remove(old);
@@ -220,13 +191,11 @@ namespace BookMap.Presentation.Apple.Services
 
             return Task.Run(() =>
             {
-                var png = item.Image.AsPNG();
+                var (result, reason) = item.Image.TrySave(path);
 
-                NSError error;
-
-                if (png.Save(path, false, out error) == false)
+                if (result == false)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Could not save image. Reason {error.LocalizedDescription}.");
+                    System.Diagnostics.Debug.WriteLine($"Could not save image. Reason {reason}.");
                 }
             });
         }
@@ -235,13 +204,11 @@ namespace BookMap.Presentation.Apple.Services
         {
             var path = GetPath(MapName, item.Name);
 
-            var png = item.Image.AsPNG();
+            var (result, reason) = item.Image.TrySave(path);
 
-            NSError error;
-
-            if (png.Save(path, false, out error) == false)
+            if (result == false)
             {
-                System.Diagnostics.Debug.WriteLine($"Could not save image. Reason {error.LocalizedDescription}.");
+                System.Diagnostics.Debug.WriteLine($"Could not save image. Reason {reason}.");
             }
         }
 

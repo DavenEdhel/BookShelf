@@ -8,6 +8,8 @@ namespace BookMap.Presentation.Apple.Extentions
 {
     public static class ImageHelper
     {
+        public static CGSize ImageSize => new CGSize(2560f, 1920f);
+
         public static string GetImageName(ImagePosition position, bool isLabel)
         {
             return $"{(isLabel ? "label" : "ground")}_{position.Level}_{position.X}_{position.Y}.png";

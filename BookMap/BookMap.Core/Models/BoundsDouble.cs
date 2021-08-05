@@ -2,6 +2,12 @@
 {
     public class BoundsDouble
     {
+        public static BoundsDouble ImageSize => new BoundsDouble()
+        {
+            Width = 2560f,
+            Height = 1920f
+        };
+
         public double Width { get; set; }
 
         public double Height { get; set; }

@@ -1,7 +1,4 @@
-﻿using BookMap.Presentation.Apple.Extentions;
-using UIKit;
-
-namespace BookMap.Presentation.Apple.Services
+﻿namespace BookMap.Presentation.Apple.Services
 {
     public class BrushInfo
     {
@@ -17,12 +14,6 @@ namespace BookMap.Presentation.Apple.Services
 
         public BrushInfo()
         {
-        }
-
-        public BrushInfo(float size, UIColor color)
-        {
-            Size = size;
-            Color = color.ToHexString();
         }
     }
 }

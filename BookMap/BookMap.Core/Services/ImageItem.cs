@@ -1,10 +1,10 @@
-﻿using UIKit;
+﻿using BookMap.Core.Models;
 
 namespace BookMap.Presentation.Apple.Services
 {
     public class ImageItem
     {
-        public UIImage Image { get; set; }
+        public IImage Image { get; set; }
 
         public string Name { get; set; }
     }

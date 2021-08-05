@@ -340,7 +340,7 @@ namespace BookMap.Presentation.Apple.Views
 
             if (_touchMode != TouchMode.MoveAndMeasure)
             {
-                _mapProvider.Modify(_active.Image, newImage, andSaveToFileSystem: _touchMode != TouchMode.MoveAndMeasure);
+                _mapProvider.Modify(_active.Image.ToImage(), newImage.ToImage(), andSaveToFileSystem: _touchMode != TouchMode.MoveAndMeasure);
                 _active.Image = newImage;
             }
             else
@@ -418,7 +418,7 @@ namespace BookMap.Presentation.Apple.Views
 
                 if (_touchMode != TouchMode.MoveAndMeasure)
                 {
-                    _mapProvider.Modify(_active.Image, newImage, andSaveToFileSystem: _touchMode != TouchMode.MoveAndMeasure);
+                    _mapProvider.Modify(_active.Image.ToImage(), newImage.ToImage(), andSaveToFileSystem: _touchMode != TouchMode.MoveAndMeasure);
                     _active.Image = newImage;
                 }
                 else
@@ -517,7 +517,7 @@ namespace BookMap.Presentation.Apple.Views
 
             if (_touchMode != TouchMode.MoveAndMeasure)
             {
-                _mapProvider.Modify(_active.Image, newImage, andSaveToFileSystem: _touchMode != TouchMode.MoveAndMeasure);
+                _mapProvider.Modify(_active.Image.ToImage(), newImage.ToImage(), andSaveToFileSystem: _touchMode != TouchMode.MoveAndMeasure);
                 _active.Image = newImage;
             }
             else
@@ -669,12 +669,12 @@ namespace BookMap.Presentation.Apple.Views
 
         private async void LoadGround(UIImageView uiImageView, ImagePosition index2D)
         {
-            uiImageView.Image = await _mapProvider.GetImageAsync(index2D, isLabel: false);
+            uiImageView.Image = (await _mapProvider.GetImageAsync(index2D, isLabel: false)).ToUIImage();
         }
 
         private async void LoadLabel(UIImageView uiImageView, ImagePosition index2D)
         {
-            uiImageView.Image = await _mapProvider.GetImageAsync(index2D, isLabel: true);
+            uiImageView.Image = (await _mapProvider.GetImageAsync(index2D, isLabel: true)).ToUIImage();
         }
 
         private void SetPosition(UIImageView part, FrameDouble frame, ImagePosition imagePosition)
@@ -742,7 +742,7 @@ namespace BookMap.Presentation.Apple.Views
 
             UIGraphics.EndImageContext();
 
-            _mapProvider.Modify(ground.Image, raw);
+            _mapProvider.Modify(ground.Image.ToImage(), raw.ToImage());
 
             ground.Image = raw;
         }

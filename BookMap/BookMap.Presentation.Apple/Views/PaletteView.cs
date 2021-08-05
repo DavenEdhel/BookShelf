@@ -116,7 +116,7 @@ namespace BookMap.Presentation.Apple.Views
         {
             _mapProvider.ChangeSettings(settings =>
             {
-                settings.Brushes = _brushes.Where(x => x.IsEraser == false).Select(x => new BrushInfo(x.Brush.Size, x.Brush.Color)).ToArray();
+                settings.Brushes = _brushes.Where(x => x.IsEraser == false).Select(x => x.Brush.Size.ToBrushInfoWithColor(x.Brush.Color)).ToArray();
             });
         }
     }

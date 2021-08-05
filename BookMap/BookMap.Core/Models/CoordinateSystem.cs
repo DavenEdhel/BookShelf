@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using BookMap.Presentation.Apple.Services;
-using BookMap.Presentation.Apple.Views;
 
 namespace BookMap.Presentation.Apple.Models
 {

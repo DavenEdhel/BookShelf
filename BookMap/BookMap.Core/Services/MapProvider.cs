@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using BookMap.Presentation.Apple.Extentions;
+using BookMap.Core.Models;
 using BookMap.Presentation.Apple.Models;
-using CoreGraphics;
-using UIKit;
 
 namespace BookMap.Presentation.Apple.Services
 {
@@ -14,17 +11,25 @@ namespace BookMap.Presentation.Apple.Services
     {
         private const int CacheSize = 60;
 
-        private readonly List<(string name, UIImage image)> _cache = new List<(string name, UIImage image)>();
+        private readonly IImageFactory _imageFactory;
 
-        private readonly Dictionary<string, Task<UIImage>> _loadingPool = new Dictionary<string, Task<UIImage>>();
+        private readonly List<(string name, IImage image)> _cache = new List<(string name, IImage image)>();
 
-        private readonly FileSystemService _fileSystemService = new FileSystemService();
+        private readonly Dictionary<string, Task<IImage>> _loadingPool = new Dictionary<string, Task<IImage>>();
+
+        private readonly FileSystemService _fileSystemService;
 
         public string CurrentMap { get; private set; }
 
         public event Action<string> MapChanged = delegate { };
 
         public event Action<MapInfo> SettingsChanged = delegate { };
+
+        public MapProvider(IImageFactory imageFactory)
+        {
+            _imageFactory = imageFactory;
+            _fileSystemService = new FileSystemService(imageFactory);
+        }
 
         public MapInfo Settings
         {
@@ -68,14 +73,14 @@ namespace BookMap.Presentation.Apple.Services
             MapChanged(mapName);
         }
 
-        public Task<UIImage> GetImageAsync(ImagePosition position, bool isLabel)
+        public Task<IImage> GetImageAsync(ImagePosition position, bool isLabel)
         {
             if (position == null)
             {
-                return Task.FromResult((UIImage)null);
+                return Task.FromResult((IImage)null);
             }
 
-            var imageName = ImageHelper.GetImageName(position, isLabel);
+            var imageName = position.GetImageName(isLabel);
 
             var result = TryLoadFromCache(imageName);
 
@@ -107,7 +112,7 @@ namespace BookMap.Presentation.Apple.Services
             return awaiter;
         }
 
-        private async Task<UIImage> GetImage(ImagePosition position, bool isLabel)
+        private async Task<IImage> GetImage(ImagePosition position, bool isLabel)
         {
             if (position == null)
             {
@@ -116,7 +121,7 @@ namespace BookMap.Presentation.Apple.Services
 
             for (int i = 0; i < 3; i++)
             {
-                var imageName = ImageHelper.GetImageName(position, isLabel);
+                var imageName = position.GetImageName(isLabel);
 
                 try
                 {
@@ -131,7 +136,7 @@ namespace BookMap.Presentation.Apple.Services
             return await MakeEmptyImage();
         }
 
-        private async Task<UIImage> LoadImage(string imageName, ImagePosition position, bool isLabel)
+        private async Task<IImage> LoadImage(string imageName, ImagePosition position, bool isLabel)
         {
             var result = TryLoadFromCache(imageName);
 
@@ -160,7 +165,7 @@ namespace BookMap.Presentation.Apple.Services
 
             if (position.Level == 0)
             {
-                result =  (position.X == 0 && position.Y == 0) ? UIColor.White.MakeEmptyImage() : await MakeEmptyImage();
+                result = (position.X == 0 && position.Y == 0) ? _imageFactory.MakeEmpty("#FFFFFF") : await MakeEmptyImage();
 
                 RegisterInCache(result, imageName);
 
@@ -183,7 +188,7 @@ namespace BookMap.Presentation.Apple.Services
             return result;
         }
 
-        private async Task<UIImage> TryLoadFromFileSystem(string imageName)
+        private async Task<IImage> TryLoadFromFileSystem(string imageName)
         {
             try
             {
@@ -196,7 +201,7 @@ namespace BookMap.Presentation.Apple.Services
             }
         }
 
-        private UIImage TryLoadFromCache(string imageName)
+        private IImage TryLoadFromCache(string imageName)
         {
             if (_cache.Any(x => x.name == imageName))
             {
@@ -206,50 +211,26 @@ namespace BookMap.Presentation.Apple.Services
             return null;
         }
 
-        private Task<UIImage> MakeSubImage(UIImage upper, FrameDouble frame)
+        private Task<IImage> MakeSubImage(IImage upper, FrameDouble frame)
         {
             return Task.Run(() =>
             {
                 lock (this)
                 {
-                    UIGraphics.BeginImageContext(frame.ToSize());
-                    //UIGraphics.BeginImageContext(upper.Size);
-
-                    var context = UIGraphics.GetCurrentContext();
-
-                    context.TranslateCTM(0f, (nfloat)frame.Height);
-                    context.ScaleCTM(1.0f, -1.0f);
-
-                    context.DrawImage(new CGRect(-(float)frame.X, -(float)frame.Y, upper.CGImage.Width, upper.CGImage.Height), upper.CGImage);
-                    //context.DrawImage(new CGRect(0, 0, upper.CGImage.Width, upper.CGImage.Height), upper.CGImage);
-
-                    context.ScaleCTM(1.0f, -1.0f);
-                    context.TranslateCTM(0f, -(nfloat)frame.Height);
-
-                    var raw = UIGraphics.GetImageFromCurrentImageContext();
-
-                    var result = raw.Scale(upper.Size);
-
-                    raw.Dispose();
-
-                    context.Dispose();
-
-                    UIGraphics.EndImageContext();
-
-                    return result;
+                    return upper.MakeSubImage(frame);
                 }
             });
         }
 
-        private Task<UIImage> MakeEmptyImage()
+        private Task<IImage> MakeEmptyImage()
         {
             return Task.Run(() =>
             {
-                return ImageHelper.MakeEmptyImage();
+                return _imageFactory.MakeEmpty();
             });
         }
 
-        private void RegisterInCache(UIImage result, string imageName)
+        private void RegisterInCache(IImage result, string imageName)
         {
             var name = imageName;
 
@@ -271,7 +252,7 @@ namespace BookMap.Presentation.Apple.Services
             }
         }
 
-        private async Task<(UIImage image, FrameDouble frame)> GetUpperLevelImage(ImagePosition position, bool isLabel)
+        private async Task<(IImage image, FrameDouble frame)> GetUpperLevelImage(ImagePosition position, bool isLabel)
         {
             if (position.Level > 0)
             {
@@ -281,9 +262,9 @@ namespace BookMap.Presentation.Apple.Services
 
                 var normalizedPosition = position.RelativePositionToParent();
 
-                image = UIImage.FromImage(image.CGImage);
+                image = image.Copy();
 
-                var bounds = image.Size.ToBounds().DownScale(8);
+                var bounds = BoundsDouble.ImageSize.DownScale(8);
 
                 var frame = new FrameDouble(bounds).Right(bounds.Width * normalizedPosition.X).Down(bounds.Height * (7 - normalizedPosition.Y));
 
@@ -293,7 +274,7 @@ namespace BookMap.Presentation.Apple.Services
             return (null, null);
         }
 
-        private Task<UIImage> TryGetAwaiter(string imageName)
+        private Task<IImage> TryGetAwaiter(string imageName)
         {
             if (_loadingPool.ContainsKey(imageName))
             {
@@ -303,7 +284,7 @@ namespace BookMap.Presentation.Apple.Services
             return null;
         }
 
-        private void RegisterAwaiter(string imageName, Task<UIImage> image)
+        private void RegisterAwaiter(string imageName, Task<IImage> image)
         {
             _loadingPool[imageName] = image;
         }
@@ -313,14 +294,14 @@ namespace BookMap.Presentation.Apple.Services
             _loadingPool.Remove(imageName);
         }
 
-        public void Modify(UIImage oldImage, UIImage newImage, bool andSaveToFileSystem = true)
+        public void Modify(IImage oldImage, IImage newImage, bool andSaveToFileSystem = true)
         {
-            if (_cache.Any(x => x.image == oldImage) == false)
+            if (_cache.Any(x => x.image.EqualsTo(oldImage)) == false)
             {
                 return;
             }
 
-            var old = _cache.First(x => x.image == oldImage);
+            var old = _cache.First(x => x.image.EqualsTo(oldImage));
 
             if (andSaveToFileSystem)
             {
@@ -348,11 +329,11 @@ namespace BookMap.Presentation.Apple.Services
         {
             foreach (var imagePosition in positions)
             {
-                var itemFromCache = _cache.FirstOrDefault(x => x.name == ImageHelper.GetImageName(imagePosition, isLabel: false));
+                var itemFromCache = _cache.FirstOrDefault(x => x.name == imagePosition.GetImageName(isLabel: false));
 
                 (var level0, var frame) = await GetUpperLevelImage(imagePosition, isLabel: false);
 
-                UIImage result;
+                IImage result;
 
                 if (level0 == null)
                 {
@@ -365,7 +346,7 @@ namespace BookMap.Presentation.Apple.Services
 
                 if (itemFromCache.name == null)
                 {
-                    RegisterInCache(result, ImageHelper.GetImageName(imagePosition, isLabel: false));
+                    RegisterInCache(result, imagePosition.GetImageName(isLabel: false));
                 }
                 else
                 {
@@ -378,7 +359,7 @@ namespace BookMap.Presentation.Apple.Services
         {
             foreach (var imagePosition in positions)
             {
-                var fileName = ImageHelper.GetImageName(imagePosition, isLabel: false);
+                var fileName = imagePosition.GetImageName(isLabel: false);
 
                 if (_fileSystemService.Exists(fileName))
                 {
@@ -391,7 +372,7 @@ namespace BookMap.Presentation.Apple.Services
         {
             foreach (var imagePosition in positions)
             {
-                _cache.RemoveAll(x => x.name == ImageHelper.GetImageName(imagePosition, isLabel: false));
+                _cache.RemoveAll(x => x.name == imagePosition.GetImageName(isLabel: false));
             }
         }
 
