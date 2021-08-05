@@ -14,7 +14,6 @@ namespace BookWiki.Core.Files.FileSystemModels
         public FileSystem(string root)
         {
             _root = root;
-
         }
 
         private IEnumerable<IAbsolutePath> GetContents()

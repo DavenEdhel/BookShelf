@@ -1,9 +1,33 @@
+﻿using System;
+using System.IO;
+using System.Text;
 using NUnit.Framework;
 
 namespace BookWiki.Core.Tests
 {
     public class TextTests
     {
+        [Test]
+        public void Weird()
+        {
+            var result = File.Exists(
+                @"C:\Work\Projects\BookShelf\BookWiki\BookWiki.Presentation.Wpf\bin\Debug\Book Wiki 4\Рассказы\Вторжение\Материалы\Безымянный.n\Text.txt");
+
+            var result1 =
+                @"C:\Work\Projects\BookShelf\BookWiki\BookWiki.Presentation.Wpf\bin\Debug\Book Wiki 4\Рассказы\Вторжение\Материалы\Безымянный.n\Text.txt";
+            var result2 =
+                @"C:\Work\Projects\BookShelf\BookWiki\BookWiki.Presentation.Wpf\bin\Debug\Book Wiki 4\Рассказы\Вторжение\Материалы\Безымянный.n\Text.txt";
+
+            var r1 = File.Exists(result1);
+            var r2 = File.Exists(result2);
+
+            var b = Encoding.Unicode.GetBytes(result1);
+
+            var result3 = Encoding.UTF8.GetString(b);
+
+            var r3 = File.Exists(result3);
+        }
+
         [Test]
         public void SmokeTest()
         {

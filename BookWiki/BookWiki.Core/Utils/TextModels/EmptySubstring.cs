@@ -11,8 +11,6 @@ namespace BookWiki.Core
 
         public int Length { get; } = 0;
         public string PlainText { get; } = string.Empty;
-        public int Offset { get; } = 0;
-
-        
+        public int Offset { get; } = 0;   
     }
 }

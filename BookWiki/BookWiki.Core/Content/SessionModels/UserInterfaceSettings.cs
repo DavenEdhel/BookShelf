@@ -6,6 +6,8 @@
 
         public bool IsScrollHidden { get; set; } = true;
 
+        public bool IsSpellCheckOn { get; set; } = true;
+
         public int PageModeIndex { get; set; } = 0;
     }
 }

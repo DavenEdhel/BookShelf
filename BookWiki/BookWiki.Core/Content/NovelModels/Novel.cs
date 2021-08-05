@@ -7,7 +7,7 @@ using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Core
 {
-    public class Novel : INovel
+    public class Novel : INovel, IFormattedContent
     {
         private readonly IRelativePath _novelPath;
         private readonly IProperty<IText> _text;
