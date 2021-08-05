@@ -22,5 +22,7 @@ namespace BookMap.Core.Models
         IImage MakeEmpty();
 
         IImage LoadFrom(string path);
+
+        IImage LoadNull();
     }
 }

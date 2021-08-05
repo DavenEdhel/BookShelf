@@ -44,5 +44,10 @@ namespace BookMap.Presentation.Apple.Services
                 throw;
             }
         }
+
+        public IImage LoadNull()
+        {
+            return new IosImage();
+        }
     }
 }
