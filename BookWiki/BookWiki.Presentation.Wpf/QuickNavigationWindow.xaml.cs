@@ -86,7 +86,7 @@ namespace BookWiki.Presentation.Wpf
                 Tag = path,
                 FontFamily = new FontFamily("Times New Roman"),
                 FontSize = 12,
-                Background = i == _lineSelected ? Brushes.WhiteSmoke : Brushes.White
+                Background = i == _lineSelected ? Brushes.DarkGray : Brushes.White
             };
         }
 
@@ -107,7 +107,7 @@ namespace BookWiki.Presentation.Wpf
             {
                 if (i == _lineSelected)
                 {
-                    itemsChild.Background = Brushes.WhiteSmoke;
+                    itemsChild.Background = Brushes.DarkGray;
                 }
                 else
                 {

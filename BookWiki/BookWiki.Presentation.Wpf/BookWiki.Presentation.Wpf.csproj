@@ -62,6 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Extensions\WindowExtensions.cs" />
     <Compile Include="Models\AppConfig.cs" />
     <Compile Include="Models\EditorState.cs" />
     <Compile Include="Models\KeyProcessorModels\KeyProcessor.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Models\ScreensStateDto.cs" />
     <Compile Include="Models\ScreenState.cs" />
     <Compile Include="Models\SessionContext.cs" />
+    <Compile Include="Models\TabDto.cs" />
     <Compile Include="Models\Utilities\DependenciesContainerExtensions.cs" />
     <Compile Include="Models\Utilities\DependenciesContainer.cs" />
     <Compile Include="Models\Utilities\EventBase.cs" />
@@ -92,6 +94,9 @@
       <DependentUpon>QuickNavigationWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FileSystemView.cs" />
+    <Compile Include="Views\OpenedTabsView.cs" />
+    <Compile Include="Views\PredefinedTabsView.cs" />
+    <Compile Include="Views\TabItemView.cs" />
     <Page Include="FileSystemWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

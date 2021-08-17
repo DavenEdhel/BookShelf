@@ -9,5 +9,9 @@ namespace BookWiki.Presentation.Wpf.Models
         public Point Position { get; set; }
 
         public bool WasMinimized { get; set; }
+
+        public bool WasMaximized { get; set; }
+
+        public double ScrollOffset { get; set; }
     }
 }

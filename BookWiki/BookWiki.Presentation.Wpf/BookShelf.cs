@@ -9,6 +9,7 @@ using BookWiki.Core;
 using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
+using BookWiki.Presentation.Wpf.Extensions;
 using BookWiki.Presentation.Wpf.Models;
 using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
@@ -23,7 +24,7 @@ namespace BookWiki.Presentation.Wpf
         public static readonly BookShelf Instance = new BookShelf();
         private bool _sessionRestored;
 
-        private IEnumerable<NovelWindow> OpenedNovels
+        public IEnumerable<NovelWindow> OpenedNovels
         {
             get
             {
@@ -37,7 +38,7 @@ namespace BookWiki.Presentation.Wpf
             }
         }
 
-        private FileSystemWindow FileSystemWindow
+        public FileSystemWindow FileSystemWindow
         {
             get
             {
@@ -85,7 +86,23 @@ namespace BookWiki.Presentation.Wpf
 
         public AppConfigDto Config { get; }
 
+        public IEnumerable<TabDto> Tabs
+        {
+            get
+            {
+                foreach (var configTab in Config.Tabs)
+                {
+                    if (Directory.Exists(new FolderPath(configTab.Path).AbsolutePath(RootPath).FullPath))
+                    {
+                        yield return configTab;
+                    }
+                }
+            }
+        }
+
         public PageConfig PageConfig { get; }
+
+        public event Action NovelListChanged = delegate { };
 
         public void RestoreLastSession()
         {
@@ -110,18 +127,13 @@ namespace BookWiki.Presentation.Wpf
             Search.InvalidateCache();
         }
 
-        public void Open(IRelativePath novel)
+        public void Open(IRelativePath novel, bool fullscreen = false)
         {
             var novelView = OpenedNovels.FirstOrDefault(x => x.Novel.EqualsTo(novel));
 
             if (novelView != null)
             {
-                if (novelView.WindowState == WindowState.Minimized)
-                {
-                    novelView.WindowState = WindowState.Normal;
-                }
-
-                novelView.Activate();
+                novelView.ActivateOrRestore(fullscreen);
             }
             else
             {
@@ -145,16 +157,17 @@ namespace BookWiki.Presentation.Wpf
 
                 if (state != null)
                 {
-                    wnd.Top = state.Position.Y;
-                    wnd.Left = state.Position.X;
+                    state.ApplyTo(wnd);
+                }
 
-                    if (state.WasMinimized)
-                    {
-                        wnd.WindowState = WindowState.Minimized;
-                    }
+                if (fullscreen)
+                {
+                    wnd.WindowState = WindowState.Maximized;
                 }
 
                 wnd.Show();
+
+                NovelListChanged();
             }
         }
 
@@ -183,6 +196,8 @@ namespace BookWiki.Presentation.Wpf
                     return;
                 }
             }
+
+            NovelListChanged();
         }
 
         public void StoreSession()
@@ -204,6 +219,11 @@ namespace BookWiki.Presentation.Wpf
                     fs.Activate();
                 }
             }
+        }
+
+        public void ReportWindowClosed()
+        {
+            NovelListChanged();
         }
     }
 }
