@@ -9,24 +9,24 @@ namespace BookMap.Presentation.Apple.Models
         {
             X = 0,
             Y = 0,
-            Width = 1024,
-            Height = 768
+            Width = 1536,
+            Height = 1152
         };
 
         private FrameDouble _lastWorld = new FrameDouble()
         {
             X = 0,
             Y = 0,
-            Width = 1024,
-            Height = 768
+            Width = 1536,
+            Height = 1152
         };
 
         private readonly FrameDouble _originalWorld = new FrameDouble()
         {
             X = 0,
             Y = 0,
-            Width = 1024,
-            Height = 768
+            Width = 1536,
+            Height = 1152
         };
 
         public double ActualWidthInMeters { get; set; } = 100000;

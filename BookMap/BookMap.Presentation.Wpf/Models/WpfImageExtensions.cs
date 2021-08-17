@@ -7,7 +7,7 @@ namespace BookMap.Presentation.Wpf.Models
 {
     public static class WpfImageExtensions
     {
-        public static BitmapImage ToUIImage(this IImage image)
+        public static BitmapSource ToUIImage(this IImage image)
         {
             var bitmap = ((WpfImage) image).Value;
 
