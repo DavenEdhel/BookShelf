@@ -4,60 +4,72 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
-        mc:Ignorable="d" ResizeMode="CanMinimize"
+        mc:Ignorable="d" ResizeMode="CanResizeWithGrip"
         PreviewKeyDown="NovelWindow_OnPreviewKeyDown"
-        Title="Novel" Height="890" Width="734">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="30"></RowDefinition>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="100"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition MinWidth="100" Width="Auto"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" VerticalAlignment="Center" Background="White" Width="30" Height="30" FontFamily="Times New Roman" FontSize="18" Click="ToLeft">L</Button>
-            <Button Grid.Column="1" VerticalAlignment="Center" Background="White" Width="30" Height="30"  FontFamily="Times New Roman" FontSize="18" Click="ToCenter">C</Button>
-            <Button Grid.Column="2" VerticalAlignment="Center" Background="White" Width="30" Height="30"  FontFamily="Times New Roman" FontSize="18" Click="ToRight">R</Button>
-            <Button Grid.Column="3" Visibility="Hidden" Name="SaveButton" VerticalAlignment="Center" Background="White" Height="30"  FontFamily="Times New Roman" FontSize="18" Click="SaveContent">Save</Button>
-            <StackPanel Grid.Column="4" HorizontalAlignment="Center" Orientation="Horizontal">
-                <Button Padding="5, 0, 5, 0" Name="ScrollSwitchButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="ScrollSwitch">Scroll Visible</Button>
-                <Button Padding="5, 0, 5, 0" Name="SpellcheckSwitchButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="SpellcheckSwitch">Spellcheck On</Button>
-            </StackPanel>
-        </Grid>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="Scroll" ScrollChanged="Scroll_OnScrollChanged">
-            <Grid>
-                <RichTextBox PreviewKeyDown="Rtb_OnPreviewKeyDown" Background="White" TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
-                    <RichTextBox.Resources>
-                        <Style TargetType="{x:Type Paragraph}">
-                            <Setter Property="Margin" Value="0"/>
-                            <Setter Property="TextIndent" Value="39"/>
-                        </Style>
-                    </RichTextBox.Resources>
-                </RichTextBox>
-                <Canvas Name="SpellCheckBox">
-                </Canvas>
-                <Canvas Name="HighlightBox">
-                </Canvas>
+        SizeChanged="OnResize"
+        Title="Novel" Height="890" Width="734" MinHeight="890" MinWidth="734">
+    <Grid Name="Root">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="300"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Background="Transparent" MouseDown="ChangeOpenedTabsVisibility"></StackPanel>
+        <StackPanel Grid.Column="3" Background="Transparent" MouseDown="ChangePredefinedTabsVisibility"></StackPanel>
+        <Grid Grid.ColumnSpan="3" Height="851" Width="718">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel MouseDown="TopBarMouseDown" Background="Transparent" Grid.Row="0"></StackPanel>
+            <Grid Name="TopBarGrid" Grid.Row="0" Background="Transparent" Visibility="Hidden" MouseDown="TopBarMouseDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition MinWidth="100" Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" VerticalAlignment="Center" Background="White" Width="30" Height="30" FontFamily="Times New Roman" FontSize="18" Click="ToLeft">L</Button>
+                <Button Grid.Column="1" VerticalAlignment="Center" Background="White" Width="30" Height="30"  FontFamily="Times New Roman" FontSize="18" Click="ToCenter">C</Button>
+                <Button Grid.Column="2" VerticalAlignment="Center" Background="White" Width="30" Height="30"  FontFamily="Times New Roman" FontSize="18" Click="ToRight">R</Button>
+                <Button Grid.Column="3" Visibility="Hidden" Name="SaveButton" VerticalAlignment="Center" Background="White" Height="30"  FontFamily="Times New Roman" FontSize="18" Click="SaveContent">Save</Button>
+                <StackPanel Grid.Column="4" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Padding="5, 0, 5, 0" Name="ScrollSwitchButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="ScrollSwitch">Scroll Visible</Button>
+                    <Button Padding="5, 0, 5, 0" Name="SpellcheckSwitchButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="SpellcheckSwitch">Spellcheck On</Button>
+                </StackPanel>
             </Grid>
-        </ScrollViewer>
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" MinWidth="100"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="100"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-                <ColumnDefinition MinWidth="100" Width="Auto"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <TextBox BorderThickness="0" PreviewKeyDown="OnSearchPreviewKeyDown" KeyDown="OnSearchKeyDown" Name="SearchBox" FontFamily="Times New Roman" FontSize="12" TextAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2"></TextBox>
-            <TextBlock Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Background="White" FontFamily="Times New Roman" FontSize="18" MouseUp="ChangeMode" Name="Pages" Margin="0, 0, 10, 0">0</TextBlock>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="Scroll" ScrollChanged="Scroll_OnScrollChanged">
+                <Grid>
+                    <RichTextBox PreviewKeyDown="Rtb_OnPreviewKeyDown" Background="White" TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
+                        <RichTextBox.Resources>
+                            <Style TargetType="{x:Type Paragraph}">
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="TextIndent" Value="39"/>
+                            </Style>
+                        </RichTextBox.Resources>
+                    </RichTextBox>
+                    <Canvas Name="SpellCheckBox">
+                    </Canvas>
+                    <Canvas Name="HighlightBox">
+                    </Canvas>
+                </Grid>
+            </ScrollViewer>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="100"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition MinWidth="100" Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox BorderThickness="0" PreviewKeyDown="OnSearchPreviewKeyDown" KeyDown="OnSearchKeyDown" Name="SearchBox" FontFamily="Times New Roman" FontSize="12" TextAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2"></TextBox>
+                <TextBlock Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Background="White" FontFamily="Times New Roman" FontSize="18" MouseUp="ChangeMode" Name="Pages" Margin="0, 0, 10, 0">0</TextBlock>
+            </Grid>
         </Grid>
     </Grid>
+    
 </Window>

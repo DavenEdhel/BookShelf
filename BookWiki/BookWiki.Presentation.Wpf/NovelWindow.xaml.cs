@@ -21,6 +21,7 @@ using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models;
 using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
+using BookWiki.Presentation.Wpf.Views;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Presentation.Wpf
@@ -38,6 +39,8 @@ namespace BookWiki.Presentation.Wpf
         private bool _requestToClose = false;
         private CancellationTokenSource _token;
         private LifeSearchEngine _lifeSearchEngine;
+        private OpenedTabsView _openedTabs;
+        private PredefinedTabsView _predefinedTabs;
 
         public bool ClosingFailed { get; set; } = false;
 
@@ -49,6 +52,20 @@ namespace BookWiki.Presentation.Wpf
 
             _novel = novel.Source;
             InitializeComponent();
+
+            _openedTabs = new OpenedTabsView();
+            _openedTabs.Visibility = Visibility.Hidden;
+            _openedTabs.Margin = new Thickness(0);
+            _openedTabs.MouseDown += ChangeOpenedTabsVisibility;
+            Grid.SetColumn(_openedTabs, 0);
+            Root.Children.Add(_openedTabs);
+
+            _predefinedTabs = new PredefinedTabsView();
+            _predefinedTabs.Visibility = Visibility.Hidden;
+            _predefinedTabs.Margin = new Thickness(0);
+            _predefinedTabs.MouseDown += ChangePredefinedTabsVisibility;
+            Grid.SetColumn(_predefinedTabs, 2);
+            Root.Children.Add(_predefinedTabs);
 
             Title = new NovelTitle(novel.Source).PlainText;
 
@@ -66,11 +83,9 @@ namespace BookWiki.Presentation.Wpf
 
             _token = new CancellationTokenSource();
             RunAutosave();
-        }
 
-        public NovelWindow(IRelativePath novel) : this(new Novel(novel, BookShelf.Instance.RootPath))
-        {
-            
+            _openedTabs.Start();
+            _predefinedTabs.Start();
         }
 
         private async Task RunAutosave()
@@ -128,8 +143,20 @@ namespace BookWiki.Presentation.Wpf
             {
                 e.Cancel = true;
             }
+            else
+            {
+                _openedTabs.Stop();
+                _predefinedTabs.Stop();
+            }
 
             base.OnClosing(e);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            BookShelf.Instance.ReportWindowClosed();
         }
 
         private void PageConfigOnChanged(UserInterfaceSettings obj)
@@ -690,6 +717,39 @@ namespace BookWiki.Presentation.Wpf
         public void ClearHighlighting()
         {
             HighlightBox.Children.Clear();
+        }
+
+        private void TopBarMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            TopBarGrid.Visibility = (TopBarGrid.Visibility == Visibility.Visible) ? Visibility.Hidden : Visibility.Visible;
+        }
+
+        private int _usualHeight = 890;
+        private int _usualWidth = 734;
+
+        private void OnResize(object sender, SizeChangedEventArgs e)
+        {
+            _openedTabs.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
+            _predefinedTabs.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
+        }
+
+        private bool CanTabsBeVisible(double width) => width > _usualWidth + 200 * 2 + 5;
+
+        private void ChangeOpenedTabsVisibility(object sender, MouseButtonEventArgs e)
+        {
+            if (CanTabsBeVisible(ActualWidth))
+            {
+                _openedTabs.ToggleVisibility();
+            }
+            
+        }
+
+        private void ChangePredefinedTabsVisibility(object sender, MouseButtonEventArgs e)
+        {
+            if (CanTabsBeVisible(ActualWidth))
+            {
+                _predefinedTabs.ToggleVisibility();
+            }
         }
     }
 }

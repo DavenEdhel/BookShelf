@@ -5,5 +5,7 @@
         public string Root { get; set; }
 
         public string LibraryPath { get; set; }
+
+        public TabDto[] Tabs { get; set; } = new TabDto[0];
     }
 }
