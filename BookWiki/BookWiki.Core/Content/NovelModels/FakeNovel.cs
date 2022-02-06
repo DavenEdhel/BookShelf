@@ -40,6 +40,8 @@ namespace BookWiki.Core
 
         public ISequence<ITextInfo> Format { get; }
 
+        public IText Comments { get; }
+
         public FakeNovel()
         {
             Content = new StringText(_text);

@@ -1,8 +1,6 @@
-﻿using System.Linq;
-using BookWiki.Core.Files.PathModels;
+﻿using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.Utils.PropertyModels;
-using Newtonsoft.Json;
 
 namespace BookWiki.Core.Files.FileModels
 {
@@ -10,10 +8,12 @@ namespace BookWiki.Core.Files.FileModels
     {
         private const string ContentFileName = "Text.txt";
         private const string FormatFileName = "Format.json";
+        private const string CommentsFileName = "Comments.txt";
 
         private readonly IProperty<IText> _text;
         private readonly IFile _contentFile;
         private readonly IFile _formatFile;
+        private readonly IFile _commentsFile;
 
         public ContentFolder(IAbsolutePath path)
         {
@@ -21,6 +21,7 @@ namespace BookWiki.Core.Files.FileModels
 
             _contentFile = new TextFile(new FilePath(path, ContentFileName));
             _formatFile = new TextFile(new FilePath(path, FormatFileName));
+            _commentsFile = new TextFile(new FilePath(path, CommentsFileName));
 
             _text = new CachedValue<IText>(LoadText);
         }
@@ -37,6 +38,13 @@ namespace BookWiki.Core.Files.FileModels
             _formatFile.Save(new TextFormat(novelFormat).ToJson());
         }
 
+        public void Save(INovel novel)
+        {
+            _contentFile.Save(novel.Content.PlainText);
+            _formatFile.Save(new TextFormat(novel.Format).ToJson());
+            _commentsFile.Save(novel.Comments.PlainText);
+        }
+
         public IText LoadText()
         {
             return new StringText(_contentFile.Content);
@@ -47,6 +55,16 @@ namespace BookWiki.Core.Files.FileModels
             var content = _formatFile.Content;
 
             return TextFormat.ParseFrom(content, _text.Value);
+        }
+
+        public IText LoadComments()
+        {
+            return new StringText(_commentsFile.Content);
+        }
+
+        public void SaveComments(IText comments)
+        {
+            _commentsFile.Save(comments.PlainText);
         }
     }
 }

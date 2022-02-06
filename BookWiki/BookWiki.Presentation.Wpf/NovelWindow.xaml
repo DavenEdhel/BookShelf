@@ -10,13 +10,13 @@
         Title="Novel" Height="890" Width="734" MinHeight="890" MinWidth="734">
     <Grid Name="Root">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition Width="300"></ColumnDefinition>
+            <ColumnDefinition MinWidth="718"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <StackPanel Background="Transparent" MouseDown="ChangeOpenedTabsVisibility"></StackPanel>
-        <StackPanel Grid.Column="3" Background="Transparent" MouseDown="ChangePredefinedTabsVisibility"></StackPanel>
-        <Grid Grid.ColumnSpan="3" Height="851" Width="718">
+        <StackPanel Grid.Column="3" Background="Transparent" MouseDown="ChangeDetailsAndConsoleVisibility"></StackPanel>
+        <Grid Grid.Column="1" Height="851" Width="718">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
@@ -41,16 +41,10 @@
                     <Button Padding="5, 0, 5, 0" Name="SpellcheckSwitchButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="SpellcheckSwitch">Spellcheck On</Button>
                 </StackPanel>
             </Grid>
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="Scroll" ScrollChanged="Scroll_OnScrollChanged">
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="Scroll">
                 <Grid>
-                    <RichTextBox PreviewKeyDown="Rtb_OnPreviewKeyDown" Background="White" TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
-                        <RichTextBox.Resources>
-                            <Style TargetType="{x:Type Paragraph}">
-                                <Setter Property="Margin" Value="0"/>
-                                <Setter Property="TextIndent" Value="39"/>
-                            </Style>
-                        </RichTextBox.Resources>
-                    </RichTextBox>
+                    <local:EnhancedRichTextBox Background="White" TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" x:Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
+                    </local:EnhancedRichTextBox>
                     <Canvas Name="SpellCheckBox">
                     </Canvas>
                     <Canvas Name="HighlightBox">
@@ -67,7 +61,7 @@
                     <ColumnDefinition MinWidth="100" Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <TextBox BorderThickness="0" PreviewKeyDown="OnSearchPreviewKeyDown" KeyDown="OnSearchKeyDown" Name="SearchBox" FontFamily="Times New Roman" FontSize="12" TextAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2"></TextBox>
-                <TextBlock Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Background="White" FontFamily="Times New Roman" FontSize="18" MouseUp="ChangeMode" Name="Pages" Margin="0, 0, 10, 0">0</TextBlock>
+                <local:PagesView Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Background="White" FontFamily="Times New Roman" FontSize="18" x:Name="Pages" Margin="0, 0, 10, 0"></local:PagesView>
             </Grid>
         </Grid>
     </Grid>

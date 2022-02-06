@@ -376,6 +376,8 @@ namespace BookWiki.Presentation.Apple.Views.Controls
 
         public ISequence<ITextInfo> Format => new ThreadSafeProperty<ISequence<ITextInfo>>(() => new ArraySequence<ITextInfo>(GetFormatting().ToArray())).Value;
 
+        public IText Comments => new EmptySubstring();
+
         public IEditorState State
         {
             get => new NovelViewEditorState(this, _content);

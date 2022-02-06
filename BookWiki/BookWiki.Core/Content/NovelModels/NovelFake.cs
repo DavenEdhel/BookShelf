@@ -8,5 +8,6 @@ namespace BookWiki.Core
         public string Title { get; set; }
         public IRelativePath Source { get; set; }
         public ISequence<ITextInfo> Format { get; set; }
+        public IText Comments { get; set; }
     }
 }

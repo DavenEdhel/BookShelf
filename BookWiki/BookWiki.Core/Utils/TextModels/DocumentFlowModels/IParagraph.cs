@@ -1,4 +1,6 @@
-﻿namespace BookWiki.Core
+﻿using System.Linq;
+
+namespace BookWiki.Core
 {
     public interface IParagraph
     {

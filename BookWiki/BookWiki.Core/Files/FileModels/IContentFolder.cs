@@ -10,8 +10,12 @@ namespace BookWiki.Core.FileSystem.FileModels
 
         void Save(ISequence<ITextInfo> novelFormat);
 
+        void Save(INovel novel);
+
         IText LoadText();
 
         ISequence<ITextInfo> LoadFormat();
+
+        IText LoadComments();
     }
 }

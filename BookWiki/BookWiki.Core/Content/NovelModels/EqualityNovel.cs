@@ -19,6 +19,8 @@ namespace BookWiki.Core.Content
 
         public ISequence<ITextInfo> Format => _content.Format;
 
+        public IText Comments => _content.Comments;
+
         public override int GetHashCode()
         {
             return (Source != null ? Source.GetHashCode() : 0);

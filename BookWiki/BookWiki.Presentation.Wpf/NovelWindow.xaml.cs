@@ -16,7 +16,6 @@ using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Logging;
-using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models;
 using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
@@ -40,7 +39,7 @@ namespace BookWiki.Presentation.Wpf
         private CancellationTokenSource _token;
         private LifeSearchEngine _lifeSearchEngine;
         private OpenedTabsView _openedTabs;
-        private PredefinedTabsView _predefinedTabs;
+        private DetailsAndConsoleView _detailsAndConsole;
 
         public bool ClosingFailed { get; set; } = false;
 
@@ -54,30 +53,32 @@ namespace BookWiki.Presentation.Wpf
             InitializeComponent();
 
             _openedTabs = new OpenedTabsView();
+            _openedTabs.Width = 300;
+            _openedTabs.HorizontalAlignment = HorizontalAlignment.Left;
             _openedTabs.Visibility = Visibility.Hidden;
             _openedTabs.Margin = new Thickness(0);
             _openedTabs.MouseDown += ChangeOpenedTabsVisibility;
             Grid.SetColumn(_openedTabs, 0);
             Root.Children.Add(_openedTabs);
 
-            _predefinedTabs = new PredefinedTabsView();
-            _predefinedTabs.Visibility = Visibility.Hidden;
-            _predefinedTabs.Margin = new Thickness(0);
-            _predefinedTabs.MouseDown += ChangePredefinedTabsVisibility;
-            Grid.SetColumn(_predefinedTabs, 2);
-            Root.Children.Add(_predefinedTabs);
+            _detailsAndConsole = new DetailsAndConsoleView();
+            _detailsAndConsole.HorizontalAlignment = HorizontalAlignment.Right;
+            _detailsAndConsole.Visibility = Visibility.Hidden;
+            _detailsAndConsole.Margin = new Thickness(0);
+            _detailsAndConsole.MouseDown += ChangeDetailsAndConsoleVisibility;
+            Grid.SetColumn(_detailsAndConsole, 2);
+            Root.Children.Add(_detailsAndConsole);
 
             Title = new NovelTitle(novel.Source).PlainText;
-
-            Rtb.FontFamily = new FontFamily("Times New Roman");
-            Rtb.FontSize = 18;
-            Rtb.Language = XmlLanguage.GetLanguage("ru");
-            Rtb.BorderThickness = new Thickness(0, 0, 0, 0);
 
             _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary));
             _lifeSearchEngine = new LifeSearchEngine(Rtb, this, SearchBox, Scroll);
 
             LoadContent(novel);
+
+            Pages.Novel = Rtb;
+            Pages.Scroll = Scroll;
+            Pages.Start();
 
             PageConfigOnChanged(BookShelf.Instance.PageConfig.Current);
 
@@ -85,7 +86,7 @@ namespace BookWiki.Presentation.Wpf
             RunAutosave();
 
             _openedTabs.Start();
-            _predefinedTabs.Start();
+            _detailsAndConsole.Start();
         }
 
         private async Task RunAutosave()
@@ -146,7 +147,8 @@ namespace BookWiki.Presentation.Wpf
             else
             {
                 _openedTabs.Stop();
-                _predefinedTabs.Stop();
+                _detailsAndConsole.Stop();
+                Pages.Stop();
             }
 
             base.OnClosing(e);
@@ -161,9 +163,6 @@ namespace BookWiki.Presentation.Wpf
 
         private void PageConfigOnChanged(UserInterfaceSettings obj)
         {
-            _pageMode = PageNumber.PageModes[obj.PageModeIndex];
-            UpdatePaging();
-
             if (IsSpellcheckOn() != obj.IsSpellCheckOn)
             {
                 ToggleSpellcheck();
@@ -178,8 +177,6 @@ namespace BookWiki.Presentation.Wpf
         private void Content_OnTextChanged(object sender, TextChangedEventArgs e)
         {
             _lifeSpellCheck.TextChangedInside(Rtb.CaretPosition.Paragraph);
-
-            UpdatePaging();
 
             _isChanged = true;
 
@@ -198,6 +195,8 @@ namespace BookWiki.Presentation.Wpf
 
                     var file = new ContentFolder(_novel.AbsolutePath(BookShelf.Instance.RootPath));
                     file.Save(formattedContent);
+
+                    file.SaveComments(_detailsAndConsole.Details.AllData);
                 }
 
                 return true;
@@ -212,47 +211,9 @@ namespace BookWiki.Presentation.Wpf
 
         private void LoadContent(Novel novel)
         {
-            var rtf = new DocumentFlowContentFromTextAndFormat(novel);
+            new DocumentFlowContentFromTextAndFormat(novel).LoadInto(Rtb);
 
-            Rtb.Document.Blocks.Clear();
-
-            foreach (var rtfParagraph in rtf.Paragraphs)
-            {
-                var paragraph = new Paragraph();
-
-                switch (rtfParagraph.FormattingStyle)
-                {
-                    case TextStyle.Centered:
-                        paragraph.TextAlignment = TextAlignment.Center;
-                        break;
-                    case TextStyle.Right:
-                        paragraph.TextAlignment = TextAlignment.Right;
-                        break;
-                }
-
-                foreach (var rtfParagraphInline in rtfParagraph.Inlines)
-                {
-                    var inline = new Run(rtfParagraphInline.Text.PlainText);
-
-                    switch (rtfParagraphInline.TextStyle)
-                    {
-                        case TextStyle.Bold:
-                            paragraph.Inlines.Add(new Bold(inline));
-                            break;
-                        case TextStyle.Italic:
-                            paragraph.Inlines.Add(new Italic(inline));
-                            break;
-                        case TextStyle.BoldAndItalic:
-                            paragraph.Inlines.Add(new Italic(new Bold(inline)));
-                            break;
-                        default:
-                            paragraph.Inlines.Add(inline);
-                            break;
-                    }
-                }
-
-                Rtb.Document.Blocks.Add(paragraph);
-            }
+            _detailsAndConsole.Details.LoadFrom(novel.Comments);
 
             _isChanged = false;
             SaveButton.Visibility = Visibility.Hidden;
@@ -318,82 +279,6 @@ namespace BookWiki.Presentation.Wpf
         private void SelectionChanged(object sender, RoutedEventArgs e)
         {
             _lifeSpellCheck.CursorPositionChanged();
-        }
-
-        private string _pageMode = PageNumber.Pages;
-
-        private int Length => new TextRange(Rtb.Document.ContentStart, Rtb.Document.ContentEnd).Text.Length;
-
-        private void UpdatePagingForAuthorLists()
-        {
-            var listSize = 40000;
-
-            var als = (double)Length / (double)listSize;
-
-            Pages.Text = $"{als:##.000} а.л.";
-        }
-
-        private void UpdatePagingForChars()
-        {
-            var ks = Length / 1000f;
-
-            Pages.Text = $"{ks:###.0}k";
-        }
-
-        private void UpdatePagingForPages()
-        {
-            var pageSize = 1020;
-
-            var totalPages = (int)(Rtb.ActualHeight / pageSize) + 1;
-
-            var currentPage = (int)(Scroll.ContentVerticalOffset / pageSize) + 1;
-
-            Pages.Text = $"{currentPage} из {totalPages}";
-        }
-
-        private void UpdatePaging()
-        {
-            if (_pageMode == PageNumber.Pages)
-            {
-                UpdatePagingForPages();
-            }
-
-            if (_pageMode == PageNumber.NotDiplay)
-            {
-                UpdatePagingForNotDisplay();
-            }
-
-            if (_pageMode == PageNumber.AuthorLists)
-            {
-                UpdatePagingForAuthorLists();
-            }
-
-            if (_pageMode == PageNumber.Characters)
-            {
-                UpdatePagingForChars();
-            }
-        }
-
-        private void UpdatePagingForNotDisplay()
-        {
-            Pages.Text = "None";
-        }
-
-        private void ChangeMode(object sender, MouseButtonEventArgs e)
-        {
-            _pageMode = PageNumber.PageModes[(PageNumber.PageModes.IndexOf(x => x == _pageMode) + 1) % PageNumber.PageModes.Length];
-
-            UpdatePaging();
-
-            BookShelf.Instance.PageConfig.SetDisplayMode(_pageMode);
-        }
-
-        private void Scroll_OnScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            if (_pageMode == PageNumber.Pages)
-            {
-                UpdatePagingForPages();
-            }
         }
 
         private void LearnNewWordFromCursor(object sender, KeyEventArgs e)
@@ -484,32 +369,7 @@ namespace BookWiki.Presentation.Wpf
             }
         }
 
-        TextPointer GetLineEnd(TextPointer position)
-        {
-            var isEof = position.GetLineStartPosition(1) == null;
-
-            if (isEof)
-            {
-                return Rtb.Document.ContentEnd;
-            }
-
-            var currentLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(position.GetLineStartPosition(0));
-            var nextLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(position.GetLineStartPosition(1));
-
-            for (int i = nextLineOffset; i > currentLineOffset; i--)
-            {
-                var possibleEol = Rtb.Document.ContentStart.GetPositionAtOffset(i);
-
-                var offsetToCheck = Rtb.Document.ContentStart.GetOffsetToPosition(possibleEol.GetLineStartPosition(0));
-
-                if (currentLineOffset == offsetToCheck)
-                {
-                    return possibleEol;
-                }
-            }
-
-            return null;
-        }
+        
 
         TextPointer GetThisLineEnd()
         {
@@ -616,39 +476,6 @@ namespace BookWiki.Presentation.Wpf
             SaveButton.Visibility = Visibility.Hidden;
         }
 
-        private void Rtb_OnPreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
-            {
-                e.Handled = true;
-                return;
-            }
-
-            if (e.Key == Key.Back)
-            {
-                if (Rtb.CaretPosition.IsAtLineStartPosition)
-                {
-                    if (string.IsNullOrWhiteSpace(Rtb.Selection.Text))
-                    {
-                        var previousEnd = Rtb.CaretPosition.GetLineStartPosition(-1);
-
-                        if (previousEnd != null)
-                        {
-                            var previousLine = GetLineEnd(previousEnd);
-
-                            Rtb.Selection.Select(previousLine.GetInsertionPosition(LogicalDirection.Backward), Rtb.CaretPosition);
-
-                            Rtb.Selection.Text = "";
-
-                            Rtb.CaretPosition = Rtb.Selection.End;
-
-                            e.Handled = true;
-                        }
-                    }
-                }
-            }
-        }
-
         private void NovelWindow_OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
@@ -730,7 +557,7 @@ namespace BookWiki.Presentation.Wpf
         private void OnResize(object sender, SizeChangedEventArgs e)
         {
             _openedTabs.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
-            _predefinedTabs.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
+            _detailsAndConsole.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
         }
 
         private bool CanTabsBeVisible(double width) => width > _usualWidth + 200 * 2 + 5;
@@ -744,11 +571,11 @@ namespace BookWiki.Presentation.Wpf
             
         }
 
-        private void ChangePredefinedTabsVisibility(object sender, MouseButtonEventArgs e)
+        private void ChangeDetailsAndConsoleVisibility(object sender, MouseButtonEventArgs e)
         {
             if (CanTabsBeVisible(ActualWidth))
             {
-                _predefinedTabs.ToggleVisibility();
+                _detailsAndConsole.ToggleVisibility();
             }
         }
     }

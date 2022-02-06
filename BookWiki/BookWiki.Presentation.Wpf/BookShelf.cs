@@ -127,6 +127,14 @@ namespace BookWiki.Presentation.Wpf
             Search.InvalidateCache();
         }
 
+        public Novel Read(IRelativePath novel)
+        {
+            Novel novelItem;
+
+            novelItem = new Novel(novel, BookShelf.Instance.RootPath);
+            return novelItem;
+        }
+
         public void Open(IRelativePath novel, bool fullscreen = false)
         {
             var novelView = OpenedNovels.FirstOrDefault(x => x.Novel.EqualsTo(novel));

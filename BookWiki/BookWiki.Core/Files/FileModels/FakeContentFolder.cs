@@ -19,6 +19,11 @@ namespace BookWiki.Core
 
         }
 
+        public void Save(INovel novel)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public virtual IText LoadText()
         {
             var result = new StringBuilder();
@@ -34,6 +39,18 @@ namespace BookWiki.Core
         public virtual ISequence<ITextInfo> LoadFormat()
         {
             return new ArraySequence<ITextInfo>(new ITextInfo[0]);
+        }
+
+        public IText LoadComments()
+        {
+            var result = new StringBuilder();
+
+            for (int i = 0; i < 5; i++)
+            {
+                result.Append(ArticlePart.CreateText(ContentHelper.GenerateParagraph()));
+            }
+
+            return new StringText(result.ToString());
         }
     }
 }
