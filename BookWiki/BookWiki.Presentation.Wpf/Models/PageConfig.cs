@@ -1,6 +1,7 @@
 ﻿using System;
 using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Utils;
+using BookWiki.Presentation.Wpf.Models.Utilities;
 
 namespace BookWiki.Presentation.Wpf.Models
 {

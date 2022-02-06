@@ -65,6 +65,7 @@
     <Compile Include="EnhancedRichTextBox.cs" />
     <Compile Include="Extensions\WindowExtensions.cs" />
     <Compile Include="Models\AppConfig.cs" />
+    <Compile Include="Models\BackupOperation.cs" />
     <Compile Include="Models\EditorState.cs" />
     <Compile Include="Models\KeyProcessorModels\KeyProcessor.cs" />
     <Compile Include="Models\NovelTitle.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Models\QuickNavigationModels\LifeSearchEngine.cs" />
     <Compile Include="Models\QuickNavigationModels\QuickNavigationProcessor.cs" />
     <Compile Include="Models\QuickNavigationModels\SearchByFileEngine.cs" />
+    <Compile Include="Models\RightSideBarConfig.cs" />
     <Compile Include="Models\ScreensStateDto.cs" />
     <Compile Include="Models\ScreenState.cs" />
     <Compile Include="Models\SessionContext.cs" />
@@ -91,16 +93,23 @@
     <Compile Include="NewContentWindow.xaml.cs">
       <DependentUpon>NewContentWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PagesView.cs" />
+    <Compile Include="Views\PagesView.cs" />
     <Compile Include="QuickNavigationWindow.xaml.cs">
       <DependentUpon>QuickNavigationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ClickablePanel.cs" />
     <Compile Include="Views\ConsoleView.cs" />
     <Compile Include="Views\DetailsView.cs" />
     <Compile Include="Views\DocumentFlowContentExtensions.cs" />
     <Compile Include="Views\FileSystemView.cs" />
     <Compile Include="Views\OpenedTabsView.cs" />
-    <Compile Include="Views\DetailsAndConsoleView.cs" />
+    <Compile Include="Views\RightSideView.cs" />
+    <Compile Include="Views\RightSideViewV2.xaml.cs">
+      <DependentUpon>RightSideViewV2.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StatisticsWindow.xaml.cs">
+      <DependentUpon>StatisticsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\TabItemView.cs" />
     <Page Include="FileSystemWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -125,6 +134,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="QuickNavigationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RightSideViewV2.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\StatisticsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

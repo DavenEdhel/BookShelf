@@ -1,0 +1,20 @@
+﻿<Window x:Class="BookWiki.Presentation.Wpf.Views.StatisticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BookWiki.Presentation.Wpf.Views"
+        mc:Ignorable="d"
+        Title="StatisticsWindow" Height="950" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Name="Chapters" Orientation="Vertical"></StackPanel>
+        <StackPanel Name="Results" Grid.Column="1" Orientation="Vertical">
+            <TextBlock Name="TotalSizeCharacters"></TextBlock>
+            <TextBlock Name="CommentsSize"></TextBlock>
+        </StackPanel>
+    </Grid>
+</Window>

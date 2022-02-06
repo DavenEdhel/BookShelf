@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
+using BookWiki.Presentation.Wpf.Models;
 
 namespace BookWiki.Presentation.Wpf.Views
 {
@@ -54,6 +55,28 @@ namespace BookWiki.Presentation.Wpf.Views
 
             itemStack.Children.Add(fileNodeName);
 
+            var statisticsButton = new Button();
+            statisticsButton.Visibility = node.IsContentFolder ? Visibility.Hidden : Visibility.Visible;
+            statisticsButton.Width = 90;
+            statisticsButton.Height = 30;
+            statisticsButton.Margin = new Thickness(40, 0, 0, 0);
+            statisticsButton.Click += StatisticsButtonOnClick;
+            statisticsButton.Background = Brushes.White;
+            statisticsButton.Content = "Статистика";
+
+            itemStack.Children.Add(statisticsButton);
+
+            var backupButton = new Button();
+            backupButton.Visibility = node.IsContentFolder ? Visibility.Hidden : Visibility.Visible;
+            backupButton.Width = 90;
+            backupButton.Height = 30;
+            backupButton.Margin = new Thickness(10, 0, 0, 0);
+            backupButton.Click += BackupButtonOnClick;
+            backupButton.Background = Brushes.White;
+            backupButton.Content = "Бэкап";
+
+            itemStack.Children.Add(backupButton);
+
             Children.Add(itemStack);
 
             _childItems = new StackPanel();
@@ -70,6 +93,19 @@ namespace BookWiki.Presentation.Wpf.Views
                     Expand();
                 }
             }
+        }
+
+        private void BackupButtonOnClick(object sender, RoutedEventArgs e)
+        {
+            var backupOperation = new BackupOperation(_node);
+            backupOperation.Execute();
+
+            MessageBox.Show(backupOperation.Result, "Результат");
+        }
+
+        private void StatisticsButtonOnClick(object sender, RoutedEventArgs e)
+        {
+            new StatisticsWindow(_node).ShowDialog();
         }
 
         private void FileNodeNameOnMouseUp(object sender, MouseButtonEventArgs e)
@@ -97,14 +133,10 @@ namespace BookWiki.Presentation.Wpf.Views
         {
             if (_expandButtonText.Text == "+")
             {
-                _expandButtonText.Text = "-";
-
                 Expand();
             }
             else
             {
-                _expandButtonText.Text = "+";
-
                 Collapse();
             }
         }
@@ -115,11 +147,15 @@ namespace BookWiki.Presentation.Wpf.Views
             {
                 _childItems.Children.Add(new FileSystemView(fileSystemNode));
             }
+
+            _expandButtonText.Text = "-";
         }
 
         private void Collapse()
         {
             _childItems.Children.Clear();
+
+            _expandButtonText.Text = "+";
         }
     }
 }

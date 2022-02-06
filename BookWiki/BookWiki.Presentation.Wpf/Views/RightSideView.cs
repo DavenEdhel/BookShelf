@@ -8,12 +8,12 @@ using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Presentation.Wpf.Views
 {
-    public class DetailsAndConsoleView : StackPanel
+    public class RightSideView : StackPanel
     {
         private readonly DetailsView _detailsView;
         private readonly ConsoleView _consoleView;
 
-        public DetailsAndConsoleView()
+        public RightSideView()
         {
             VerticalAlignment = VerticalAlignment.Center;
 

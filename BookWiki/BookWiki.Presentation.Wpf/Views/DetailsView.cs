@@ -7,21 +7,23 @@ using BookWiki.Presentation.Wpf.Models;
 
 namespace BookWiki.Presentation.Wpf.Views
 {
-    public class DetailsView : EnhancedRichTextBox
+    public class DetailsView : ScrollViewer
     {
+        private readonly EnhancedRichTextBox _rtb;
+
         public DetailsView()
         {
+            Content = _rtb = new EnhancedRichTextBox();
+
             Height = 450;
-            Background = new SolidColorBrush(Colors.White);
-            FontSize = 15;
-            Margin = new Thickness(30, 0, 30, 0);
+            _rtb.Background = new SolidColorBrush(Colors.White);
         }
 
-        public IText AllData => new FormattedContentFromDocumentFlow(new DocumentFlowContentFromRichTextBox(this)).Content;
+        public IText AllData => new FormattedContentFromDocumentFlow(new DocumentFlowContentFromRichTextBox(_rtb)).Content;
 
         public void LoadFrom(IText novelComments)
         {
-            new DocumentFlowContentFromTextAndFormat(novelComments, new EmptySequence<ITextInfo>()).LoadInto(this);
+            new DocumentFlowContentFromTextAndFormat(novelComments, new EmptySequence<ITextInfo>()).LoadInto(_rtb);
         }
     }
 }

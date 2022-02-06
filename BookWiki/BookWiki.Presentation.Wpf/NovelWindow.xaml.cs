@@ -39,7 +39,7 @@ namespace BookWiki.Presentation.Wpf
         private CancellationTokenSource _token;
         private LifeSearchEngine _lifeSearchEngine;
         private OpenedTabsView _openedTabs;
-        private DetailsAndConsoleView _detailsAndConsole;
+        private RightSideViewV2 _rightSide;
 
         public bool ClosingFailed { get; set; } = false;
 
@@ -61,13 +61,13 @@ namespace BookWiki.Presentation.Wpf
             Grid.SetColumn(_openedTabs, 0);
             Root.Children.Add(_openedTabs);
 
-            _detailsAndConsole = new DetailsAndConsoleView();
-            _detailsAndConsole.HorizontalAlignment = HorizontalAlignment.Right;
-            _detailsAndConsole.Visibility = Visibility.Hidden;
-            _detailsAndConsole.Margin = new Thickness(0);
-            _detailsAndConsole.MouseDown += ChangeDetailsAndConsoleVisibility;
-            Grid.SetColumn(_detailsAndConsole, 2);
-            Root.Children.Add(_detailsAndConsole);
+            _rightSide = new RightSideViewV2();
+            _rightSide.HorizontalAlignment = HorizontalAlignment.Right;
+            _rightSide.Visibility = Visibility.Hidden;
+            _rightSide.Margin = new Thickness(0);
+            _rightSide.MouseDown += ChangeRightSideVisibility;
+            Grid.SetColumn(_rightSide, 2);
+            Root.Children.Add(_rightSide);
 
             Title = new NovelTitle(novel.Source).PlainText;
 
@@ -86,7 +86,7 @@ namespace BookWiki.Presentation.Wpf
             RunAutosave();
 
             _openedTabs.Start();
-            _detailsAndConsole.Start();
+            _rightSide.Start();
         }
 
         private async Task RunAutosave()
@@ -147,7 +147,7 @@ namespace BookWiki.Presentation.Wpf
             else
             {
                 _openedTabs.Stop();
-                _detailsAndConsole.Stop();
+                _rightSide.Stop();
                 Pages.Stop();
             }
 
@@ -196,7 +196,7 @@ namespace BookWiki.Presentation.Wpf
                     var file = new ContentFolder(_novel.AbsolutePath(BookShelf.Instance.RootPath));
                     file.Save(formattedContent);
 
-                    file.SaveComments(_detailsAndConsole.Details.AllData);
+                    file.SaveComments(_rightSide.Details.AllData);
                 }
 
                 return true;
@@ -213,7 +213,7 @@ namespace BookWiki.Presentation.Wpf
         {
             new DocumentFlowContentFromTextAndFormat(novel).LoadInto(Rtb);
 
-            _detailsAndConsole.Details.LoadFrom(novel.Comments);
+            _rightSide.Details.LoadFrom(novel.Comments);
 
             _isChanged = false;
             SaveButton.Visibility = Visibility.Hidden;
@@ -557,7 +557,7 @@ namespace BookWiki.Presentation.Wpf
         private void OnResize(object sender, SizeChangedEventArgs e)
         {
             _openedTabs.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
-            _detailsAndConsole.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
+            _rightSide.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
         }
 
         private bool CanTabsBeVisible(double width) => width > _usualWidth + 200 * 2 + 5;
@@ -571,11 +571,11 @@ namespace BookWiki.Presentation.Wpf
             
         }
 
-        private void ChangeDetailsAndConsoleVisibility(object sender, MouseButtonEventArgs e)
+        private void ChangeRightSideVisibility(object sender, MouseButtonEventArgs e)
         {
             if (CanTabsBeVisible(ActualWidth))
             {
-                _detailsAndConsole.ToggleVisibility();
+                _rightSide.ToggleVisibility();
             }
         }
     }

@@ -50,14 +50,16 @@ namespace BookWiki.Presentation.Wpf.Models
             return this;
         }
 
-        public void Store(IEnumerable<NovelWindow> openedNovels, PageConfig pageConfig, IRootPath root)
+        public void Store(IEnumerable<NovelWindow> openedNovels, PageConfig pageConfig,
+            RightSideBarConfig rightSideBarConfig, IRootPath root)
         {
             var file = new SessionFile(new List<string>(), openedNovels.Select(x => new EditorState(x)).ToArray(), new UserInterfaceSettings()
             {
                 IsSideBarHidden = pageConfig.Current.IsSideBarHidden,
                 IsScrollHidden = pageConfig.Current.IsScrollHidden,
                 PageModeIndex = pageConfig.Current.PageModeIndex,
-                IsSpellCheckOn = pageConfig.Current.IsSpellCheckOn
+                IsSpellCheckOn = pageConfig.Current.IsSpellCheckOn,
+                RightSideBar = rightSideBarConfig.Current
             }, root);
 
             file.Save();

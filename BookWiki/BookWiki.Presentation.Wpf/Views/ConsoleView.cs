@@ -17,21 +17,21 @@ namespace BookWiki.Presentation.Wpf.Views
     {
         private readonly EnhancedRichTextBox _output;
         private readonly TextBox _input;
+        private readonly ScrollViewer _scrollView;
 
         public ConsoleView()
         {
             Height = 450;
             Orientation = Orientation.Vertical;
             Background = new SolidColorBrush(Colors.Azure);
-            Margin = new Thickness(30, 0, 30, 0);
 
-            var scrollView = new ScrollViewer();
-            scrollView.Height = 420;
+            _scrollView = new ScrollViewer();
+            _scrollView.Height = 420;
             _output = new EnhancedRichTextBox();
             
-            scrollView.Content = _output;
+            _scrollView.Content = _output;
 
-            Children.Add(scrollView);
+            Children.Add(_scrollView);
             Children.Add(_input = new TextBox()
             {
                 Height = 30,
@@ -41,6 +41,17 @@ namespace BookWiki.Presentation.Wpf.Views
             });
 
             _input.KeyDown += InputOnKeyDown;
+        }
+
+        public void SetHeight(double value)
+        {
+            if (value == 0)
+            {
+                value = 900;
+            }
+
+            Height = value;
+            _scrollView.Height = value - 30;
         }
 
         private void InputOnKeyDown(object sender, KeyEventArgs e)
@@ -62,9 +73,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
                 _output.Document.Blocks.Add(new Paragraph(new Run("*******")));
 
-                _input.Text = new Query(_input.Text).Command + " ";
-
-                _output.ScrollToEnd();
+                _input.Text = string.Empty;
             }
         }
     }

@@ -70,6 +70,7 @@ namespace BookWiki.Presentation.Wpf
             Session = new SessionContext(RootPath).Restore();
 
             PageConfig = new PageConfig(Session);
+            RightSideBarConfig = new RightSideBarConfig(Session);
         }
 
         public KeyProcessor KeyProcessor { get; } = new KeyProcessor();
@@ -101,6 +102,8 @@ namespace BookWiki.Presentation.Wpf
         }
 
         public PageConfig PageConfig { get; }
+
+        public RightSideBarConfig RightSideBarConfig { get; }
 
         public event Action NovelListChanged = delegate { };
 
@@ -210,7 +213,7 @@ namespace BookWiki.Presentation.Wpf
 
         public void StoreSession()
         {
-            Session.Store(OpenedNovels, PageConfig, RootPath);
+            Session.Store(OpenedNovels, PageConfig, RightSideBarConfig, RootPath);
         }
 
         public void ShowFileSystem()
