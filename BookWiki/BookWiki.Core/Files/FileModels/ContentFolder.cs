@@ -1,4 +1,5 @@
-﻿using BookWiki.Core.Files.PathModels;
+﻿using System.Linq;
+using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.Utils.PropertyModels;
 
@@ -48,6 +49,11 @@ namespace BookWiki.Core.Files.FileModels
         public IText LoadText()
         {
             return new StringText(_contentFile.Content);
+        }
+
+        public IText[] LoadLines()
+        {
+            return _contentFile.Lines.Select(x => new StringText(x)).ToArray();
         }
 
         public ISequence<ITextInfo> LoadFormat()

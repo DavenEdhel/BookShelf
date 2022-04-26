@@ -14,6 +14,8 @@ namespace BookWiki.Core.FileSystem.FileModels
 
         IText LoadText();
 
+        IText[] LoadLines();
+
         ISequence<ITextInfo> LoadFormat();
 
         IText LoadComments();

@@ -62,6 +62,10 @@ namespace BookWiki.Presentation.Wpf.Models
             foreach (string file in files)
             {
                 string name = Path.GetFileName(file);
+                if (name.Contains("cover"))
+                {
+                    continue;
+                }
                 string dest = Path.Combine(destFolder, name);
                 File.Copy(file, dest);
             }

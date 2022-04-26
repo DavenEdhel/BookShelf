@@ -36,6 +36,11 @@ namespace BookWiki.Core
             return new StringText(result.ToString());
         }
 
+        public IText[] LoadLines()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public virtual ISequence<ITextInfo> LoadFormat()
         {
             return new ArraySequence<ITextInfo>(new ITextInfo[0]);

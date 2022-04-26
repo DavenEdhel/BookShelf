@@ -9,10 +9,13 @@ namespace BookWiki.Core.Files.FileModels
 
         private CachedValue<string> _content;
 
+        private CachedValue<string[]> _lines;
+
         public CachedTextFile(IFile file)
         {
             _file = file;
             _content = new CachedValue<string>(() => _file.Content);
+            _lines = new CachedValue<string[]>(() => _file.Lines);
         }
 
         public void Save(string content)
@@ -22,5 +25,7 @@ namespace BookWiki.Core.Files.FileModels
         }
 
         public string Content => _content.Value;
+
+        public string[] Lines => _lines.Value;
     }
 }

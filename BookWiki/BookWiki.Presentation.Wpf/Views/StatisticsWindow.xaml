@@ -11,10 +11,18 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <StackPanel Name="Chapters" Orientation="Vertical"></StackPanel>
+        <StackPanel>
+            <StackPanel Name="Chapters" Orientation="Vertical"></StackPanel>
+        </StackPanel>
         <StackPanel Name="Results" Grid.Column="1" Orientation="Vertical">
             <TextBlock Name="TotalSizeCharacters"></TextBlock>
             <TextBlock Name="CommentsSize"></TextBlock>
+            <TextBlock FontFamily="Times New Roman" FontSize="16" Height="30">Тайтл:</TextBlock>
+            <TextBox FontFamily="Times New Roman" FontSize="16" Height="30" Name="BookTitle"></TextBox>
+            <TextBlock FontFamily="Times New Roman" FontSize="16" Height="30">Аннотация:</TextBlock>
+            <TextBox MinLines="5" FontFamily="Times New Roman" FontSize="16" MinHeight="100" Name="BookAnnotation"></TextBox>
+            <Button  FontFamily="Times New Roman" FontSize="16" Height="30" Click="GenerageFb2" Margin="10, 0">Сгенерировать</Button>
+            <Image Name="Cover"></Image>
         </StackPanel>
     </Grid>
 </Window>

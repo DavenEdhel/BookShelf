@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using BookWiki.Core;
+using BookWiki.Core.Fb2Models;
 using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
@@ -38,7 +32,9 @@ namespace BookWiki.Presentation.Wpf.Views
 
             _novels = _node.InnerNodes.Where(x => x.IsContentFolder).Select(x => BookShelf.Instance.Read(x.Path.RelativePath(BookShelf.Instance.RootPath))).ToArray();
 
-            var toInclude = new NodeFolder(node.Path).Load();
+            var statistics = new NodeFolder(node.Path);
+
+            var toInclude = statistics.Load();
 
             foreach (var novel in _novels)
             {
@@ -57,12 +53,24 @@ namespace BookWiki.Presentation.Wpf.Views
                 Chapters.Children.Add(checkbox);
             }
 
+            var bookMetadata = statistics.LoadMetadata();
+
+            BookTitle.Text = bookMetadata.Title;
+            BookAnnotation.Text = bookMetadata.Annotation;
+
+            var coverPath = new AutodetectCoverFilePath(node.Path);
+
+            if (coverPath.Value != null)
+            {
+                Cover.Source = new BitmapImage(new Uri(coverPath.Value.FullPath));
+            }
+
             Recalculate(null, null);
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            new NodeFolder(_node.Path).Save(CheckedNovels().Select(x => x.Source));
+            new NodeFolder(_node.Path).Save(CheckedNovels().Select(x => x.Source), BookTitle.Text, BookAnnotation.Text);
 
             base.OnClosing(e);
         }
@@ -105,6 +113,18 @@ namespace BookWiki.Presentation.Wpf.Views
                     yield return chaptersChild.Tag.CastTo<Novel>();
                 }
             }
+        }
+
+        private void GenerageFb2(object sender, RoutedEventArgs e)
+        {
+            new Fb2Template()
+            {
+                Annotation = BookAnnotation.Text,
+                Title = BookTitle.Text,
+                Chapters = CheckedNovels().ToArray().Select(x => x.Source.AbsolutePath(BookShelf.Instance.RootPath)).ToList()
+            }.CompileToFile(_node.Path);
+
+            MessageBox.Show("Книга скомпилирована", "Результат");
         }
     }
 }

@@ -5,5 +5,7 @@
         void Save(string content);
 
         string Content { get; }
+
+        string[] Lines { get; }
     }
 }

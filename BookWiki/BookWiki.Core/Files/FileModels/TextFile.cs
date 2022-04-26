@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
@@ -32,6 +33,19 @@ namespace BookWiki.Core.Files.FileModels
 
                 return string.Empty;
             }
-        } 
+        }
+
+        public string[] Lines
+        {
+            get
+            {
+                if (File.Exists(_pathToFile.FullPath))
+                {
+                    return File.ReadAllLines(_pathToFile.FullPath);
+                }
+
+                return Array.Empty<string>();
+            }
+        }
     }
 }
