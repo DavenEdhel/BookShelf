@@ -584,5 +584,25 @@ namespace BookWiki.Presentation.Wpf
                 _rightSide.ToggleVisibility();
             }
         }
+
+        private void TextSelectedAndClicked(object sender, MouseButtonEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl))
+            {
+                var cursorOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
+
+                var substrings = new PunctuationSeparatedEnumeration(Rtb.Document, Rtb.CaretPosition.Paragraph).ToArray();
+
+                var selectedSubstring = substrings.FirstOrDefault(x => cursorOffset >= x.StartIndex && cursorOffset < x.EndIndex);
+
+                if (selectedSubstring != null)
+                {
+                    //if (new SpellCheckV2(BookShelf.Instance.Dictionary).IsCorrect(selectedSubstring.Text) == false)
+                    {
+                        new WordInfoWindow(selectedSubstring.Text).ShowDialog();
+                    }
+                }
+            }
+        }
     }
 }

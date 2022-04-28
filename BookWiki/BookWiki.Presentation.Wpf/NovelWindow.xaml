@@ -43,7 +43,7 @@
             </Grid>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="Scroll">
                 <Grid>
-                    <local:EnhancedRichTextBox Background="White" TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" x:Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
+                    <local:EnhancedRichTextBox PreviewMouseLeftButtonUp="TextSelectedAndClicked" Background="White" TextChanged="Content_OnTextChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" x:Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
                     </local:EnhancedRichTextBox>
                     <Canvas Name="SpellCheckBox">
                     </Canvas>

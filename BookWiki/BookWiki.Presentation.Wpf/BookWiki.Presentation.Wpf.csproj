@@ -116,6 +116,9 @@
       <DependentUpon>StatisticsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TabItemView.cs" />
+    <Compile Include="WordInfoWindow.xaml.cs">
+      <DependentUpon>WordInfoWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="FileSystemWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -151,6 +154,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\StatisticsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WordInfoWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
