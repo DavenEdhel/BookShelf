@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Logging;
 
 namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
@@ -57,10 +58,54 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
             return _root.GetWordsWithLetterInPosition(letter);
         }
 
+        public void Append(string item)
+        {
+            _root.Append(item);
+        }
+
         public Task Learn(string newWord)
         {
             return Task.Run(() =>
             {
+                bool changed = false;
+
+                lock (_criticalSection)
+                {
+                    _logger.Info($"Started learning {DateTime.Now.ToLongTimeString()}");
+
+                    newWord = newWord.ToLower();
+
+                    if (new SpellCheckV2(this).IsCorrect(newWord))
+                    {
+                        _logger.Info($"Work {newWord} is already known");
+
+                        return;
+                    }
+
+                    _fileProvider.Append(_lexPath, newWord);
+
+                    _root.Append(newWord);
+
+                    _logger.Info($"Word {newWord} added to the dictionary.");
+
+                    _logger.Info($"Ended learning {DateTime.Now.ToLongTimeString()}");
+
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    Changed.Invoke();
+                }
+            });
+        }
+
+        public Task LearnV1(string newWord)
+        {
+            return Task.Run(() =>
+            {
+                bool changed = false;
+
                 lock (_criticalSection)
                 {
                     _logger.Info($"Started learning {DateTime.Now.ToLongTimeString()}");
@@ -71,6 +116,8 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 
                     if (all.Contains(newWord))
                     {
+                        _logger.Info($"Work {newWord} is already known");
+
                         return;
                     }
 
@@ -82,9 +129,20 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 
                     _root = root;
 
+                    _logger.Info($"Word {newWord} added to the dictionary.");
+
                     _logger.Info($"Ended learning {DateTime.Now.ToLongTimeString()}");
+
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    Changed.Invoke();
                 }
             });
         }
+
+        public event Action Changed = delegate { };
     }
 }

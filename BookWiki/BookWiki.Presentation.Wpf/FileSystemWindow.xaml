@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
         xmlns:system="clr-namespace:System;assembly=System"
         xmlns:views="clr-namespace:BookWiki.Presentation.Wpf.Views"
-        mc:Ignorable="d" ResizeMode="CanMinimize"
+        mc:Ignorable="d"
         KeyDown="OnKeyDown"
         Title="Книжная Полка" Height="800" Width="680">
     <Grid>

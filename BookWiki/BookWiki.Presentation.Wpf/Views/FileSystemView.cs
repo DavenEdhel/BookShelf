@@ -21,7 +21,15 @@ namespace BookWiki.Presentation.Wpf.Views
             _node = node;
             Orientation = Orientation.Vertical;
 
+            var itemGrid = new Grid();
+            itemGrid.ColumnDefinitions.Add(new ColumnDefinition()
+            {
+                Width = GridLength.Auto
+            });
+            itemGrid.ColumnDefinitions.Add(new ColumnDefinition());
+
             var itemStack = new StackPanel();
+            Grid.SetColumn(itemStack, 0);
             itemStack.VerticalAlignment = VerticalAlignment.Center;
             itemStack.Orientation = Orientation.Horizontal;
             itemStack.Margin = new Thickness(_offset, 0, 0, 0);
@@ -55,29 +63,50 @@ namespace BookWiki.Presentation.Wpf.Views
 
             itemStack.Children.Add(fileNodeName);
 
+            var buttons = new StackPanel();
+            Grid.SetColumn(buttons, 1);
+            buttons.VerticalAlignment = VerticalAlignment.Center;
+            buttons.Orientation = Orientation.Horizontal;
+            buttons.HorizontalAlignment = HorizontalAlignment.Right;
+            buttons.Margin = new Thickness(_offset, 0, 0, 0);
+
             var statisticsButton = new Button();
             statisticsButton.Visibility = node.IsContentFolder ? Visibility.Hidden : Visibility.Visible;
             statisticsButton.Width = 90;
             statisticsButton.Height = 30;
-            statisticsButton.Margin = new Thickness(40, 0, 0, 0);
+            statisticsButton.Margin = new Thickness(10, 0, 0, 0);
             statisticsButton.Click += StatisticsButtonOnClick;
             statisticsButton.Background = Brushes.White;
             statisticsButton.Content = "Статистика";
 
-            itemStack.Children.Add(statisticsButton);
+            buttons.Children.Add(statisticsButton);
+
+            var compilation = new Button();
+            compilation.Visibility = node.IsContentFolder ? Visibility.Hidden : Visibility.Visible;
+            compilation.Width = 90;
+            compilation.Height = 30;
+            compilation.Margin = new Thickness(10, 0, 0, 0);
+            compilation.Click += PreviewButtonOnClick;
+            compilation.Background = Brushes.White;
+            compilation.Content = "Превью";
+
+            buttons.Children.Add(compilation);
 
             var backupButton = new Button();
             backupButton.Visibility = node.IsContentFolder ? Visibility.Hidden : Visibility.Visible;
             backupButton.Width = 90;
             backupButton.Height = 30;
-            backupButton.Margin = new Thickness(10, 0, 0, 0);
+            backupButton.Margin = new Thickness(10, 0, 10, 0);
             backupButton.Click += BackupButtonOnClick;
             backupButton.Background = Brushes.White;
             backupButton.Content = "Бэкап";
 
-            itemStack.Children.Add(backupButton);
+            buttons.Children.Add(backupButton);
 
-            Children.Add(itemStack);
+            Children.Add(itemGrid);
+
+            itemGrid.Children.Add(itemStack);
+            itemGrid.Children.Add(buttons);
 
             _childItems = new StackPanel();
             _childItems.Margin = new Thickness(_offset*2, 0, 0, 0);
@@ -106,6 +135,11 @@ namespace BookWiki.Presentation.Wpf.Views
         private void StatisticsButtonOnClick(object sender, RoutedEventArgs e)
         {
             new StatisticsWindow(_node).ShowDialog();
+        }
+
+        private void PreviewButtonOnClick(object sender, RoutedEventArgs e)
+        {
+            new CompiledNovelWindow(_node).ShowDialog();
         }
 
         private void FileNodeNameOnMouseUp(object sender, MouseButtonEventArgs e)

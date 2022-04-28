@@ -71,6 +71,8 @@ namespace BookWiki.Presentation.Wpf.Views
             BookShelf.Instance.RightSideBarConfig.Changed += RightSideBarConfigOnChanged;
 
             RightSideBarConfigOnChanged(BookShelf.Instance.RightSideBarConfig.Current);
+
+            ConsoleView.Start();
         }
 
         private void RightSideBarConfigOnChanged(RightSideBarSettings obj)
@@ -85,6 +87,8 @@ namespace BookWiki.Presentation.Wpf.Views
         public void Stop()
         {
             BookShelf.Instance.RightSideBarConfig.Changed -= RightSideBarConfigOnChanged;
+
+            ConsoleView.Stop();
         }
 
         public void ToggleVisibility(bool? toVisible = null)

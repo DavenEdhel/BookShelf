@@ -66,6 +66,7 @@
     <Compile Include="Extensions\WindowExtensions.cs" />
     <Compile Include="Models\AppConfig.cs" />
     <Compile Include="Models\BackupOperation.cs" />
+    <Compile Include="Models\CompilationTitle.cs" />
     <Compile Include="Models\EditorState.cs" />
     <Compile Include="Models\KeyProcessorModels\KeyProcessor.cs" />
     <Compile Include="Models\NovelTitle.cs" />
@@ -93,6 +94,10 @@
     <Compile Include="NewContentWindow.xaml.cs">
       <DependentUpon>NewContentWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CompiledNovelWindow.xaml.cs">
+      <DependentUpon>CompiledNovelWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ConsoleLogSource.cs" />
     <Compile Include="Views\PagesView.cs" />
     <Compile Include="QuickNavigationWindow.xaml.cs">
       <DependentUpon>QuickNavigationWindow.xaml</DependentUpon>
@@ -128,6 +133,10 @@
     <Page Include="NewContentWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CompiledNovelWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="NovelWindow.xaml">
       <SubType>Designer</SubType>

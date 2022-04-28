@@ -9,8 +9,6 @@ namespace BookWiki.Presentation.Wpf.Views
     {
         public static void LoadInto(this IDocumentFlowContent rtf, RichTextBox view)
         {
-            view.Document.Blocks.Clear();
-
             foreach (var rtfParagraph in rtf.Paragraphs)
             {
                 var paragraph = new Paragraph();
@@ -48,6 +46,13 @@ namespace BookWiki.Presentation.Wpf.Views
 
                 view.Document.Blocks.Add(paragraph);
             }
+        }
+
+        public static void ReloadInto(this IDocumentFlowContent rtf, RichTextBox view)
+        {
+            view.Document.Blocks.Clear();
+
+            rtf.LoadInto(view);
         }
     }
 }

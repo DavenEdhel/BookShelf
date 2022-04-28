@@ -132,5 +132,11 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
                 }
             }
         }
+
+        public void Invalidate()
+        {
+            _lastCheckedIndex = Int32.MinValue / 2;
+            CursorPositionChanged();
+        }
     }
 }

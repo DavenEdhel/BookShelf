@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using BookWiki.Core.Utils;
 
 namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 {
     public class FakeFileProvider : IFileProvider
     {
-        private readonly string[] _toProvide;
+        private string[] _toProvide;
 
         public FakeFileProvider(string[] toProvide)
         {
@@ -18,7 +20,10 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 
         public void Append(string lexPath, string newWord)
         {
-            throw new NotImplementedException();
+            var items = new List<string>(_toProvide);
+            items.Add(newWord);
+
+            _toProvide = items.ToArray();
         }
     }
 }

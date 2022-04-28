@@ -11,5 +11,7 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
         int LetterPosition { get; }
 
         IWordCollection GetWordsWithLetterInPosition(char letter);
+
+        void Append(string item);
     }
 }

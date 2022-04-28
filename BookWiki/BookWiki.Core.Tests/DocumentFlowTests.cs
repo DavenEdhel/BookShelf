@@ -1,157 +1,15 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Search;
-using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.TextModels;
-using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 using Keurig.Tests.Common.Utils;
 using NUnit.Framework;
 
 namespace BookWiki.Core.Tests
 {
-    public class IndexSequenceV2Tests
-    {
-        [Test]
-        public void ShouldReturnIndexesOfAllX()
-        {
-            var text = "012XX5X78X";
-
-            var s = new IndexesOfCharacters(text, 'X').ToArray();
-
-            Claim.Equal(s.Length, 4);
-            Claim.Equal(text[s[0]], 'X');
-            Claim.Equal(text[s[1]], 'X');
-            Claim.Equal(text[s[2]], 'X');
-            Claim.Equal(text[s[3]], 'X');
-        }
-
-        [Test]
-        public void ShouldSplitToIntervalsCorrectly()
-        {
-            var text = "Рога, копыта да хвосты";
-
-            var s = new IntervalsBetweenCharacters(text, TextParts.NotALetterOrNumber).ToArray();
-
-            Claim.Equal(text.Substring(s[0]), "Рога");
-            Claim.Equal(text.Substring(s[1]), "копыта");
-            Claim.Equal(text.Substring(s[2]), "да");
-            Claim.Equal(text.Substring(s[3]), "хвосты");
-        }
-
-        [Test]
-        public void ShouldSplitToSubstringsCorrectly()
-        {
-            var items = new List<OffsetText>()
-            {
-                new OffsetText()
-                {
-                    Offset = 100,
-                    Text = "123 456 "
-                },
-                new OffsetText()
-                {
-                    Offset = 110,
-                    Text = "789"
-                },
-                new OffsetText()
-                {
-                    Offset = 120,
-                    Text = " 123"
-                },
-                new OffsetText()
-                {
-                    Offset = 130,
-                    Text = " "
-                },
-                new OffsetText()
-                {
-                    Offset = 140,
-                    Text = "456 "
-                },
-                new OffsetText()
-                {
-                    Offset = 150,
-                    Text = "123"
-                },
-                new OffsetText()
-                {
-                    Offset = 160,
-                    Text = "4"
-                },
-                new OffsetText()
-                {
-                    Offset = 170,
-                    Text = "56"
-                },
-            };
-
-            var substrings = new PunctuationSeparatedEnumerationV2(items).ToArray();
-
-            Claim.Equal(substrings[0].Text, "123");
-            Claim.Equal(substrings[1].Text, "456");
-            Claim.Equal(substrings[2].Text, "789");
-            Claim.Equal(substrings[3].Text, "123");
-            Claim.Equal(substrings[4].Text, "456");
-            Claim.Equal(substrings[5].Text, "123456");
-        }
-
-        [Test]
-        public void ShouldSplitToSubstringsCorrectly2()
-        {
-            var items = new List<OffsetText>()
-            {
-                new OffsetText()
-                {
-                    Offset = 150,
-                    Text = "123"
-                },
-                new OffsetText()
-                {
-                    Offset = 160,
-                    Text = "4"
-                },
-                new OffsetText()
-                {
-                    Offset = 170,
-                    Text = "56"
-                },
-            };
-
-            var substrings = new PunctuationSeparatedEnumerationV2(items).ToArray();
-
-            Claim.Equal(substrings.Length, 1);
-            Claim.Equal(substrings[0].Text, "123456");
-        }
-
-        [Test]
-        public async Task SpellcheckShouldWork()
-        {
-            var lex = new WordCollectionFromLex(string.Empty, new FakeFileProvider(new[]
-            {
-                "ааа",
-                "аб",
-                "абв"
-            }));
-
-            await lex.Load();
-
-            var spellCheck = new SpellCheckV2(lex);
-
-            Claim.False(spellCheck.IsCorrect("аа"));
-            Claim.True(spellCheck.IsCorrect("аб"));
-            Claim.True(spellCheck.IsCorrect("ааа"));
-            Claim.False(spellCheck.IsCorrect("аааа"));
-        }
-    }
-
-
-
     public class DocumentFlowTests
     {
         private string _textWithRN = @"..\..\..\Глава 01. Впереди шторм.n";

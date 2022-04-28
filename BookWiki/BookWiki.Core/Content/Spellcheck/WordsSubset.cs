@@ -115,11 +115,38 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
             }
         }
 
-        public bool IsFinalWord { get; }
+        public bool IsFinalWord { get; private set; }
 
         public bool IsLoaded { get; } = true;
 
         public int LetterPosition => _position;
+
+        public void Append(string item)
+        {
+            if (item.Length == _position)
+            {
+                IsFinalWord = true;
+            }
+
+            for (int i = 0; i < 33; i++)
+            {
+                var cToCheck = ToChar(i);
+
+                var isApplicableForPosition = item.Length > _position && item[_position] == cToCheck;
+
+                if (isApplicableForPosition)
+                {
+                    if (_characters[i] != null)
+                    {
+                        _characters[i].Append(item);
+                    }
+                    else
+                    {
+                        _characters[i] = new WordsSubset(_position + 1, new []{ item });
+                    }
+                }
+            }
+        }
 
         public IWordCollection GetWordsWithLetterInPosition(char letter)
         {

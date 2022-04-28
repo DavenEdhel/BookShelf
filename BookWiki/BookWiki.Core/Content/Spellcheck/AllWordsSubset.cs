@@ -12,5 +12,9 @@
         {
             return new AllWordsSubset();
         }
+
+        public void Append(string item)
+        {
+        }
     }
 }
