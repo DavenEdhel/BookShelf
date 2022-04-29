@@ -21,7 +21,7 @@ namespace BookWiki.Presentation.Wpf.Views
         private readonly EnhancedRichTextBox _output;
         private readonly TextBox _input;
         private readonly ScrollViewer _scrollView;
-        private readonly ILogSource _consoleLogSource;
+        private readonly LogSourceHolder _consoleLogSource = new LogSourceHolder();
 
         public ConsoleView()
         {
@@ -46,17 +46,17 @@ namespace BookWiki.Presentation.Wpf.Views
 
             _input.KeyDown += InputOnKeyDown;
 
-            _consoleLogSource = new ConsoleLogSource(_output, Dispatcher.CurrentDispatcher);
+            _consoleLogSource.LogSource = BookShelf.Instance.PageConfig.Current.IsLoggingOn ? (ILogSource)new ConsoleLogSource(_output, Dispatcher.CurrentDispatcher) : new EmptyLogSource();
         }
 
         public void Start()
         {
-            Logger.Sources.Add(_consoleLogSource);
+            _consoleLogSource.Start();
         }
 
         public void Stop()
         {
-            Logger.Sources.Remove(_consoleLogSource);
+            _consoleLogSource.Stop();
         }
 
         public void SetHeight(double value)
@@ -75,6 +75,27 @@ namespace BookWiki.Presentation.Wpf.Views
             if (e.Key == Key.Enter)
             {
                 e.Handled = true;
+
+                var queryString = new Query(_input.Text);
+
+                if (queryString.Command == "лог")
+                {
+                    if (queryString.Arguments == "показывать")
+                    {
+                        _consoleLogSource.LogSource = new ConsoleLogSource(_output, Dispatcher.CurrentDispatcher);
+                        BookShelf.Instance.PageConfig.Current.IsLoggingOn = true;
+                        _input.Text = string.Empty;
+                        return;
+                    }
+
+                    if (queryString.Arguments == "скрыть")
+                    {
+                        _consoleLogSource.LogSource = new EmptyLogSource();
+                        BookShelf.Instance.PageConfig.Current.IsLoggingOn = false;
+                        _input.Text = string.Empty;
+                        return;
+                    }
+                }
 
                 var q = new GenericQuery(_input.Text);
 
@@ -119,7 +140,9 @@ namespace BookWiki.Presentation.Wpf.Views
                     return new List<string>()
                     {
                         "комманда не распознана",
-                        "доступные комманды [имя], [место], [имена]"
+                        "доступные комманды [имя], [место], [имена]",
+                        "лог показывать",
+                        "лог скрыть"
                     };
             }
         }

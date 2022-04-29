@@ -8,6 +8,8 @@
 
         public bool IsSpellCheckOn { get; set; } = true;
 
+        public bool IsLoggingOn { get; set; }
+
         public int PageModeIndex { get; set; } = 0;
 
         public RightSideBarSettings RightSideBar { get; set; } = new RightSideBarSettings();

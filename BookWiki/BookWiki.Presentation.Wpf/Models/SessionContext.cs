@@ -59,7 +59,8 @@ namespace BookWiki.Presentation.Wpf.Models
                 IsScrollHidden = pageConfig.Current.IsScrollHidden,
                 PageModeIndex = pageConfig.Current.PageModeIndex,
                 IsSpellCheckOn = pageConfig.Current.IsSpellCheckOn,
-                RightSideBar = rightSideBarConfig.Current
+                RightSideBar = rightSideBarConfig.Current,
+                IsLoggingOn = pageConfig.Current.IsLoggingOn
             }, root);
 
             file.Save();
