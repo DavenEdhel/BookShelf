@@ -23,6 +23,10 @@
                     <TextBlock Name="AdjustedWordToLearn"></TextBlock>
                 </StackPanel>
                 <Button FontSize="16" Background="White" Click="Learn">Выучить</Button>
+                <StackPanel Orientation="Vertical" Name="ParsedWords">
+                    
+                </StackPanel>
+                <Button FontSize="16" Background="White" Click="LearnAll">Выучить все</Button>
             </StackPanel>
         </Grid>
         <Grid Grid.Column="1">
@@ -34,6 +38,7 @@
                 <TextBox Name="AdjustedNameForSearch" KeyDown="AdjustedNameForSearch_OnKeyDown" TextChanged="AdjustedNameForSearch_OnTextChanged" MinWidth="100"></TextBox>
                 <Button FontFamily="Times New Roman" Click="ButtonBase_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Искать везде</Button>
                 <Button FontFamily="Times New Roman" Click="OpenSearch_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Открыть поиск</Button>
+                <Button FontFamily="Times New Roman" Click="OpenGoogle_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Google</Button>
             </StackPanel>
             <WebBrowser Name="WordFromWiki" Grid.Row="1"></WebBrowser>
         </Grid>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,204 +14,241 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using BookMap.Core.Models;
 using BookMap.Presentation.Apple.Models;
 using BookMap.Presentation.Apple.Services;
+using BookMap.Presentation.Wpf.InteractionModels;
+using BookMap.Presentation.Wpf.MapModels;
 using BookMap.Presentation.Wpf.Models;
+using BookMap.Presentation.Wpf.Views;
 using Newtonsoft.Json;
+using MapInfo = BookMap.Presentation.Apple.Services.MapInfo;
+using Measure = BookMap.Presentation.Wpf.InteractionModels.Measure;
+using Path = System.IO.Path;
 
 namespace BookMap.Presentation.Wpf
 {
+    //todo:
+    // useful api to draw on image
+    // pointer for moving, pointer for drawing, pointer for labels, they should be different
+    //  pointer should correspond drawing area
+    //  should have borders of colors of drawing or semitransparent
+    //  ground or label on it with the color of drawing
+    // palette, try to use wpf one, but not necessary
+    // ability to create and fast configure new map
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IMapView, ILabel
     {
+        private int w = 2560;
+        private int h = 1920;
+
         private MapProviderSynchronous _mapProvider;
         private CoordinateSystem _coordinates;
-        private Measure _measure;
+        private Models.Measure _measure;
 
-        private Image[] _activeGround = new Image[9];
-        private Image[] _nextGround = new Image[9];
-        private Image[] _activeLabels = new Image[9];
-        private Image[] _nextLabels = new Image[9];
+        private MapPart[] _activeGround = new MapPart[9];
+        private MapPart[] _nextGround = new MapPart[9];
+        private MapPart[] _activeLabels = new MapPart[9];
+        private MapPart[] _nextLabels = new MapPart[9];
 
-        private double _lastScale = 1;
+        private MapLayer _ground;
+
+        public bool ShowLabels = true;
+        private AppConfigDto? _config;
+        
+        private readonly MapLayer _labels;
+        private readonly Palette _palette;
+        private readonly Interactions _interactions;
+        private readonly CurrentBrush _brush;
 
         public MainWindow()
         {
             InitializeComponent();
 
+            _coordinates = new CoordinateSystem();
+            _mapProvider = new MapProviderSynchronous(new WpfImageFactory());
+            _measure = new Models.Measure(_coordinates);
+
             _config = JsonConvert.DeserializeObject<AppConfigDto>(File.ReadAllText("MapConfig.json"));
 
             FileSystemServiceSynchronous.DirectoryPath = _config.Root;
 
+            var mapInfo = new MapReference(_config, "1");
+
             for (int i = 0; i < _nextGround.Length; i++)
             {
-                _nextGround[i] = new Image();
-                _activeGround[i] = new Image();
-                _nextLabels[i] = new Image();
-                _activeLabels[i] = new Image();
-                
+                _nextGround[i] = new MapPart(mapInfo, isLabel: false, _mapProvider);
+                _activeGround[i] = new MapPart(mapInfo, isLabel: false, _mapProvider);
+                _nextLabels[i] = new MapPart(mapInfo, isLabel: true, _mapProvider);
+                _activeLabels[i] = new MapPart(mapInfo, isLabel: true, _mapProvider);
+
                 Container.Children.Add(_nextGround[i]);
                 Container.Children.Add(_nextLabels[i]);
                 Container.Children.Add(_activeGround[i]);
                 Container.Children.Add(_activeLabels[i]);
             }
 
-            _menu = new StackPanel();
-            _menu.Width = Width;
-            _menu.Height = 20;
+            _ground = new MapLayer(Container, _activeGround);
+            _labels = new MapLayer(Container, _activeLabels);
+            _brush = new CurrentBrush();
 
-            Container.Children.Add(_menu);
+            var cursor = new LabeledCursor(Container, currentBrush: _brush, _coordinates);
 
-            _menu.Children.Add(_info = new TextBlock());
-            _info.Text = _lastScale.ToString();
+            _palette = new Palette(_brush, _coordinates);
+            Container.Children.Add(_palette);
 
-            Container.MouseWheel += ContainerOnMouseWheel;
-            Container.MouseDown += ContainerOnMouseDown;
-            Container.MouseUp += ContainerOnMouseUp;
-            Container.MouseMove += ContainerOnMouseMove;
+            _interactions = new Interactions(
+                this,
+                Container,
 
-            KeyUp += OnKeyUp;
+                new Interaction(
+                    new Blocking(
+                        new WhenRightMouseButtonClicked()
+                    ),
+                    new WithPredefinedCursor(
+                        Container,
+                        cursor,
+                        Cursors.Arrow,
+                        new Show(
+                            _palette,
+                            Container
+                        )
+                    )
+                ),
 
-            Initialize();
-        }
+                new Interaction(
+                    new AlwaysOn(),
+                    new MoveCustomCursor(
+                        Container,
+                        cursor
+                    )
+                ),
 
-        private void OnKeyUp(object sender, KeyEventArgs e)
-        {
-            if (!e.IsDown && e.Key == Key.LeftCtrl)
-            {
-                if (_measureMode)
-                {
-                    _measure.Reset();
-                }
+                new Interaction(
+                    new Blocking(
+                        new WhenKeyHold(Key.Space)
+                    ),
+                    new WithPredefinedCursor(
+                        Container,
+                        cursor,
+                        Cursors.Hand,
+                        new MoveAndScale(
+                            Container,
+                            _coordinates,
+                            this
+                        )
+                    )
+                ),
 
-                _measureMode = true;
+                new Interaction(
+                    new Blocking(
+                        new WhenKeyPressed(Key.X)
+                    ),
+                    new WithStatus(
+                        "Draw on labels",
+                        this,
+                        new WithCustomCursor(
+                            Container,
+                            "labels",
+                            cursor,
+                            new Draw(
+                                _labels,
+                                _brush
+                            )
+                        )
+                    )
+                ),
 
-                Title = $"Measure on {_measure.Meters}m";
-            }
+                new Interaction(
+                    new Blocking(
+                        new WhenKeyPressed(Key.Z)
+                    ),
+                    new WithStatus(
+                        "Draw on ground",
+                        this,
+                        new WithCustomCursor(
+                            Container,
+                            "ground",
+                            cursor,
+                            new Draw(
+                                _ground,
+                                _brush
+                            )
+                        )
+                    )
+                ),
 
-            if (!e.IsDown && e.Key == Key.LeftShift)
-            {
-                _measureMode = false;
+                new Interaction(
+                    new Blocking(
+                        new WhenKeysPressed(
+                            on: Key.LeftCtrl,
+                            off: Key.LeftShift
+                        )
+                    ),
 
-                Title = $"Measure off {_measure.Meters}m";
-            }
-        }
+                    new WithStatus(
+                        "Measuring",
+                        this,
+                        new WithPredefinedCursor(
+                            Container,
+                            cursor,
+                            Cursors.Pen,
+                            new Measure(
+                                this,
+                                Container,
+                                _measure
+                            )
+                        )
+                    )
 
-        private void ContainerOnMouseMove(object sender, MouseEventArgs e)
-        {
-            if (_moveInProgress)
-            {
-                var current = e.GetPosition(Container);
+                ),
 
-                _offset = _initialPoint - current;
-
-                PositionMap();
-            }
-        }
-
-        private void ContainerOnMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if (_measureMode)
-            {
-                var position = e.GetPosition(Container);
-
-                _measure.AddPoint(new PointDouble2D()
-                {
-                    X = position.X,
-                    Y = position.Y
-                });
-
-                Title = $"Measure {_measure.Meters}m";
-            }
-
-            if (_moveInProgress)
-            {
-                _coordinates.End();
-
-                _offset = new Vector(0, 0);
-
-                _moveInProgress = false;
-            }
-        }
-
-        private void ContainerOnMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (_measureMode)
-            {
-                return;
-            }
-
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                _coordinates.Begin();
-
-                _moveInProgress = true;
-
-                _initialPoint = e.GetPosition(Container);
-            }
-
-            if (e.ChangedButton == MouseButton.Middle)
-            {
-                _zoomLocation = e.GetPosition(Container);
-
-                _coordinates.Begin();
-
-                _lastScale += 1;
-
-                PositionMap();
-
-                _coordinates.End();
-
-                _lastScale = 1;
-            }
-        }
-
-        private void ContainerOnMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            _zoomLocation = e.GetPosition(Container);
-
-            _coordinates.Begin();
-
-            _lastScale += e.Delta/1000f;
-
-            PositionMap();
-
-            _coordinates.End();
-
-            _lastScale = 1;
-        }
-
-        private void Initialize()
-        {
-            _coordinates = new CoordinateSystem();
-            _mapProvider = new MapProviderSynchronous(new WpfImageFactory());
-            _measure = new Measure(_coordinates);
+                new Interaction(
+                    new AlwaysOn(),
+                    new WithStatus(
+                        "Exploring",
+                        this,
+                        new WithPredefinedCursor(
+                            Container,
+                            cursor,
+                            Cursors.Hand,
+                            new MoveAndScale(
+                                Container,
+                                _coordinates,
+                                this
+                            )
+                        )
+                    )
+                )
+            );
 
             _coordinates.Reset();
 
             _mapProvider.LoadMap("1");
 
-            //_coordinates.Position(_mapProvider.Settings.Bookmarks.First(x => x.Name == "Аленой"));
-
             _coordinates.ActualWidthInMeters = _mapProvider.Settings.Width;
 
-            PositionMap();            
+            Reposition(1, new Point(0, 0), new Vector(0, 0));
         }
 
-        public void PositionMap()
+        public void Reposition(double lastScale, Point zoomLocation, Vector offset)
         {
-            _coordinates.MoveAndScaleFrame(_lastScale, new PointDouble2D()
-            {
-                X = _zoomLocation.X,
-                Y = _zoomLocation.Y
-            },
-                new PointDouble2D()
-            {
-                X = -_offset.X,
-                Y = -_offset.Y
-            });
+            _coordinates.MoveAndScaleFrame(
+                lastScale,
+                scaleCenter: new PointDouble2D()
+                {
+                    X = zoomLocation.X,
+                    Y = zoomLocation.Y
+                },
+                offset: new PointDouble2D()
+                {
+                    X = -offset.X,
+                    Y = -offset.Y
+                }
+            );
 
             var level0 = _coordinates.GetVisibleItems(_coordinates.DescreetLevel);
             var level1 = _coordinates.GetVisibleItems(_coordinates.DescreetLevel + 1);
@@ -218,16 +256,6 @@ namespace BookMap.Presentation.Wpf
             PositionLevel(level0, 0);
             PositionLevel(level1, 1);
         }
-
-        public bool ShowLabels = true;
-        private StackPanel _menu;
-        private TextBlock _info;
-        private bool _moveInProgress;
-        private Point _initialPoint = new Point(0, 0);
-        private Vector _offset = new Vector(0, 0);
-        private Point _zoomLocation = new Point(0, 0);
-        private bool _measureMode;
-        private AppConfigDto? _config;
 
         private void PositionLevel(ImagePosition[] positions, int level)
         {
@@ -253,14 +281,14 @@ namespace BookMap.Presentation.Wpf
             }
         }
 
-        private void LoadGround(Image uiImageView, ImagePosition index2D)
+        private void LoadGround(MapPart uiImageView, ImagePosition index2D)
         {
-            uiImageView.Source = _mapProvider.GetImageAsync(index2D, isLabel: false).ToUIImage();
+            uiImageView.Load(index2D);
         }
 
-        private void LoadLabel(Image uiImageView, ImagePosition index2D)
+        private void LoadLabel(MapPart uiImageView, ImagePosition index2D)
         {
-            uiImageView.Source = _mapProvider.GetImageAsync(index2D, isLabel: true).ToUIImage();
+            uiImageView.Load(index2D);
         }
 
         private void SetPosition(Image part, FrameDouble frame, ImagePosition imagePosition)
@@ -282,8 +310,14 @@ namespace BookMap.Presentation.Wpf
             var da = 0.05f;
 
             var alpha = (isUpperLevel ? ((1 + a) / da) : (1 - a / da));
-
+            
             part.Opacity = alpha;
+
+        }
+
+        public void Set(string text)
+        {
+            Title = text;
         }
     }
 }

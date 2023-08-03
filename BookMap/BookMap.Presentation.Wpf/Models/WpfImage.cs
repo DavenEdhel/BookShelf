@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -10,7 +11,7 @@ namespace BookMap.Presentation.Wpf.Models
 {
     public class WpfImage : IImage
     {
-        public BitmapSource Value { get; set; }
+        public WriteableBitmap Value { get; set; }
 
         public IImage Copy()
         {
@@ -28,7 +29,14 @@ namespace BookMap.Presentation.Wpf.Models
 
         public (bool, string) TrySave(string path)
         {
-            throw new System.NotImplementedException();
+            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(Value));
+                encoder.Save(fileStream);
+            }
+
+            return (true, string.Empty);
         }
 
         public void Dispose()
@@ -43,7 +51,7 @@ namespace BookMap.Presentation.Wpf.Models
 
             return new WpfImage()
             {
-                Value = transformed
+                Value = new WriteableBitmap(transformed)
             };
         }
     }

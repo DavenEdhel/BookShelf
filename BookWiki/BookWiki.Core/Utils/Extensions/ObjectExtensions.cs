@@ -37,5 +37,12 @@ namespace Keurig.IQ.Core.CrossCutting.Extensions
         {
             return !(self is T);
         }
+
+        public static T Make<T>(this T item, Action<T> action)
+        {
+            action(item);
+
+            return item;
+        }
     }
 }

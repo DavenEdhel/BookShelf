@@ -10,6 +10,15 @@ namespace BookWiki.Core.Utils
     {
         public static T SecondOrFirst<T>(this IEnumerable<T> self) => self.Count() > 1 ? self.ElementAt(1) : self.First();
 
+        public static IEnumerable<T> SortAndReturn<T>(this IEnumerable<T> self) where T : IComparable
+        {
+            var result = self.ToList();
+
+            result.Sort();
+
+            return result;
+        }
+
         public static int IndexOf<T>(this IEnumerable<T> self, Func<T, bool> condition)
         {
             var i = 0;

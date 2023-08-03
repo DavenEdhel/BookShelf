@@ -35,6 +35,8 @@ namespace BookMap.Presentation.Apple.Models
 
         public double Scale => _currentWorld.Width / _originalWorld.Width;
 
+        public double ScaleBetweenLevels => Scale / Math.Pow(8, DescreetLevel);
+
         public double Level => Math.Log(Scale, 8);
 
         public int DescreetLevel => (int) Math.Floor(Level);
@@ -83,6 +85,11 @@ namespace BookMap.Presentation.Apple.Models
 
         public void MoveAndScaleFrame(double scale, PointDouble2D scaleCenter, PointDouble2D offset)
         {
+            if (scale < 0)
+            {
+                scale = 0.1;
+            }
+
             if (DisableScrollingToNegatives && Level <= 0.0001 && scale < 1)
             {
                 return;
@@ -102,6 +109,26 @@ namespace BookMap.Presentation.Apple.Models
 
             var nx = _lastWorld.X - xOffset + offset.X * scale;
             var ny = _lastWorld.Y - yOffset + offset.Y * scale;
+
+            if (nx < -scaledFrame.Width)
+            {
+                nx = -scaledFrame.Width;
+            }
+
+            if (nx > scaledFrame.Width)
+            {
+                nx = scaledFrame.Width;
+            }
+
+            if (ny < -scaledFrame.Height)
+            {
+                ny = -scaledFrame.Height;
+            }
+
+            if (ny > scaledFrame.Height)
+            {
+                ny = scaledFrame.Height;
+            }
 
             _currentWorld = new FrameDouble()
             {
@@ -202,6 +229,11 @@ namespace BookMap.Presentation.Apple.Models
                     Width = part.Width
                 };
 
+                //if (double.IsNaN(originalPosition.Height) || double.IsInfinity(originalPosition.Height))
+                //{
+                //    originalPosition = null;
+                //}
+
                 result[i] = originalPosition;
             }
 
@@ -250,6 +282,11 @@ namespace BookMap.Presentation.Apple.Models
             var scaledD = d / Scale;
 
             return ActualWidthInMeters / 1024 * scaledD;
+        }
+
+        public PointDouble2D GetAccuratePosition(PointDouble2D screenPoint)
+        {
+            return screenPoint.Multiply(Scale).Substract(CurrentWorld.Offset());
         }
 
         public void Position(Bookmark bookmark)

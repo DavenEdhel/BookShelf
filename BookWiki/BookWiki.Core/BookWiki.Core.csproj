@@ -23,4 +23,8 @@
     <WeaverFiles Include="$(SolutionDir)weavers\PureOopAddin.Fody.dll" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="AuthorTodayModels\" />
+  </ItemGroup>
+
 </Project>

@@ -13,5 +13,12 @@ namespace BookMap.Presentation.Wpf.Models
 
             return bitmap;
         }
+
+        public static WpfImage ToWpfImage(this IImage image)
+        {
+            var bitmap = ((WpfImage) image);
+
+            return bitmap;
+        }
     }
 }

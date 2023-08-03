@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProjectGuid>{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}</ProjectGuid>
+    <ProjectGuid>{32F44487-3DAA-4BB0-81E8-ADCAA4BC57D8}</ProjectGuid>
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <RootNamespace>BookMap.Presentation.Apple</RootNamespace>

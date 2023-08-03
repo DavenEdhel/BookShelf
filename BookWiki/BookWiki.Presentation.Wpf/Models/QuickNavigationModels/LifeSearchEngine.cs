@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -186,6 +187,93 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
                 yield return current;
 
                 current = current.NextBlock.CastTo<Paragraph>();
+            }
+        }
+    }
+
+    public class SpecialItemsHighlightEngine
+    {
+        private FlowDocument _document;
+        private RichTextBox _rtb;
+        private readonly IHighlightCollection _highlightCollection;
+        private readonly List<string> _specialItems;
+        private readonly ScrollViewer _scroll;
+        private readonly Action<string> _onSpecialItemClick;
+        private bool highlighted;
+
+        public SpecialItemsHighlightEngine(RichTextBox rtb, IHighlightCollection highlightCollection, List<string> specialItems, ScrollViewer scroll, Action<string> onSpecialItemClick)
+        {
+            _document = rtb.Document;
+            _rtb = rtb;
+            _highlightCollection = highlightCollection;
+            _specialItems = specialItems;
+            _scroll = scroll;
+            _onSpecialItemClick = onSpecialItemClick;
+
+            _rtb.PreviewKeyDown += RtbOnPreviewKeyDown;
+            _rtb.PreviewKeyUp += RtbOnPreviewKeyUp;
+        }
+
+        private void RtbOnPreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (highlighted)
+            {
+                _highlightCollection.ClearHighlighting();
+                highlighted = false;
+            }
+        }
+
+        private void RtbOnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift) &&
+                e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                HighlightAll();
+                highlighted = true;
+            }
+            
+        }
+
+        private void HighlightAll()
+        {
+            _highlightCollection.ClearHighlighting();
+
+            foreach (var p in GetAllVisibleParagraphs())
+            {
+                var words = new PunctuationSeparatedEnumeration(_document, p).ToArray();
+
+                foreach (var substring in words)
+                {
+                    if (_specialItems.Contains(substring.Text.ToLowerInvariant()))
+                    {
+                        _highlightCollection.Highlight(substring, false,
+                            text =>
+                            {
+                                _highlightCollection.ClearHighlighting();
+
+                                _onSpecialItemClick(text);
+                            });
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<Paragraph> GetAllVisibleParagraphs()
+        {
+            var first = _rtb.GetPositionFromPoint(new Point(0, _scroll.VerticalOffset), true).Paragraph;
+            var last = _rtb.GetPositionFromPoint(new Point(0, _scroll.VerticalOffset + _scroll.ActualHeight), true).Paragraph;
+            var current = first;
+
+            yield return current;
+
+            while (current != last)
+            {
+                current = current.NextBlock?.CastTo<Paragraph>();
+
+                if (current != null)
+                {
+                    yield return current;
+                }
             }
         }
     }

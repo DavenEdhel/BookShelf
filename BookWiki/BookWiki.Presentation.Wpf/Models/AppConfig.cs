@@ -11,5 +11,7 @@ namespace BookWiki.Presentation.Wpf.Models
         public TabDto[] Tabs { get; set; } = new TabDto[0];
 
         public string BackupPath { get; set; }
+
+        public int HeightModification { get; set; }
     }
 }

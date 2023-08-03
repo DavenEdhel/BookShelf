@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -11,6 +12,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using BookWiki.Core;
+using BookWiki.Core.Fb2Models;
 using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
@@ -22,6 +24,7 @@ using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using BookWiki.Presentation.Wpf.Views;
 using Keurig.IQ.Core.CrossCutting.Extensions;
+using TextCopy;
 
 namespace BookWiki.Presentation.Wpf
 {
@@ -74,6 +77,17 @@ namespace BookWiki.Presentation.Wpf
             _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary));
             _lifeSearchEngine = new LifeSearchEngine(Rtb, this, SearchBox, Scroll);
 
+            _specialItemsHighlighter = new SpecialItemsHighlightEngine(Rtb, this, new List<string>()
+            {
+                "он",
+                "крион"
+            }, Scroll,
+                specialItem =>
+                {
+                    MessageBox.Show(specialItem);
+                    // open detailed article
+                });
+
             LoadContent(novel);
 
             Pages.Novel = Rtb;
@@ -89,6 +103,16 @@ namespace BookWiki.Presentation.Wpf
             _rightSide.Start();
 
             BookShelf.Instance.Dictionary.Changed += RecheckSpelling;
+
+            ApplyHeightAdjustments();
+        }
+
+        private void ApplyHeightAdjustments()
+        {
+            this.MinHeight -= BookShelf.Instance.Config.HeightModification;
+            Height -= BookShelf.Instance.Config.HeightModification;
+            NovelContentGrid.Height -= BookShelf.Instance.Config.HeightModification;
+            _rightSide.Margin = new Thickness(0, 0, 0, BookShelf.Instance.Config.HeightModification);
         }
 
         private async Task RunAutosave()
@@ -511,7 +535,7 @@ namespace BookWiki.Presentation.Wpf
             
         }
 
-        public void Highlight(ISubstring toHighlight, bool specialStyle)
+        public void Highlight(ISubstring toHighlight, bool specialStyle, Action<string> onClick = null)
         {
             var x1 = Rtb.Document.ContentStart.GetPositionAtOffset(toHighlight.StartIndex).GetCharacterRect(LogicalDirection.Forward);
             var x2 = Rtb.Document.ContentStart.GetPositionAtOffset(toHighlight.EndIndex).GetCharacterRect(LogicalDirection.Forward);
@@ -525,6 +549,12 @@ namespace BookWiki.Presentation.Wpf
                     Stroke = specialStyle ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.LightBlue),
                     Stretch = Stretch.Fill,
                     Fill = new SolidColorBrush(Color.FromArgb(60, Colors.LightBlue.R, Colors.LightBlue.G, Colors.LightBlue.B)),
+                    Tag = toHighlight.Text
+                };
+
+                r.MouseUp += (sender, args) =>
+                {
+                    onClick?.Invoke(sender.CastTo<Rectangle>().Tag.ToString());
                 };
 
                 Canvas.SetTop(r, x1.Top);
@@ -559,6 +589,7 @@ namespace BookWiki.Presentation.Wpf
 
         private int _usualHeight = 890;
         private int _usualWidth = 734;
+        private readonly SpecialItemsHighlightEngine _specialItemsHighlighter;
 
         private void OnResize(object sender, SizeChangedEventArgs e)
         {
@@ -597,12 +628,32 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
-                    //if (new SpellCheckV2(BookShelf.Instance.Dictionary).IsCorrect(selectedSubstring.Text) == false)
-                    {
-                        new WordInfoWindow(selectedSubstring.Text).ShowDialog();
-                    }
+                    new WordInfoWindow(selectedSubstring.Text).ShowDialog();
                 }
             }
+        }
+
+        private void Compile(object sender, RoutedEventArgs e)
+        {
+            new CompileToFb2Operation(_novel, BookShelf.Instance.RootPath).Execute();
+        }
+
+        private void CompileWithDetails(object sender, MouseButtonEventArgs e)
+        {
+            new DiffWindow(_novel).ShowDialog();
+
+            e.Handled = true;
+        }
+
+        private void CopyAsHtm(object sender, RoutedEventArgs e)
+        {
+            ClipboardService.SetText(
+                new HtmlChapterWithoutTitle(
+                    _novel.AbsolutePath(
+                        BookShelf.Instance.RootPath
+                    )
+                ).Value
+            );
         }
     }
 }

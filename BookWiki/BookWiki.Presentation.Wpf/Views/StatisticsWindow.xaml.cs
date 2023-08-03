@@ -122,9 +122,11 @@ namespace BookWiki.Presentation.Wpf.Views
                 Annotation = BookAnnotation.Text,
                 Title = BookTitle.Text,
                 Chapters = CheckedNovels().ToArray().Select(x => x.Source.AbsolutePath(BookShelf.Instance.RootPath)).ToList()
-            }.CompileToFile(_node.Path);
+            }.CompileToFolder(_node.Path);
 
             MessageBox.Show("Книга скомпилирована", "Результат");
+
+            _node.Path.OpenInExplorer();
         }
     }
 }

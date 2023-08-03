@@ -8,6 +8,14 @@ namespace Keurig.Tests.Common.Utils
 {
     public static class Claim
     {
+        public static void ClaimEqual<T>(this T actual, T expected, string message = null) => Equal(actual, expected, message);
+
+        public static void ClaimNotEqual<T>(this T actual, T expected) => NotEqual(actual, expected);
+
+        public static void ClaimFalse(this bool item) => False(item);
+
+        public static void ClaimTrue(this bool item) => True(item);
+
         public static void Equal(decimal actual, decimal expected)
         {
             Assert.AreEqual(expected, actual);
