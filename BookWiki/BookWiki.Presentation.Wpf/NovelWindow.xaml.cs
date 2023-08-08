@@ -74,19 +74,10 @@ namespace BookWiki.Presentation.Wpf
 
             Title = new NovelTitle(novel.Source).PlainText;
 
-            _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary));
+            _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary, BookShelf.Instance.Articles));
             _lifeSearchEngine = new LifeSearchEngine(Rtb, this, SearchBox, Scroll);
 
-            _specialItemsHighlighter = new SpecialItemsHighlightEngine(Rtb, this, new List<string>()
-            {
-                "он",
-                "крион"
-            }, Scroll,
-                specialItem =>
-                {
-                    MessageBox.Show(specialItem);
-                    // open detailed article
-                });
+            _specialItemsHighlighter = new NavigateToArticleEngine(Rtb, this, Scroll);
 
             LoadContent(novel);
 
@@ -320,7 +311,7 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
-                    if (new SpellCheckV2(BookShelf.Instance.Dictionary).IsCorrect(selectedSubstring.Text) == false)
+                    if (new SpellCheckV2(BookShelf.Instance.Dictionary, BookShelf.Instance.Articles).IsCorrect(selectedSubstring.Text) == false)
                     {
                         BookShelf.Instance.Dictionary.Learn(selectedSubstring.Text);
                     }
@@ -345,91 +336,6 @@ namespace BookWiki.Presentation.Wpf
 
                 e.Handled = true;
             }
-
-            if (e.KeyboardDevice.IsKeyDown(Key.LeftAlt))
-            {
-                if (e.KeyboardDevice.IsKeyDown(Key.Right))
-                {
-                    if (e.KeyboardDevice.IsKeyDown(Key.LeftShift))
-                    {
-                        Rtb.Selection.Select(Rtb.Selection.Start, GetThisLineEnd());
-
-                        e.Handled = true;
-                    }
-                    else
-                    {
-                        Rtb.CaretPosition = GetThisLineEnd();
-
-                        e.Handled = true;
-                    }
-                }
-
-                if (e.KeyboardDevice.IsKeyDown(Key.Left))
-                {
-                    if (e.KeyboardDevice.IsKeyDown(Key.LeftShift))
-                    {
-                        Rtb.Selection.Select(Rtb.CaretPosition.GetLineStartPosition(0), Rtb.Selection.End);
-
-                        e.Handled = true;
-                    }
-                    else
-                    {
-                        Rtb.CaretPosition = Rtb.CaretPosition.GetLineStartPosition(0);
-
-                        e.Handled = true;
-                    }
-                }
-            }
-
-            if (e.Key == Key.D2 && e.KeyboardDevice.Modifiers == ModifierKeys.Shift)
-            {
-                var text = new TextRange(Rtb.Document.ContentStart, Rtb.CaretPosition).Text;
-
-                var closings = new IndexSequenceV2(text, '»').SelfOrEmpty();
-                var openings = new IndexSequenceV2(text, '«').SelfOrEmpty();
-
-                var toInsert = closings.Count() < openings.Count() ? "»" : "«";
-
-                Insert(toInsert);
-
-                e.Handled = true;
-            }
-        }
-
-        TextPointer GetThisLineEnd()
-        {
-            var isEof = Rtb.CaretPosition.GetLineStartPosition(1) == null;
-
-            if (isEof)
-            {
-                return Rtb.Document.ContentEnd;
-            }
-
-            var currentLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition.GetLineStartPosition(0));
-            var nextLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition.GetLineStartPosition(1));
-
-            for (int i = nextLineOffset; i > currentLineOffset; i--)
-            {
-                var possibleEol = Rtb.Document.ContentStart.GetPositionAtOffset(i);
-
-                var offsetToCheck = Rtb.Document.ContentStart.GetOffsetToPosition(possibleEol.GetLineStartPosition(0));
-
-                if (currentLineOffset == offsetToCheck)
-                {
-                    return possibleEol;
-                }
-            }
-
-            return null;
-        }
-
-        private void Insert(string toInsert)
-        {
-            var currentCaretPosition = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
-
-            Rtb.Selection.Start.InsertTextInRun(toInsert);
-
-            Rtb.CaretPosition = Rtb.Document.ContentStart.GetPositionAtOffset(currentCaretPosition + 1);
         }
 
         private void ScrollSwitch(object sender, RoutedEventArgs e)
@@ -589,7 +495,7 @@ namespace BookWiki.Presentation.Wpf
 
         private int _usualHeight = 890;
         private int _usualWidth = 734;
-        private readonly SpecialItemsHighlightEngine _specialItemsHighlighter;
+        private readonly NavigateToArticleEngine _specialItemsHighlighter;
 
         private void OnResize(object sender, SizeChangedEventArgs e)
         {
@@ -628,6 +534,12 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
+                    if (_specialItemsHighlighter.IsApplicable(selectedSubstring))
+                    {
+                        _specialItemsHighlighter.Navigate(selectedSubstring);
+                        return;
+                    }
+
                     new WordInfoWindow(selectedSubstring.Text).ShowDialog();
                 }
             }

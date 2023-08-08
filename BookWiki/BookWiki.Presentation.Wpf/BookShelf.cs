@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using BookWiki.Core;
+using BookWiki.Core.Articles;
 using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
@@ -35,6 +36,36 @@ namespace BookWiki.Presentation.Wpf
                         yield return novelWindow;
                     }
                 }
+            }
+        }
+
+        public IEnumerable<ArticleWindow> OpenedArticles
+        {
+            get
+            {
+                foreach (Window currentWindow in Application.Current.Windows)
+                {
+                    if (currentWindow is ArticleWindow articleWindow)
+                    {
+                        yield return articleWindow;
+                    }
+                }
+            }
+        }
+
+        public AllArticlesWindow AllArticlesWindow
+        {
+            get
+            {
+                foreach (Window currentWindow in Application.Current.Windows)
+                {
+                    if (currentWindow is AllArticlesWindow fs)
+                    {
+                        return fs;
+                    }
+                }
+
+                return null;
             }
         }
 
@@ -71,11 +102,15 @@ namespace BookWiki.Presentation.Wpf
 
             PageConfig = new PageConfig(Session);
             RightSideBarConfig = new RightSideBarConfig(Session);
+
+            Articles = new ArticlesLibrary(RootPath);
         }
 
         public KeyProcessor KeyProcessor { get; } = new KeyProcessor();
 
         public SearchByFileEngine Search { get; } = new SearchByFileEngine();
+
+        public ArticlesLibrary Articles { get; }
 
         public SessionContext Session { get; }
 
@@ -105,7 +140,7 @@ namespace BookWiki.Presentation.Wpf
 
         public RightSideBarConfig RightSideBarConfig { get; }
 
-        public event Action NovelListChanged = delegate { };
+        public event Action ItemsListChanged = delegate { };
 
         public void RestoreLastSession()
         {
@@ -136,6 +171,86 @@ namespace BookWiki.Presentation.Wpf
 
             novelItem = new Novel(novel, BookShelf.Instance.RootPath);
             return novelItem;
+        }
+
+        public void OpenArticlesSearch(string search = "", bool focusedOnQuery = false)
+        {
+            foreach (Window currentWindow in Application.Current.Windows)
+            {
+                if (currentWindow is AllArticlesWindow fs)
+                {
+                    if (currentWindow.WindowState == WindowState.Minimized)
+                    {
+                        currentWindow.WindowState = WindowState.Normal;
+                    }
+
+                    fs.Activate();
+                    fs.SetQuery(search);
+
+                    if (focusedOnQuery)
+                    {
+                        fs.FocusOnQuery();
+                    }
+                    
+
+                    return;
+                }
+            }
+
+            var aw = new AllArticlesWindow();
+            aw.SetQuery(search);
+            aw.Show();
+            if (focusedOnQuery)
+            {
+                aw.FocusOnQuery();
+            }
+            
+
+            ItemsListChanged();
+        }
+
+        public void OpenArticle(IRelativePath novel, bool fullscreen = true)
+        {
+            var articleView = OpenedArticles.FirstOrDefault(x => x.Novel.EqualsTo(novel));
+
+            if (articleView != null)
+            {
+                articleView.ActivateOrRestore(fullscreen);
+            }
+            else
+            {
+                Article articleItem;
+
+                try
+                {
+                    articleItem = Articles.Get(novel);
+                    var novelLength = articleItem.Content.Length;
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Cannot restore {novel.Name}.", e.ToString());
+
+                    return;
+                }
+
+                var wnd = new ArticleWindow(articleItem);
+
+                var state = Session.ScreenStates.FirstOrDefault(x => x.Novel.EqualsTo(novel));
+
+                if (state != null)
+                {
+                    state.ApplyTo(wnd);
+                }
+
+                if (fullscreen)
+                {
+                    wnd.WindowState = WindowState.Maximized;
+                }
+
+                wnd.Show();
+
+                ItemsListChanged();
+            }
         }
 
         public void Open(IRelativePath novel, bool fullscreen = false)
@@ -178,12 +293,19 @@ namespace BookWiki.Presentation.Wpf
 
                 wnd.Show();
 
-                NovelListChanged();
+                ItemsListChanged();
             }
         }
 
         public async void CloseAllAsync()
         {
+            AllArticlesWindow?.Close();
+
+            foreach (var openedArticles in OpenedArticles)
+            {
+                openedArticles.Close();
+            }
+
             foreach (var openedNovel in OpenedNovels)
             {
                 openedNovel.Close();
@@ -208,7 +330,7 @@ namespace BookWiki.Presentation.Wpf
                 }
             }
 
-            NovelListChanged();
+            ItemsListChanged();
         }
 
         public void StoreSession()
@@ -234,7 +356,7 @@ namespace BookWiki.Presentation.Wpf
 
         public void ReportWindowClosed()
         {
-            NovelListChanged();
+            ItemsListChanged();
         }
     }
 }

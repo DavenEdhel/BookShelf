@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BookWiki.Core.Articles;
 using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Logging;
 
@@ -75,7 +76,7 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 
                     newWord = newWord.ToLower();
 
-                    if (new SpellCheckV2(this).IsCorrect(newWord))
+                    if (new SpellCheckV2(this, new EmptyLex()).IsCorrect(newWord))
                     {
                         _logger.Info($"Work {newWord} is already known");
 

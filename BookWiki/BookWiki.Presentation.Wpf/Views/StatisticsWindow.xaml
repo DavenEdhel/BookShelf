@@ -20,7 +20,7 @@
             <TextBlock FontFamily="Times New Roman" FontSize="16" Height="30">Тайтл:</TextBlock>
             <TextBox FontFamily="Times New Roman" FontSize="16" Height="30" Name="BookTitle"></TextBox>
             <TextBlock FontFamily="Times New Roman" FontSize="16" Height="30">Аннотация:</TextBlock>
-            <TextBox MinLines="5" FontFamily="Times New Roman" FontSize="16" MinHeight="100" Name="BookAnnotation"></TextBox>
+            <TextBox MinLines="5" FontFamily="Times New Roman" TextWrapping="Wrap" AcceptsReturn="True" FontSize="16" MinHeight="100" Name="BookAnnotation"></TextBox>
             <Button  FontFamily="Times New Roman" FontSize="16" Height="30" Click="GenerageFb2" Margin="10, 0">Сгенерировать</Button>
             <Image Name="Cover"></Image>
         </StackPanel>

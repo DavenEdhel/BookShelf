@@ -22,7 +22,7 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
             var i = new PunctuationSeparatedEnumerationV2(_p.Inlines.Select(x => new OffsetText()
             {
                 Offset = _document.ContentStart.GetOffsetToPosition(x.ContentStart),
-                Text = FlowDocumentExtensions.GetText(x)
+                Text = x.GetText()
             })).ToArray();
 
             return i.ToList().GetEnumerator();

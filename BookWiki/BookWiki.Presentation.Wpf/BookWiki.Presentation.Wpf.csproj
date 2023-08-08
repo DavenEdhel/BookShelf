@@ -44,6 +44,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Reactive">
+      <HintPath>..\..\..\..\..\Users\Stanislau_Kanapliani\.nuget\packages\system.reactive\6.0.0\lib\netstandard2.0\System.Reactive.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -62,6 +65,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AllArticlesWindow.xaml.cs">
+      <DependentUpon>AllArticlesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ArticleWindow.xaml.cs">
+      <DependentUpon>ArticleWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="EnhancedRichTextBox.cs" />
     <Compile Include="Extensions\WindowExtensions.cs" />
     <Compile Include="Models\AppConfig.cs" />
@@ -97,6 +106,9 @@
     <Compile Include="CompiledNovelWindow.xaml.cs">
       <DependentUpon>CompiledNovelWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ArticleItemView.xaml.cs">
+      <DependentUpon>ArticleItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ConsoleLogSource.cs" />
     <Compile Include="Views\DiffWindow.xaml.cs">
       <DependentUpon>DiffWindow.xaml</DependentUpon>
@@ -124,6 +136,14 @@
     <Compile Include="WordInfoWindow.xaml.cs">
       <DependentUpon>WordInfoWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="AllArticlesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ArticleWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FileSystemWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -151,6 +171,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="QuickNavigationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ArticleItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -219,6 +243,9 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="System.Reactive">
+      <Version>6.0.0</Version>
     </PackageReference>
     <PackageReference Include="TextCopy">
       <Version>6.2.1</Version>

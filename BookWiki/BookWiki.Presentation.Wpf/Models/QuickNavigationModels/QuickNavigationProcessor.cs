@@ -7,4 +7,12 @@
             new QuickNavigationWindow().ShowDialog();
         }
     }
+
+    public class QuickArticleProcessor
+    {
+        public void Process()
+        {
+            BookShelf.Instance.OpenArticlesSearch(focusedOnQuery: true);
+        }
+    }
 }

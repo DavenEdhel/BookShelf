@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using BookWiki.Core.Articles;
 using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
@@ -191,22 +192,71 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
         }
     }
 
+    public class NavigateToArticleEngine
+    {
+        private readonly SpecialItemsHighlightEngine _specialItemsHighlighter;
+
+        public NavigateToArticleEngine(RichTextBox rtb,
+            IHighlightCollection highlightCollection,
+            ScrollViewer scroll)
+        {
+            _specialItemsHighlighter = new SpecialItemsHighlightEngine(rtb, highlightCollection, BookShelf.Instance.Articles, scroll,
+                specialItem =>
+                {
+                    var searchResult = BookShelf.Instance.Articles.Search($"!{specialItem.Trim().ToLowerInvariant()}");
+
+                    if (searchResult.Count() == 1)
+                    {
+                        BookShelf.Instance.OpenArticle(searchResult.First().Source);
+                    }
+                    else
+                    {
+                        BookShelf.Instance.OpenArticlesSearch($"!{specialItem.Trim().ToLowerInvariant()}");
+                    }
+                });
+        }
+
+        public bool IsApplicable(ISubstring selectedSubstring)
+        {
+            return _specialItemsHighlighter.IsApplicable(selectedSubstring);
+        }
+
+        public void Navigate(ISubstring substring)
+        {
+            _specialItemsHighlighter.Navigate(substring);
+        }
+    }
+
     public class SpecialItemsHighlightEngine
     {
         private FlowDocument _document;
         private RichTextBox _rtb;
         private readonly IHighlightCollection _highlightCollection;
-        private readonly List<string> _specialItems;
+        private readonly ArticlesLibrary _articles;
+
+        private List<string> SpecialItems
+        {
+            get
+            {
+                return _articles.Search("*").SelectMany(x => x.NameVariations).Select(x => x.ToLowerInvariant()).ToList();
+            }
+        }
+
         private readonly ScrollViewer _scroll;
         private readonly Action<string> _onSpecialItemClick;
         private bool highlighted;
 
-        public SpecialItemsHighlightEngine(RichTextBox rtb, IHighlightCollection highlightCollection, List<string> specialItems, ScrollViewer scroll, Action<string> onSpecialItemClick)
+        public SpecialItemsHighlightEngine(
+            RichTextBox rtb,
+            IHighlightCollection highlightCollection,
+            ArticlesLibrary articles,
+            ScrollViewer scroll,
+            Action<string> onSpecialItemClick)
         {
             _document = rtb.Document;
             _rtb = rtb;
             _highlightCollection = highlightCollection;
-            _specialItems = specialItems;
+            _articles = articles;
             _scroll = scroll;
             _onSpecialItemClick = onSpecialItemClick;
 
@@ -244,7 +294,7 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
 
                 foreach (var substring in words)
                 {
-                    if (_specialItems.Contains(substring.Text.ToLowerInvariant()))
+                    if (SpecialItems.Contains(substring.Text.ToLowerInvariant()))
                     {
                         _highlightCollection.Highlight(substring, false,
                             text =>
@@ -275,6 +325,16 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
                     yield return current;
                 }
             }
+        }
+
+        public bool IsApplicable(ISubstring selectedSubstring)
+        {
+            return SpecialItems.Contains(selectedSubstring.Text.ToLowerInvariant());
+        }
+
+        public void Navigate(ISubstring substring)
+        {
+            _onSpecialItemClick(substring.Text.ToLowerInvariant());
         }
     }
 }
