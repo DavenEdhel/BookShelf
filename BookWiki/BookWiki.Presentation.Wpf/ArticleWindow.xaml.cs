@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -27,6 +28,7 @@ using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using BookWiki.Presentation.Wpf.Views;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 using TextCopy;
+using Path = System.IO.Path;
 
 namespace BookWiki.Presentation.Wpf
 {
@@ -235,6 +237,8 @@ namespace BookWiki.Presentation.Wpf
             ArticleName.Text = article.Name;
             NameVariations.Text = article.NameVariations.JoinStringsWithoutSkipping(" ");
             Tags.Text = article.Tags.JoinStringsWithoutSkipping(" ");
+
+            ReloadImages();
         }
 
         private void ToRight(object sender, RoutedEventArgs e)
@@ -570,6 +574,66 @@ namespace BookWiki.Presentation.Wpf
 
                     new WordInfoWindow(selectedSubstring.Text).ShowDialog();
                 }
+            }
+        }
+
+        private void Title_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ArticleName.Focus();
+        }
+
+        private void ArticleWindow_OnDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                var ext = Path.GetExtension(files[0]);
+                
+                File.Copy(
+                    files[0],
+                    Path.Combine(
+                        _article.Source.AbsolutePath(BookShelf.Instance.RootPath).FullPath,
+                        Guid.NewGuid().ToString().Replace("-", "") + ext
+                    )
+                );
+
+                ReloadImages();
+            }
+        }
+
+        private void ReloadImages()
+        {
+            var images = Directory.GetFiles(_article.Source.AbsolutePath(BookShelf.Instance.RootPath).FullPath).Where(
+                x =>
+                {
+                    var ext = Path.GetExtension(x);
+
+                    if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+            ).ToArray();
+
+            Images.Children.Clear();
+
+            if (images.Any())
+            {
+                ImagesContainer.Visibility = Visibility.Visible;
+
+                foreach (var image in images)
+                {
+                    var i = new Image();
+                    i.Source = new BitmapImage(new Uri(image));
+                    Images.Children.Add(i);
+                }
+            }
+            else
+            {
+                ImagesContainer.Visibility = Visibility.Collapsed;
             }
         }
     }

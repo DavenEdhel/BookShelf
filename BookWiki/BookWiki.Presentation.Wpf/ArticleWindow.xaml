@@ -7,7 +7,10 @@
         mc:Ignorable="d"
         Height="890" Width="734" MinHeight="890" MinWidth="734"
         PreviewKeyDown="NovelWindow_OnPreviewKeyDown"
-        Title="ArticleWindow">
+        Title="ArticleWindow"
+        Drop="ArticleWindow_OnDrop"
+        AllowDrop="True"
+        >
     <Grid Name="Root">
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
@@ -42,17 +45,28 @@
             </Grid>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="Scroll">
                 <StackPanel Orientation="Vertical">
-                    <TextBox Name="ArticleName" TextChanged="MarkChanged" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="22">Название статьи</TextBox>
+                    <TextBlock MouseDown="Title_OnMouseDown" VerticalAlignment="Stretch" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="22">Статья</TextBlock>
+                    <TextBox Name="ArticleName" TextChanged="MarkChanged" BorderThickness="0" BorderBrush="LightGray" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="26"></TextBox>
+                    <ScrollViewer Name="ImagesContainer" Visibility="Collapsed" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
+                        <StackPanel Orientation="Horizontal"  Name="Images" Height="250"></StackPanel>
+                    </ScrollViewer>
                     <Grid>
-                        <local:EnhancedRichTextBox BorderThickness="1" PreviewMouseLeftButtonUp="TextSelectedAndClicked" Background="White" TextChanged="MarkChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" x:Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
+                        <local:EnhancedRichTextBox BorderThickness="0" BorderBrush="LightGray" PreviewMouseLeftButtonUp="TextSelectedAndClicked" Background="White" TextChanged="MarkChanged" Padding="0 0 0 50" SelectionChanged="SelectionChanged" x:Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
                         </local:EnhancedRichTextBox>
                         <Canvas Name="HighlightBox">
                         </Canvas>
                     </Grid>
-                    <TextBlock>Вариации</TextBlock>
-                    <TextBox Name="NameVariations" TextWrapping="Wrap" TextChanged="MarkChanged" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" MinHeight="30" FontSize="18"></TextBox>
-                    <TextBlock>Тэги</TextBlock>
-                    <TextBox Name="Tags" TextChanged="MarkChanged" TextWrapping="Wrap" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" MinHeight="30" FontSize="18"></TextBox>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Stretch" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="22">Вариации</TextBlock>
+                        <Button Grid.Column="1" Padding="5, 0, 5, 0" Name="GenerateVariations" Background="White" HorizontalAlignment="Right" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="ScrollSwitch">сгенерировать</Button>
+                    </Grid>
+                    <TextBox Name="NameVariations" TextWrapping="Wrap" BorderThickness="0" BorderBrush="LightGray" TextChanged="MarkChanged" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" MinHeight="30" FontSize="18"></TextBox>
+                    <TextBlock VerticalAlignment="Stretch" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="22">Тэги</TextBlock>
+                    <TextBox Name="Tags" TextChanged="MarkChanged" BorderThickness="0" BorderBrush="LightGray" TextWrapping="Wrap" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" MinHeight="30" FontSize="18"></TextBox>
                 </StackPanel>
             </ScrollViewer>
             <Grid Grid.Row="2">

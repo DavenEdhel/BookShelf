@@ -1,0 +1,21 @@
+﻿<Window x:Class="BookWiki.Presentation.Wpf.Views.GenerateVariationsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BookWiki.Presentation.Wpf.Views"
+        mc:Ignorable="d"
+        Title="Вариации">
+    <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Vertical" Width="300">
+            <TextBlock FontFamily="Times New Roman" Foreground="Gray" FontSize="16" TextAlignment="Left" Margin="8, 0,0, 0" VerticalAlignment="Center">Первое склонение</TextBlock>
+            <TextBox Name="V1N1" BorderBrush="LightGray" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="16"></TextBox>
+            <Button Padding="5, 0, 5, 0" Background="White" HorizontalAlignment="Stretch" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="16">Добавить</Button>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Width="300">
+            <TextBlock FontFamily="Times New Roman" Foreground="Gray" FontSize="16" TextAlignment="Left" Margin="8, 0,0, 0" VerticalAlignment="Center">Первое склонение</TextBlock>
+            <TextBox Name="V2N1" BorderBrush="LightGray" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="16"></TextBox>
+            <Button Padding="5, 0, 5, 0" Background="White" HorizontalAlignment="Stretch" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="16">Добавить</Button>
+        </StackPanel>
+    </StackPanel>
+</Window>

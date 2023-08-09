@@ -114,6 +114,9 @@
       <DependentUpon>DiffWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\EmptyLogSource.cs" />
+    <Compile Include="Views\GenerateVariationsWindow.xaml.cs">
+      <DependentUpon>GenerateVariationsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\LogSourceHolder.cs" />
     <Compile Include="Views\PagesView.cs" />
     <Compile Include="QuickNavigationWindow.xaml.cs">
@@ -179,6 +182,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\DiffWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\GenerateVariationsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -53,17 +53,11 @@ namespace BookWiki.Core.Files.FileModels
 
         public class Data
         {
-            public string Name { get; set; } = "name";
+            public string Name { get; set; } =string.Empty;
 
-            public string[] Tags { get; set; } = new[]
-            {
-                "tag"
-            };
+            public string[] Tags { get; set; } = new string[0];
 
-            public string[] NameVariations { get; set; } = new[]
-            {
-                "names"
-            };
+            public string[] NameVariations { get; set; } = new string[0];
         }
 
         public void Invalidate()
