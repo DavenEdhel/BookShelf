@@ -41,6 +41,7 @@
                     <Button Padding="5, 0, 5, 0" Name="SpellcheckSwitchButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="SpellcheckSwitch">Spellcheck On</Button>
                     <Button Padding="5, 0, 5, 0" Name="CompileButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="Compile" MouseDown="CompileWithDetails">Compile</Button>
                     <Button Padding="5, 0, 5, 0" Name="CopyAsHtmButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="CopyAsHtm">Copy as htm</Button>
+                    <Button Padding="5, 0, 5, 0" Name="FormatButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="Format">Format</Button>
                 </StackPanel>
             </Grid>
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="Scroll">

@@ -203,16 +203,7 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
             _specialItemsHighlighter = new SpecialItemsHighlightEngine(rtb, highlightCollection, BookShelf.Instance.Articles, scroll,
                 specialItem =>
                 {
-                    var searchResult = BookShelf.Instance.Articles.Search($"!{specialItem.Trim().ToLowerInvariant()}");
-
-                    if (searchResult.Count() == 1)
-                    {
-                        BookShelf.Instance.OpenArticle(searchResult.First().Source);
-                    }
-                    else
-                    {
-                        BookShelf.Instance.OpenArticlesSearch($"!{specialItem.Trim().ToLowerInvariant()}");
-                    }
+                    BookShelf.Instance.OpenArticleOrSearch(specialItem);
                 });
         }
 
@@ -238,7 +229,7 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
         {
             get
             {
-                return _articles.Search("*").SelectMany(x => x.NameVariations).Select(x => x.ToLowerInvariant()).ToList();
+                return _articles.Search("*").SelectMany(x => x.Article.NameVariations).Select(x => x.ToLowerInvariant()).ToList();
             }
         }
 
@@ -334,7 +325,7 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
 
         public void Navigate(ISubstring substring)
         {
-            _onSpecialItemClick(substring.Text.ToLowerInvariant());
+            _onSpecialItemClick(substring.Text);
         }
     }
 }

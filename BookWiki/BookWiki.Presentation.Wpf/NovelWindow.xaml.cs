@@ -425,6 +425,22 @@ namespace BookWiki.Presentation.Wpf
                 SearchBox.Focus();
                 return;
             }
+
+            if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) && e.KeyboardDevice.IsKeyDown(Key.D))
+            {
+                var cursorOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
+
+                var substrings = new PunctuationSeparatedEnumeration(Rtb.Document, Rtb.CaretPosition.Paragraph).ToArray();
+
+                var selectedSubstring = substrings.FirstOrDefault(x => cursorOffset >= x.StartIndex && cursorOffset < x.EndIndex);
+
+                if (selectedSubstring != null)
+                {
+                    _specialItemsHighlighter.Navigate(selectedSubstring);
+                }
+
+                return;
+            }
         }
 
         private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
@@ -534,6 +550,8 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
+                    System.Diagnostics.Debug.WriteLine(selectedSubstring.Text);
+
                     if (_specialItemsHighlighter.IsApplicable(selectedSubstring))
                     {
                         _specialItemsHighlighter.Navigate(selectedSubstring);
@@ -566,6 +584,11 @@ namespace BookWiki.Presentation.Wpf
                     )
                 ).Value
             );
+        }
+
+        private void Format(object sender, RoutedEventArgs e)
+        {
+            Rtb.Prettify();
         }
     }
 }

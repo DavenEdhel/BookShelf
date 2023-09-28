@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.FileSystem.FileModels;
@@ -17,6 +18,11 @@ namespace BookWiki.Core.Files.PathModels
             Parts = new PartsSequence(new RunOnceSequence<ITextRange>(new StringPathPartsSequence(path)));
             Name = new FileName(Parts);
             Extension = new Extension(Parts);
+        }
+
+        public FolderPath(IEnumerable<string> pathParts) : this(Path.Combine(pathParts.ToArray()))
+        {
+
         }
 
         public FolderPath(IAbsolutePath root, IFileName folderName, IExtension extension) : this(Path.Combine(root.FullPath, $"{folderName.PlainText}{(extension.Type != NodeType.Directory ? "." : string.Empty)}{extension.PlainText}"))

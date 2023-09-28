@@ -6,13 +6,18 @@
         xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
         xmlns:views="clr-namespace:BookWiki.Presentation.Wpf.Views"
         mc:Ignorable="d"
-        Title="Статьи" Height="450" Width="800">
+        Title="Статьи" Height="800" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="70"></RowDefinition>
         </Grid.RowDefinitions>
-        <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="230"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition Width="50"></ColumnDefinition>
@@ -20,8 +25,15 @@
             <views:TagsEditBox x:Name="QueryBox" KeyDown="QueryBox_OnKeyDown" PreviewKeyDown="QueryBox_OnPreviewKeyDown" TextChanged="QueryBox_OnTextChanged"></views:TagsEditBox>
             <Button Grid.Column="1" VerticalAlignment="Center" Background="White" Height="30" FontFamily="Times New Roman" FontSize="18" Click="NewArticle">+</Button>
         </Grid>
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="FileSystemScroll">
-            <views:ArticlesView x:Name="ArticlesView"></views:ArticlesView>
+        <ScrollViewer Grid.Row="1" Grid.Column="1">
+            <TextBlock  Name="Suggestions" FontFamily="Times New Roman" Foreground="Gray" FontSize="14" TextWrapping="Wrap"></TextBlock>
         </ScrollViewer>
+        <views:ArticlesViewV2 Grid.Row="1" x:Name="ArticlesView">
+        </views:ArticlesViewV2>
+        <StackPanel VerticalAlignment="Center" Orientation="Vertical" Grid.Row="2" Grid.ColumnSpan="2">
+            <views:ScopeBox x:Name="GlobalScope"></views:ScopeBox>
+            <views:ScopeBox x:Name="BookScope"></views:ScopeBox>
+            <views:ScopeBox x:Name="ChapterScope"></views:ScopeBox>
+        </StackPanel>
     </Grid>
 </Window>

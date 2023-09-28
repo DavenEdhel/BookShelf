@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using BookWiki.Core;
+using BookWiki.Core.Articles;
+using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Presentation.Wpf.Views
 {
@@ -22,26 +24,27 @@ namespace BookWiki.Presentation.Wpf.Views
     public partial class ArticleItemView : UserControl
     {
         private bool _isSelected = false;
-        private Article _article;
+        private ArticleSearchResult _searchResult;
 
         public ArticleItemView()
         {
             InitializeComponent();
         }
 
-        public ArticleItemView(Article article)
+        public ArticleItemView(ArticleSearchResult searchResult)
         {
-            _article = article;
-            
             InitializeComponent();
 
-            ArticleName.Text = article.Name;
+            Set(searchResult);
         }
 
-        public void Set(Article article)
+        public void Set(ArticleSearchResult searchResult)
         {
-            _article = article;
-            ArticleName.Text = article.Source.Name.PlainText;
+            _searchResult = searchResult;
+
+            ArticleName.Text = $"{searchResult.Article.Name} ({searchResult.Score})";
+            MatchedTags.Text = searchResult.MatchedTags.JoinStringsWithoutSkipping(" ");
+            PartiallyMatchedTags.Text = searchResult.PartiallyMatchedTags.JoinStringsWithoutSkipping(" ");
         }
 
         public bool IsSelected
@@ -71,7 +74,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
         public void Open()
         {
-            BookShelf.Instance.OpenArticle(_article?.Source);
+            BookShelf.Instance.OpenArticle(_searchResult?.Article.Source);
         }
     }
 }

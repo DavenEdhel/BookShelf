@@ -71,7 +71,7 @@ namespace BookWiki.Core.Fb2Models
                     offset += p.PlainText.Length + 1;
                 }
 
-                return result;
+                return result.Replace("–", "—");
 
                 ITextInfo GetFormat()
                 {

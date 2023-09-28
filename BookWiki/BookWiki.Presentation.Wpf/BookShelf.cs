@@ -104,6 +104,8 @@ namespace BookWiki.Presentation.Wpf
             RightSideBarConfig = new RightSideBarConfig(Session);
 
             Articles = new ArticlesLibrary(RootPath);
+
+            Trashcan = new Trashcan(RootPath);
         }
 
         public KeyProcessor KeyProcessor { get; } = new KeyProcessor();
@@ -111,6 +113,8 @@ namespace BookWiki.Presentation.Wpf
         public SearchByFileEngine Search { get; } = new SearchByFileEngine();
 
         public ArticlesLibrary Articles { get; }
+
+        public Trashcan Trashcan { get; }
 
         public SessionContext Session { get; }
 
@@ -139,6 +143,8 @@ namespace BookWiki.Presentation.Wpf
         public PageConfig PageConfig { get; }
 
         public RightSideBarConfig RightSideBarConfig { get; }
+
+        public IRelativePath CurrentNovel { get; private set; }
 
         public event Action ItemsListChanged = delegate { };
 
@@ -185,37 +191,56 @@ namespace BookWiki.Presentation.Wpf
                     }
 
                     fs.Activate();
+
                     fs.SetQuery(search);
 
                     if (focusedOnQuery)
                     {
                         fs.FocusOnQuery();
                     }
-                    
 
                     return;
                 }
             }
 
-            var aw = new AllArticlesWindow();
-            aw.SetQuery(search);
+            var aw = new AllArticlesWindow(search);
+            
             aw.Show();
+
             if (focusedOnQuery)
             {
                 aw.FocusOnQuery();
             }
-            
 
             ItemsListChanged();
         }
 
-        public void OpenArticle(IRelativePath novel, bool fullscreen = true)
+        public void OpenArticleOrSearch(string query)
+        {
+            var searchResult = Articles.Search($"!{query.Trim().ToLowerInvariant()}");
+            if (searchResult.Count() == 1)
+            {
+                OpenArticle(searchResult.First().Article.Source);
+            }
+            else if (searchResult.Count() > 1)
+            {
+                OpenArticlesSearch($"!{query.Trim().ToLowerInvariant()}", true);
+            }
+            else
+            {
+                OpenArticlesSearch($"{query.Trim()}", focusedOnQuery: true);
+            }
+        }
+
+        public ArticleWindow OpenArticle(IRelativePath novel, bool fullscreen = true)
         {
             var articleView = OpenedArticles.FirstOrDefault(x => x.Novel.EqualsTo(novel));
 
             if (articleView != null)
             {
                 articleView.ActivateOrRestore(fullscreen);
+
+                return articleView;
             }
             else
             {
@@ -230,7 +255,7 @@ namespace BookWiki.Presentation.Wpf
                 {
                     MessageBox.Show($"Cannot restore {novel.Name}.", e.ToString());
 
-                    return;
+                    return null;
                 }
 
                 var wnd = new ArticleWindow(articleItem);
@@ -250,11 +275,15 @@ namespace BookWiki.Presentation.Wpf
                 wnd.Show();
 
                 ItemsListChanged();
+
+                return wnd;
             }
         }
 
         public void Open(IRelativePath novel, bool fullscreen = false)
         {
+            CurrentNovel = novel;
+
             var novelView = OpenedNovels.FirstOrDefault(x => x.Novel.EqualsTo(novel));
 
             if (novelView != null)

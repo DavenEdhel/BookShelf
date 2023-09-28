@@ -88,6 +88,7 @@
     <Compile Include="Models\ScreenState.cs" />
     <Compile Include="Models\SessionContext.cs" />
     <Compile Include="Models\TabDto.cs" />
+    <Compile Include="Models\ArticlesScopeBehavior.cs" />
     <Compile Include="Models\Utilities\DependenciesContainerExtensions.cs" />
     <Compile Include="Models\Utilities\DependenciesContainer.cs" />
     <Compile Include="Models\Utilities\EventBase.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Views\ArticleItemView.xaml.cs">
       <DependentUpon>ArticleItemView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ArticlesViewV2.cs" />
     <Compile Include="Views\ConsoleLogSource.cs" />
     <Compile Include="Views\DiffWindow.xaml.cs">
       <DependentUpon>DiffWindow.xaml</DependentUpon>
@@ -132,10 +134,18 @@
     <Compile Include="Views\RightSideViewV2.xaml.cs">
       <DependentUpon>RightSideViewV2.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ScopeBox.xaml.cs">
+      <DependentUpon>ScopeBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ShowOnFocusBehavior.cs" />
     <Compile Include="Views\StatisticsWindow.xaml.cs">
       <DependentUpon>StatisticsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TabItemView.cs" />
+    <Compile Include="Views\TagsSuggestionsBehavior.cs" />
+    <Compile Include="Views\VariationsView.xaml.cs">
+      <DependentUpon>VariationsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WordInfoWindow.xaml.cs">
       <DependentUpon>WordInfoWindow.xaml</DependentUpon>
     </Compile>
@@ -193,7 +203,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\ScopeBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\StatisticsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\VariationsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

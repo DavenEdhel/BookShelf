@@ -5,17 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookWiki.Presentation.Wpf.Views"
         mc:Ignorable="d"
+        MinWidth="600"
+        Height="300"
         Title="Вариации">
-    <StackPanel Orientation="Horizontal">
-        <StackPanel Orientation="Vertical" Width="300">
-            <TextBlock FontFamily="Times New Roman" Foreground="Gray" FontSize="16" TextAlignment="Left" Margin="8, 0,0, 0" VerticalAlignment="Center">Первое склонение</TextBlock>
-            <TextBox Name="V1N1" BorderBrush="LightGray" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="16"></TextBox>
-            <Button Padding="5, 0, 5, 0" Background="White" HorizontalAlignment="Stretch" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="16">Добавить</Button>
-        </StackPanel>
-        <StackPanel Orientation="Vertical" Width="300">
-            <TextBlock FontFamily="Times New Roman" Foreground="Gray" FontSize="16" TextAlignment="Left" Margin="8, 0,0, 0" VerticalAlignment="Center">Первое склонение</TextBlock>
-            <TextBox Name="V2N1" BorderBrush="LightGray" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="16"></TextBox>
-            <Button Padding="5, 0, 5, 0" Background="White" HorizontalAlignment="Stretch" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="16">Добавить</Button>
+    <StackPanel Orientation="Vertical">
+        <TextBlock VerticalAlignment="Stretch" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="22">Корень имени</TextBlock>
+        <TextBox Name="Root" TextChanged="NameChanged" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="26"></TextBox>
+        <StackPanel Name="Variations" Orientation="Horizontal">
+
         </StackPanel>
     </StackPanel>
 </Window>

@@ -46,7 +46,6 @@ namespace BookWiki.Presentation.Wpf
         private CancellationTokenSource _token;
         private LifeSearchEngine _lifeSearchEngine;
         private OpenedTabsView _openedTabs;
-        private RightSideViewV2 _rightSide;
 
         public bool ClosingFailed { get; set; } = false;
 
@@ -70,15 +69,7 @@ namespace BookWiki.Presentation.Wpf
             Grid.SetColumn(_openedTabs, 0);
             Root.Children.Add(_openedTabs);
 
-            _rightSide = new RightSideViewV2();
-            _rightSide.HorizontalAlignment = HorizontalAlignment.Right;
-            _rightSide.Visibility = Visibility.Hidden;
-            _rightSide.Margin = new Thickness(0);
-            _rightSide.MouseDown += ChangeRightSideVisibility;
-            Grid.SetColumn(_rightSide, 2);
-            Root.Children.Add(_rightSide);
-
-            Title = new NovelTitle(article.Source).PlainText;
+            Title = new ArticleTitle(article).PlainText;
             
             _lifeSearchEngine = new LifeSearchEngine(Rtb, this, SearchBox, Scroll);
 
@@ -92,9 +83,19 @@ namespace BookWiki.Presentation.Wpf
             RunAutosave();
 
             _openedTabs.Start();
-            _rightSide.Start();
 
             ApplyHeightAdjustments();
+
+            _tagsAutocomplete = new TagsOverviewBehavior(Suggestions);
+            _tagsAutocomplete2 = new TagsSuggestionsBehavior(
+                Tags,
+                InlineSuggestions,
+                new ArticlesScope(
+                    new ArticlesScopeOnFileSystem(BookShelf.Instance.CurrentNovel, BookShelf.Instance.RootPath)
+                )
+            );
+
+            new ShowOnFocusBehavior(focusable: Tags, canBeCollapsed: SuggestionsScroll);
         }
 
 
@@ -103,7 +104,6 @@ namespace BookWiki.Presentation.Wpf
             this.MinHeight -= BookShelf.Instance.Config.HeightModification;
             Height -= BookShelf.Instance.Config.HeightModification;
             NovelContentGrid.Height -= BookShelf.Instance.Config.HeightModification;
-            _rightSide.Margin = new Thickness(0, 0, 0, BookShelf.Instance.Config.HeightModification);
         }
 
         private async Task RunAutosave()
@@ -164,8 +164,10 @@ namespace BookWiki.Presentation.Wpf
             else
             {
                 _openedTabs.Stop();
-                _rightSide.Stop();
             }
+
+            _tagsAutocomplete.Dispose();
+            _tagsAutocomplete2.Dispose();
 
             base.OnClosing(e);
         }
@@ -214,7 +216,7 @@ namespace BookWiki.Presentation.Wpf
                         Tags = Tags.Text.Split(' ')
                     });
 
-                    // todo: images
+                    BookShelf.Instance.Articles.Save(_article);
                 }
 
                 return true;
@@ -528,12 +530,8 @@ namespace BookWiki.Presentation.Wpf
         private int _usualWidth = 734;
         private readonly NavigateToArticleEngine _specialItemsHighlighter;
         private readonly ArticleMetadata _metadata;
-
-        private void OnResize(object sender, SizeChangedEventArgs e)
-        {
-            _openedTabs.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
-            _rightSide.ToggleVisibility(CanTabsBeVisible(e.NewSize.Width));
-        }
+        private readonly TagsOverviewBehavior _tagsAutocomplete;
+        private readonly TagsSuggestionsBehavior _tagsAutocomplete2;
 
         private bool CanTabsBeVisible(double width) => width > _usualWidth + 200 * 2 + 5;
 
@@ -544,14 +542,6 @@ namespace BookWiki.Presentation.Wpf
                 _openedTabs.ToggleVisibility();
             }
 
-        }
-
-        private void ChangeRightSideVisibility(object sender, MouseButtonEventArgs e)
-        {
-            if (CanTabsBeVisible(ActualWidth))
-            {
-                _rightSide.ToggleVisibility();
-            }
         }
 
         private void TextSelectedAndClicked(object sender, MouseButtonEventArgs e)
@@ -588,15 +578,18 @@ namespace BookWiki.Presentation.Wpf
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                var ext = Path.GetExtension(files[0]);
-                
-                File.Copy(
-                    files[0],
-                    Path.Combine(
-                        _article.Source.AbsolutePath(BookShelf.Instance.RootPath).FullPath,
-                        Guid.NewGuid().ToString().Replace("-", "") + ext
-                    )
-                );
+                foreach (var file in files)
+                {
+                    var ext = Path.GetExtension(file);
+
+                    File.Copy(
+                        files[0],
+                        Path.Combine(
+                            _article.Source.AbsolutePath(BookShelf.Instance.RootPath).FullPath,
+                            Guid.NewGuid().ToString().Replace("-", "") + ext
+                        )
+                    );
+                }
 
                 ReloadImages();
             }
@@ -609,7 +602,7 @@ namespace BookWiki.Presentation.Wpf
                 {
                     var ext = Path.GetExtension(x);
 
-                    if (ext == ".png" || ext == ".jpg" || ext == ".jpeg")
+                    if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".jfif")
                     {
                         return true;
                     }
@@ -627,7 +620,16 @@ namespace BookWiki.Presentation.Wpf
                 foreach (var image in images)
                 {
                     var i = new Image();
-                    i.Source = new BitmapImage(new Uri(image));
+                    i.Tag = image;
+                    i.MouseUp += ImageOnMouseUp;
+
+                    var bmp = new BitmapImage();
+                    bmp.BeginInit();
+                    bmp.CacheOption = BitmapCacheOption.OnLoad;
+                    bmp.UriSource = new Uri(image);
+                    bmp.EndInit();
+
+                    i.Source = bmp;
                     Images.Children.Add(i);
                 }
             }
@@ -635,6 +637,48 @@ namespace BookWiki.Presentation.Wpf
             {
                 ImagesContainer.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void ImageOnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                _article.Source.AbsolutePath(BookShelf.Instance.RootPath).OpenInExplorer();
+            }
+
+            if (e.ChangedButton == MouseButton.Right)
+            {
+                var imagePath = sender.CastTo<Image>().Tag.ToString();
+                var filename = Path.GetFileName(imagePath);
+
+                Images.Children.Remove(sender.CastTo<Image>());
+
+                if (Images.Children.Count == 0)
+                {
+                    ImagesContainer.Visibility = Visibility.Collapsed;
+                }
+
+                File.Move(imagePath, Path.Combine(BookShelf.Instance.Trashcan.Root.FullPath, filename));
+            }
+        }
+
+        private void OpenVariationWindow(object sender, RoutedEventArgs e)
+        {
+            var w = new GenerateVariationsWindow();
+            w.SetInitialName(ArticleName.Text);
+            w.ShowDialog();
+
+            var initial = NameVariations.Text.Split(' ').ToList();
+            initial.AddRange(w.ResultTags);
+            NameVariations.Text = initial.Distinct().JoinStringsWithoutSkipping(" ");
+        }
+
+        public void InitWith(string title, string[] scope)
+        {
+            ArticleName.Text = title;
+            NameVariations.Text = title;
+            Rtb.Focus();
+            Tags.Text = $" {scope.JoinStringsWithoutSkipping(" ")}";
         }
     }
 }

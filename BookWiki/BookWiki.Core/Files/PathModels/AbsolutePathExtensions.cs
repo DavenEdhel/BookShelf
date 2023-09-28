@@ -15,5 +15,13 @@ namespace BookWiki.Core.Files.PathModels
                 Verb = "open"
             });
         }
+
+        public static void EnsureCreated(this IAbsolutePath path)
+        {
+            if (Directory.Exists(path.FullPath) == false)
+            {
+                Directory.CreateDirectory(path.FullPath);
+            }
+        }
     }
 }

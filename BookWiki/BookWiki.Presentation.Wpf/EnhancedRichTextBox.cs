@@ -7,6 +7,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using BookWiki.Core;
 using BookWiki.Core.Utils;
+using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Presentation.Wpf
@@ -21,6 +22,24 @@ namespace BookWiki.Presentation.Wpf
             BorderThickness = new Thickness(0, 0, 0, 0);
 
             PreviewKeyDown += OnPreviewKeyDown;
+            PreviewMouseLeftButtonUp += OnPreviewMouseLeftButtonUp;
+        }
+
+        private void OnPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftAlt))
+            {
+                var cursorOffset = Document.ContentStart.GetOffsetToPosition(CaretPosition);
+
+                var substrings = new PunctuationSeparatedEnumeration(Document, CaretPosition.Paragraph).ToArray();
+
+                var selectedSubstring = substrings.FirstOrDefault(x => cursorOffset >= x.StartIndex && cursorOffset < x.EndIndex);
+
+                if (selectedSubstring != null)
+                {
+                    BookShelf.Instance.OpenArticleOrSearch(selectedSubstring.Text);
+                }
+            }
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
@@ -76,9 +95,20 @@ namespace BookWiki.Presentation.Wpf
 
             if (e.Key == Key.OemMinus)
             {
-                var previousChar = new TextRange(CaretPosition.GetNextInsertionPosition(LogicalDirection.Backward), CaretPosition);
+                var previousPosition = CaretPosition.GetNextInsertionPosition(LogicalDirection.Backward);
 
-                if (TextParts.NotALetterOrNumber.Contains(previousChar.Text[0]))
+                var isItNotALetterOrNumber = false;
+
+                if (previousPosition == null)
+                {
+                    isItNotALetterOrNumber = true;
+                }
+                else if (TextParts.NotALetterOrNumber.Contains(new TextRange(previousPosition, CaretPosition).Text[0]))
+                {
+                    isItNotALetterOrNumber = true;
+                }
+
+                if (isItNotALetterOrNumber)
                 {
                     Insert("–");
 
@@ -87,6 +117,53 @@ namespace BookWiki.Presentation.Wpf
             }
 
             base.OnKeyDown(e);
+        }
+
+        public void Prettify()
+        {
+            char? previous = null;
+            var cursor = Document.ContentStart;
+
+            while (true)
+            {
+                var nextToCursor = cursor.GetNextInsertionPosition(LogicalDirection.Forward);
+
+                if (nextToCursor == null)
+                {
+                    return;
+                }
+
+                var currentText = new TextRange(cursor, nextToCursor).Text;
+
+                if (currentText.Length > 0)
+                {
+                    char current = currentText[0];
+
+                    if (current == '-')
+                    {
+                        var isItNotALetterOrNumber = false;
+
+                        if (previous == null)
+                        {
+                            isItNotALetterOrNumber = true;
+                        }
+                        else if (TextParts.NotALetterOrNumber.Contains(previous.Value))
+                        {
+                            isItNotALetterOrNumber = true;
+                        }
+
+                        if (isItNotALetterOrNumber)
+                        {
+                            Selection.Select(cursor, nextToCursor);
+                            Selection.Text = "–";
+                        }
+                    }
+
+                    previous = current;
+                }
+                
+                cursor = nextToCursor;
+            }
         }
 
         TextPointer GetThisLineEnd()

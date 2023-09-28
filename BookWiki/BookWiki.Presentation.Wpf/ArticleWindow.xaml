@@ -10,6 +10,7 @@
         Title="ArticleWindow"
         Drop="ArticleWindow_OnDrop"
         AllowDrop="True"
+        d:DesignHeight="734" d:DesignWidth="1200"
         >
     <Grid Name="Root">
         <Grid.ColumnDefinitions>
@@ -18,7 +19,9 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <StackPanel Background="Transparent" MouseDown="ChangeOpenedTabsVisibility"></StackPanel>
-        <StackPanel Grid.Column="2" Background="Transparent" MouseDown="ChangeRightSideVisibility"></StackPanel>
+        <StackPanel Grid.Column="2" Background="Transparent">
+            <TextBlock  Name="Suggestions" FontFamily="Times New Roman" Foreground="Gray" FontSize="14" TextWrapping="Wrap"></TextBlock>
+        </StackPanel>
         <Grid Name="NovelContentGrid" Grid.Column="1" Height="851" Width="718">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"></RowDefinition>
@@ -62,11 +65,14 @@
                             <ColumnDefinition></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <TextBlock VerticalAlignment="Stretch" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="22">Вариации</TextBlock>
-                        <Button Grid.Column="1" Padding="5, 0, 5, 0" Name="GenerateVariations" Background="White" HorizontalAlignment="Right" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="ScrollSwitch">сгенерировать</Button>
+                        <Button Grid.Column="1" Padding="5, 0, 5, 0" Name="GenerateVariations" Background="White" HorizontalAlignment="Right" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="OpenVariationWindow">сгенерировать</Button>
                     </Grid>
                     <TextBox Name="NameVariations" TextWrapping="Wrap" BorderThickness="0" BorderBrush="LightGray" TextChanged="MarkChanged" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" MinHeight="30" FontSize="18"></TextBox>
                     <TextBlock VerticalAlignment="Stretch" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="22">Тэги</TextBlock>
                     <TextBox Name="Tags" TextChanged="MarkChanged" BorderThickness="0" BorderBrush="LightGray" TextWrapping="Wrap" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" MinHeight="30" FontSize="18"></TextBox>
+                    <ScrollViewer Name="SuggestionsScroll" Height="300">
+                        <TextBlock Name="InlineSuggestions" FontFamily="Times New Roman" Foreground="Gray" FontSize="14" TextWrapping="Wrap"></TextBlock>
+                    </ScrollViewer>
                 </StackPanel>
             </ScrollViewer>
             <Grid Grid.Row="2">

@@ -94,6 +94,40 @@ namespace BookWiki.Core.Tests
         }
 
         [Test]
+        public void Chapter()
+        {
+            var c = "Ник вылез, снова хлопнул дверью аааа.";
+
+            var items = new PunctuationSeparatedEnumerationV2(new []
+            {
+                new OffsetText()
+                {
+                    Offset = 2,
+                    Text = c
+                }
+            }).ToArray();
+
+            (items.Last().EndIndex - items.Last().StartIndex).ClaimEqual(4);
+        }
+
+        [Test]
+        public void SpecificCase()
+        {
+            var json =
+                "[{\"Text\":\"- Проверил я, проверил, - пробурчал Ник в ответ, а потом добавил раздражённое: - сэр. Было пол\",\"Offset\":17598},{\"Text\":\"а\",\"Offset\":17694},{\"Text\":\"бака. Только вот, сэр, знаете в чём проблема? - Ник на\",\"Offset\":17697},{\"Text\":\"та\",\"Offset\":17753},{\"Text\":\"чинал медленно закипать. - Хуй знает, какой здесь расход! Может как у танка, сто литров на сто километров. И объём бака сложно определить без эстакады и разбора, блять!\",\"Offset\":17757}]";
+
+            var obj = Newtonsoft.Json.JsonConvert.DeserializeObject<List<OffsetText>>(json);
+
+            var items = new PunctuationSeparatedEnumerationV2(obj).ToArray();
+
+            var e = items[13];
+
+            var i = 32;
+
+
+        }
+
+        [Test]
         public void ShouldSplitToSubstringsCorrectly2()
         {
             var items = new List<OffsetText>()

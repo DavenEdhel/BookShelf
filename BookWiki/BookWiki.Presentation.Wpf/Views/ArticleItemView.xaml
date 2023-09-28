@@ -11,6 +11,11 @@
         <Border Name="Border" Visibility="Hidden" BorderThickness="1" BorderBrush="Gray">
             
         </Border>
-        <TextBlock Name="ArticleName" FontFamily="Times New Roman" FontSize="16" TextAlignment="Left" Margin="8, 0,0, 0" VerticalAlignment="Center">Blah</TextBlock>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Name="ArticleName" FontFamily="Times New Roman" FontSize="16" TextAlignment="Left" Margin="8, 0,0, 0" VerticalAlignment="Center">Blah</TextBlock>
+            <TextBlock Name="MatchedTags" FontFamily="Times New Roman" FontSize="14" TextAlignment="Left" Margin="8, 0,0, 0" VerticalAlignment="Center"></TextBlock>
+            <TextBlock Name="PartiallyMatchedTags" FontFamily="Times New Roman" FontSize="14" Foreground="Gray" TextAlignment="Left" Margin="8, 0,0, 0" VerticalAlignment="Center"></TextBlock>
+        </StackPanel>
+        
     </Grid>
 </UserControl>
