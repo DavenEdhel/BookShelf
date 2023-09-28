@@ -2,9 +2,71 @@
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.Utils.PropertyModels;
+using Newtonsoft.Json;
 
 namespace BookWiki.Core.Files.FileModels
 {
+    public class ArticleMetadata
+    {
+        private readonly IAbsolutePath _path;
+        private const string MetadataFileName = "Metadata.json";
+
+        private readonly CachedValue<IText> _text;
+        private readonly CachedValue<Data> _content;
+
+        private readonly IFile _contentFile;
+
+        public ArticleMetadata(IAbsolutePath path)
+        {
+            _path = path;
+
+            _contentFile = new TextFile(new FilePath(path, MetadataFileName));
+
+            _text = new CachedValue<IText>(LoadText);
+            _content = new CachedValue<Data>(
+                () =>
+                {
+                    return JsonConvert.DeserializeObject<Data>(_text.Value.PlainText) ?? new Data();
+                }
+            );
+        }
+
+        public string Name => _content.Value.Name;
+
+        public string[] NameVariations => _content.Value.NameVariations;
+
+        public string[] Tags => _content.Value.Tags;
+
+        public void Save(Data data)
+        {
+            var text = JsonConvert.SerializeObject(data);
+
+            _contentFile.Save(text);
+
+            Invalidate();
+        }
+
+        private IText LoadText()
+        {
+            return new StringText(_contentFile.Content);
+        }
+
+        public class Data
+        {
+            public string Name { get; set; } =string.Empty;
+
+            public string[] Tags { get; set; } = new string[0];
+
+            public string[] NameVariations { get; set; } = new string[0];
+        }
+
+        public void Invalidate()
+        {
+            _text.Invalidate();
+            _content.Invalidate();
+        }
+    }
+
     public class ContentFolder : IContentFolder
     {
         private const string ContentFileName = "Text.txt";

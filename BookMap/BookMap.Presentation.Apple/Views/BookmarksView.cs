@@ -60,7 +60,7 @@ namespace BookMap.Presentation.Apple.Views
 
             public int GetSelectedIndex(UITableView list)
             {
-                return list.IndexPathForSelectedRow.Row;
+                return list.IndexPathForSelectedRow?.Row ?? -1;
             }
 
             public Bookmark GetSelectedBookmark(UITableView list)

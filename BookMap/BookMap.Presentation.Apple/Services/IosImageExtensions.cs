@@ -10,6 +10,14 @@ namespace BookMap.Presentation.Apple.Services
             Value = image
         };
 
-        public static UIImage ToUIImage(this IImage image) => ((IosImage) image).Value;
+        public static UIImage ToUIImage(this IImage image)
+        {
+            if (image == null)
+            {
+                return null;
+            }
+
+            return ((IosImage) image).Value;
+        }
     }
 }

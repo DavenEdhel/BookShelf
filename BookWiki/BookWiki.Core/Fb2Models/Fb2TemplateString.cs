@@ -13,8 +13,7 @@ namespace BookWiki.Core.Fb2Models
 
         public string Annotation { get; set; } = string.Empty;
 
-        public string Value => @"
-<?xml version=""1.0"" encoding=""utf-8""?>
+        public string Value => @"<?xml version=""1.0"" encoding=""utf-8""?>
 <FictionBook xmlns:l=""http://www.w3.org/1999/xlink"" xmlns=""http://www.gribuser.ru/xml/fictionbook/2.0"">
   <description>
     <title-info>

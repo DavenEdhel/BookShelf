@@ -14,6 +14,6 @@ namespace BookWiki.Core.Fb2Models
 
         public string Text { get; } = string.Empty;
 
-        public string Value => $"<{Tag}>{Text}</{Tag}>";
+        public string Value => $"<{Tag}>{Text}</{Tag}>\n";
     }
 }

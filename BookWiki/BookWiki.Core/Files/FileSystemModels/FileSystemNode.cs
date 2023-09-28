@@ -15,6 +15,11 @@ namespace BookWiki.Core.Files.FileSystemModels
         {
         }
 
+        public FileSystemNode(AbsoluteDirectoryPath directoryPath) : this (directoryPath.FullPath, 0)
+        {
+
+        }
+
         public FileSystemNode(IFileSystemNode parent, IAbsolutePath path) : this(path.FullPath, parent.Level + 1)
         {
         }

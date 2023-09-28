@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using BookWiki.Core.Articles;
 using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using Keurig.Tests.Common.Utils;
@@ -20,7 +21,7 @@ namespace BookWiki.Core.Tests
 
             await lex.Load();
 
-            var spellCheck = new SpellCheckV2(lex);
+            var spellCheck = new SpellCheckV2(lex, new EmptyLex());
 
             Claim.False(spellCheck.IsCorrect("аа"));
             Claim.True(spellCheck.IsCorrect("аб"));
@@ -40,7 +41,7 @@ namespace BookWiki.Core.Tests
 
             await lex.Load();
 
-            var spellCheck = new SpellCheckV2(lex);
+            var spellCheck = new SpellCheckV2(lex, new EmptyLex());
 
             Claim.False(spellCheck.IsCorrect("аа"));
             Claim.True(spellCheck.IsCorrect("аб"));
@@ -49,7 +50,7 @@ namespace BookWiki.Core.Tests
 
             await lex.Learn("абвг");
 
-            var spellCheck2 = new SpellCheckV2(lex);
+            var spellCheck2 = new SpellCheckV2(lex, new EmptyLex());
 
             Claim.True(spellCheck2.IsCorrect("абвг"));
         }

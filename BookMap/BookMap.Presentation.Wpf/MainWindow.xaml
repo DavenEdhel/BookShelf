@@ -6,5 +6,6 @@
         xmlns:local="clr-namespace:BookMap.Presentation.Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="1000" Width="1500">
-    <Canvas Name="Container"></Canvas>
+    <Canvas Name="Container">
+    </Canvas>
 </Window>

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using BookWiki.Core.Utils;
 
 namespace BookWiki.Core.Files.PathModels
 {
@@ -20,6 +22,28 @@ namespace BookWiki.Core.Files.PathModels
             }
 
             return false;
+        }
+
+        public static bool CanGoUp(this IRelativePath origin)
+        {
+            return origin.Parts.Count() > 0;
+        }
+
+        public static IRelativePath Up(this IRelativePath origin)
+        {
+            return new FolderPath(origin.Parts.Take(origin.Parts.Count() - 1).Select(x => x.PlainText).ToArray()) ;
+        }
+
+        public static IRelativePath Down(this IRelativePath origin, string fileName)
+        {
+            return new FolderPath(
+                origin.Parts.Select(x => x.PlainText).ToArray().And(
+                    new List<string>()
+                    {
+                        fileName
+                    }
+                )
+            );
         }
     }
 }

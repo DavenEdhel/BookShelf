@@ -14,5 +14,19 @@
                 Y = Y - b.Y
             };
         }
+
+        public PointDouble2D Multiply(double scale)
+        {
+            return new PointDouble2D()
+            {
+                X = X * scale,
+                Y = Y * scale
+            };
+        }
+
+        public override string ToString()
+        {
+            return $"[{X};{Y}]";
+        }
     }
 }

@@ -126,7 +126,7 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
-                    if (new SpellCheckV2(BookShelf.Instance.Dictionary).IsCorrect(selectedSubstring.Text) == false)
+                    if (new SpellCheckV2(BookShelf.Instance.Dictionary, BookShelf.Instance.Articles).IsCorrect(selectedSubstring.Text) == false)
                     {
                         BookShelf.Instance.Dictionary.Learn(selectedSubstring.Text);
                     }

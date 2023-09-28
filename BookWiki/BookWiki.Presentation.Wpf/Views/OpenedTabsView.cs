@@ -18,13 +18,13 @@ namespace BookWiki.Presentation.Wpf.Views
 
         public void Start()
         {
-            BookShelf.Instance.NovelListChanged += Render;
+            BookShelf.Instance.ItemsListChanged += Render;
             Render();
         }
 
         public void Stop()
         {
-            BookShelf.Instance.NovelListChanged -= Render;
+            BookShelf.Instance.ItemsListChanged -= Render;
         }
 
         private void Render()
@@ -42,15 +42,11 @@ namespace BookWiki.Presentation.Wpf.Views
             {
                 Render(novelWindow);
             }
-        }
 
-        private void ItemClicked(object sender, RoutedEventArgs e)
-        {
-            var b = sender.CastTo<Button>();
-
-            var w = b.Tag.CastTo<Window>();
-
-            w.ActivateOrRestore();
+            foreach (var articleWindow in BookShelf.Instance.OpenedArticles.OrderBy(x => x.Title))
+            {
+                Render(articleWindow);
+            }
         }
 
         private void Render(Window window)
@@ -60,6 +56,15 @@ namespace BookWiki.Presentation.Wpf.Views
             Children.Add(button);
 
             button.Click += ItemClicked;
+        }
+
+        private void ItemClicked(object sender, RoutedEventArgs e)
+        {
+            var b = sender.CastTo<Button>();
+
+            var w = b.Tag.CastTo<Window>();
+
+            w.ActivateOrRestore();
         }
 
         public void ToggleVisibility(bool? toVisible = null)

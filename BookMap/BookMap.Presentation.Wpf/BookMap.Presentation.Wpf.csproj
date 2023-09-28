@@ -10,4 +10,14 @@
     <ProjectReference Include="..\BookMap.Core\BookMap.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Core\" />
+    <Folder Include="MapModels\DrawModels\" />
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="6.0.0" />
+  </ItemGroup>
+
 </Project>

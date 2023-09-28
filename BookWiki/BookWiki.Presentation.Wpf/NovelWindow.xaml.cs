@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -11,6 +12,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using BookWiki.Core;
+using BookWiki.Core.Fb2Models;
 using BookWiki.Core.Files.FileModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
@@ -22,6 +24,7 @@ using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using BookWiki.Presentation.Wpf.Views;
 using Keurig.IQ.Core.CrossCutting.Extensions;
+using TextCopy;
 
 namespace BookWiki.Presentation.Wpf
 {
@@ -71,8 +74,10 @@ namespace BookWiki.Presentation.Wpf
 
             Title = new NovelTitle(novel.Source).PlainText;
 
-            _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary));
+            _lifeSpellCheck = new LifeSpellCheckV2(Rtb, this, new SpellCheckV2(BookShelf.Instance.Dictionary, BookShelf.Instance.Articles));
             _lifeSearchEngine = new LifeSearchEngine(Rtb, this, SearchBox, Scroll);
+
+            _specialItemsHighlighter = new NavigateToArticleEngine(Rtb, this, Scroll);
 
             LoadContent(novel);
 
@@ -89,6 +94,16 @@ namespace BookWiki.Presentation.Wpf
             _rightSide.Start();
 
             BookShelf.Instance.Dictionary.Changed += RecheckSpelling;
+
+            ApplyHeightAdjustments();
+        }
+
+        private void ApplyHeightAdjustments()
+        {
+            this.MinHeight -= BookShelf.Instance.Config.HeightModification;
+            Height -= BookShelf.Instance.Config.HeightModification;
+            NovelContentGrid.Height -= BookShelf.Instance.Config.HeightModification;
+            _rightSide.Margin = new Thickness(0, 0, 0, BookShelf.Instance.Config.HeightModification);
         }
 
         private async Task RunAutosave()
@@ -296,7 +311,7 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
-                    if (new SpellCheckV2(BookShelf.Instance.Dictionary).IsCorrect(selectedSubstring.Text) == false)
+                    if (new SpellCheckV2(BookShelf.Instance.Dictionary, BookShelf.Instance.Articles).IsCorrect(selectedSubstring.Text) == false)
                     {
                         BookShelf.Instance.Dictionary.Learn(selectedSubstring.Text);
                     }
@@ -321,91 +336,6 @@ namespace BookWiki.Presentation.Wpf
 
                 e.Handled = true;
             }
-
-            if (e.KeyboardDevice.IsKeyDown(Key.LeftAlt))
-            {
-                if (e.KeyboardDevice.IsKeyDown(Key.Right))
-                {
-                    if (e.KeyboardDevice.IsKeyDown(Key.LeftShift))
-                    {
-                        Rtb.Selection.Select(Rtb.Selection.Start, GetThisLineEnd());
-
-                        e.Handled = true;
-                    }
-                    else
-                    {
-                        Rtb.CaretPosition = GetThisLineEnd();
-
-                        e.Handled = true;
-                    }
-                }
-
-                if (e.KeyboardDevice.IsKeyDown(Key.Left))
-                {
-                    if (e.KeyboardDevice.IsKeyDown(Key.LeftShift))
-                    {
-                        Rtb.Selection.Select(Rtb.CaretPosition.GetLineStartPosition(0), Rtb.Selection.End);
-
-                        e.Handled = true;
-                    }
-                    else
-                    {
-                        Rtb.CaretPosition = Rtb.CaretPosition.GetLineStartPosition(0);
-
-                        e.Handled = true;
-                    }
-                }
-            }
-
-            if (e.Key == Key.D2 && e.KeyboardDevice.Modifiers == ModifierKeys.Shift)
-            {
-                var text = new TextRange(Rtb.Document.ContentStart, Rtb.CaretPosition).Text;
-
-                var closings = new IndexSequenceV2(text, '»').SelfOrEmpty();
-                var openings = new IndexSequenceV2(text, '«').SelfOrEmpty();
-
-                var toInsert = closings.Count() < openings.Count() ? "»" : "«";
-
-                Insert(toInsert);
-
-                e.Handled = true;
-            }
-        }
-
-        TextPointer GetThisLineEnd()
-        {
-            var isEof = Rtb.CaretPosition.GetLineStartPosition(1) == null;
-
-            if (isEof)
-            {
-                return Rtb.Document.ContentEnd;
-            }
-
-            var currentLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition.GetLineStartPosition(0));
-            var nextLineOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition.GetLineStartPosition(1));
-
-            for (int i = nextLineOffset; i > currentLineOffset; i--)
-            {
-                var possibleEol = Rtb.Document.ContentStart.GetPositionAtOffset(i);
-
-                var offsetToCheck = Rtb.Document.ContentStart.GetOffsetToPosition(possibleEol.GetLineStartPosition(0));
-
-                if (currentLineOffset == offsetToCheck)
-                {
-                    return possibleEol;
-                }
-            }
-
-            return null;
-        }
-
-        private void Insert(string toInsert)
-        {
-            var currentCaretPosition = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
-
-            Rtb.Selection.Start.InsertTextInRun(toInsert);
-
-            Rtb.CaretPosition = Rtb.Document.ContentStart.GetPositionAtOffset(currentCaretPosition + 1);
         }
 
         private void ScrollSwitch(object sender, RoutedEventArgs e)
@@ -495,6 +425,22 @@ namespace BookWiki.Presentation.Wpf
                 SearchBox.Focus();
                 return;
             }
+
+            if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) && e.KeyboardDevice.IsKeyDown(Key.D))
+            {
+                var cursorOffset = Rtb.Document.ContentStart.GetOffsetToPosition(Rtb.CaretPosition);
+
+                var substrings = new PunctuationSeparatedEnumeration(Rtb.Document, Rtb.CaretPosition.Paragraph).ToArray();
+
+                var selectedSubstring = substrings.FirstOrDefault(x => cursorOffset >= x.StartIndex && cursorOffset < x.EndIndex);
+
+                if (selectedSubstring != null)
+                {
+                    _specialItemsHighlighter.Navigate(selectedSubstring);
+                }
+
+                return;
+            }
         }
 
         private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
@@ -511,7 +457,7 @@ namespace BookWiki.Presentation.Wpf
             
         }
 
-        public void Highlight(ISubstring toHighlight, bool specialStyle)
+        public void Highlight(ISubstring toHighlight, bool specialStyle, Action<string> onClick = null)
         {
             var x1 = Rtb.Document.ContentStart.GetPositionAtOffset(toHighlight.StartIndex).GetCharacterRect(LogicalDirection.Forward);
             var x2 = Rtb.Document.ContentStart.GetPositionAtOffset(toHighlight.EndIndex).GetCharacterRect(LogicalDirection.Forward);
@@ -525,6 +471,12 @@ namespace BookWiki.Presentation.Wpf
                     Stroke = specialStyle ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.LightBlue),
                     Stretch = Stretch.Fill,
                     Fill = new SolidColorBrush(Color.FromArgb(60, Colors.LightBlue.R, Colors.LightBlue.G, Colors.LightBlue.B)),
+                    Tag = toHighlight.Text
+                };
+
+                r.MouseUp += (sender, args) =>
+                {
+                    onClick?.Invoke(sender.CastTo<Rectangle>().Tag.ToString());
                 };
 
                 Canvas.SetTop(r, x1.Top);
@@ -559,6 +511,7 @@ namespace BookWiki.Presentation.Wpf
 
         private int _usualHeight = 890;
         private int _usualWidth = 734;
+        private readonly NavigateToArticleEngine _specialItemsHighlighter;
 
         private void OnResize(object sender, SizeChangedEventArgs e)
         {
@@ -597,12 +550,45 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
-                    //if (new SpellCheckV2(BookShelf.Instance.Dictionary).IsCorrect(selectedSubstring.Text) == false)
+                    System.Diagnostics.Debug.WriteLine(selectedSubstring.Text);
+
+                    if (_specialItemsHighlighter.IsApplicable(selectedSubstring))
                     {
-                        new WordInfoWindow(selectedSubstring.Text).ShowDialog();
+                        _specialItemsHighlighter.Navigate(selectedSubstring);
+                        return;
                     }
+
+                    new WordInfoWindow(selectedSubstring.Text).ShowDialog();
                 }
             }
+        }
+
+        private void Compile(object sender, RoutedEventArgs e)
+        {
+            new CompileToFb2Operation(_novel, BookShelf.Instance.RootPath).Execute();
+        }
+
+        private void CompileWithDetails(object sender, MouseButtonEventArgs e)
+        {
+            new DiffWindow(_novel).ShowDialog();
+
+            e.Handled = true;
+        }
+
+        private void CopyAsHtm(object sender, RoutedEventArgs e)
+        {
+            ClipboardService.SetText(
+                new HtmlChapterWithoutTitle(
+                    _novel.AbsolutePath(
+                        BookShelf.Instance.RootPath
+                    )
+                ).Value
+            );
+        }
+
+        private void Format(object sender, RoutedEventArgs e)
+        {
+            Rtb.Prettify();
         }
     }
 }

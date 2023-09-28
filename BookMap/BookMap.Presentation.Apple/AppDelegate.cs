@@ -44,9 +44,9 @@ namespace BookMap.Presentation.Apple
 
             var filePath = Path.Combine(dirPath, fileName);
 
-            if (File.Exists(filePath))
+            if (!File.Exists(filePath))
             {
-                File.Create(filePath);
+                File.Create(filePath).Dispose();
             }
 
             File.AppendAllText(filePath, unhandledExceptionEventArgs.ExceptionObject.ToString());

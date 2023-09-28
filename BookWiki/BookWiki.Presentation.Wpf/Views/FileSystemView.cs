@@ -9,6 +9,75 @@ using BookWiki.Presentation.Wpf.Models;
 
 namespace BookWiki.Presentation.Wpf.Views
 {
+    public class TagsEditBox : TextBox
+    {
+        public TagsEditBox()
+        {
+            
+        }
+    }
+
+    public class ArticleNodeView : StackPanel
+    {
+        private IFileSystemNode _node;
+        private StackPanel _childItems;
+        private int _offset = 20;
+
+        public ArticleNodeView(IFileSystemNode node)
+        {
+            _node = node;
+            Orientation = Orientation.Vertical;
+
+            var itemGrid = new Grid();
+            itemGrid.ColumnDefinitions.Add(new ColumnDefinition()
+            {
+                Width = GridLength.Auto
+            });
+            itemGrid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            var itemStack = new StackPanel();
+            Grid.SetColumn(itemStack, 0);
+            itemStack.VerticalAlignment = VerticalAlignment.Center;
+            itemStack.Orientation = Orientation.Horizontal;
+            itemStack.Margin = new Thickness(_offset, 0, 0, 0);
+
+            var fileNodeName = new TextBlock();
+            fileNodeName.MouseUp += FileNodeNameOnMouseUp;
+            fileNodeName.Height = 30;
+            fileNodeName.Margin = new Thickness(10, 10, 0, 0);
+            fileNodeName.FontFamily = new FontFamily("Times New Roman");
+            fileNodeName.FontSize = 16;
+            fileNodeName.Text = node.Path.Name.PlainText;
+            fileNodeName.TextAlignment = TextAlignment.Center;
+
+            itemStack.Children.Add(fileNodeName);
+
+            var buttons = new StackPanel();
+            Grid.SetColumn(buttons, 1);
+            buttons.VerticalAlignment = VerticalAlignment.Center;
+            buttons.Orientation = Orientation.Horizontal;
+            buttons.HorizontalAlignment = HorizontalAlignment.Right;
+            buttons.Margin = new Thickness(_offset, 0, 0, 0);
+
+            Children.Add(itemGrid);
+
+            itemGrid.Children.Add(itemStack);
+            itemGrid.Children.Add(buttons);
+
+            _childItems = new StackPanel();
+            _childItems.Margin = new Thickness(_offset * 2, 0, 0, 0);
+            _childItems.Orientation = Orientation.Vertical;
+            Children.Add(_childItems);
+        }
+
+        private void FileNodeNameOnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            BookShelf.Instance.OpenArticle(_node.Path.RelativePath(BookShelf.Instance.RootPath));
+
+            BookShelf.Instance.AllArticlesWindow?.Close();
+        }
+    }
+
     public class FileSystemView : StackPanel
     {
         private IFileSystemNode _node;
@@ -40,6 +109,11 @@ namespace BookWiki.Presentation.Wpf.Views
             expandButton.Height = 30;
             expandButton.Click += ExpandButtonOnClick;
             expandButton.Background = Brushes.White;
+
+            if (node.IsArticlesFolder())
+            {
+                expandButton.Visibility = Visibility.Hidden;
+            }
 
             Grid.SetColumn(expandButton, 1);
 
@@ -144,6 +218,13 @@ namespace BookWiki.Presentation.Wpf.Views
 
         private void FileNodeNameOnMouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (_node.IsArticlesFolder())
+            {
+                BookShelf.Instance.OpenArticlesSearch();
+
+                return;
+            }
+
             if (_node.IsContentFolder == false)
             {
                 var contentWindow = new NewContentWindow();
@@ -175,11 +256,21 @@ namespace BookWiki.Presentation.Wpf.Views
             }
         }
 
-        private void Expand()
+        public void Expand()
         {
-            foreach (var fileSystemNode in _node.InnerNodes)
+            if (_node.IsArticlesFolder())
             {
-                _childItems.Children.Add(new FileSystemView(fileSystemNode));
+                foreach (var fileSystemNode in _node.InnerNodes)
+                {
+                    _childItems.Children.Add(new ArticleNodeView(fileSystemNode));
+                }
+            }
+            else
+            {
+                foreach (var fileSystemNode in _node.InnerNodes)
+                {
+                    _childItems.Children.Add(new FileSystemView(fileSystemNode));
+                }
             }
 
             _expandButtonText.Text = "-";

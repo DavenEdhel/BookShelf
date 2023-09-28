@@ -1,10 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Subjects;
 using System.Windows.Documents;
+using BookWiki.Core;
 using BookWiki.Core.Files.FileSystemModels;
+using BookWiki.Core.Files.PathModels;
 
 namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
 {
+    
+
+    
+
     public class SearchByFileEngine
     {
         private bool _isCacheReady = false;
@@ -15,7 +24,7 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
         {
             if (query.Length > 2)
             {
-                ParseLeafsIfNotParsed();
+                EnsureLeafsParsed();
 
                 var searchResults = new List<KeyValuePair<IFileSystemNode, int>>();
 
@@ -50,7 +59,7 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
             _isCacheReady = false;
         }
 
-        private void ParseLeafsIfNotParsed()
+        private void EnsureLeafsParsed()
         {
             if (_isCacheReady == false)
             {

@@ -44,6 +44,11 @@ namespace Keurig.IQ.Core.CrossCutting.Extensions
 
         public static string JoinStringsWithoutSkipping(this IEnumerable<string> self, string separator)
         {
+            if (self.Any() == false)
+            {
+                return string.Empty;
+            }
+
             var result = new StringBuilder();
 
             foreach (var str in self)

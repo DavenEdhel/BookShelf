@@ -21,16 +21,6 @@ namespace BookWiki.Core.Content
 
         public IText Content => _content ?? (_content = new StringText(ToSingleString()));
 
-        public FakeArticle(ArticleTitle title)
-        {
-            _source = new PathFake(title.PlainText);
-
-            Parts = new List<ArticlePart>()
-            {
-                ArticlePart.CreateHeader(title.TextWithLineBreak)
-            };
-        }
-
         public FakeArticle(List<ArticlePart> parts)
         {
             _fetched = true;

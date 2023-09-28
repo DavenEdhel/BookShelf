@@ -11,7 +11,7 @@ namespace BookWiki.Core.Fb2Models
         public Fb2File(IAbsolutePath path, string fileName, string content)
         {
             _content = content;
-            _pathToSave = new FilePath(path, $"{fileName}.fb2");
+            _pathToSave = new FilePath(path, new UniqueName(path, fileName, "fb2").Value);
         }
 
         public void Save()

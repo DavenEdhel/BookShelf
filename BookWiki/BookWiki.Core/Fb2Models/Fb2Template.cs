@@ -13,7 +13,7 @@ namespace BookWiki.Core.Fb2Models
 
         public List<IAbsolutePath> Chapters { get; set; } = new List<IAbsolutePath>();
 
-        public void CompileToFile(IAbsolutePath path)
+        public void CompileToFolder(IAbsolutePath path)
         {
             var content = new Fb2TemplateString()
             {
@@ -23,7 +23,7 @@ namespace BookWiki.Core.Fb2Models
                 Body = new Fb2BookContent(Chapters).Value
             }.Value;
 
-            new Fb2File(path, "test", content).Save();
+            new Fb2File(path, Title, content).Save();
         }
     }
 }

@@ -31,6 +31,15 @@
             };
         }
 
+        public PointDouble2D Offset()
+        {
+            return new PointDouble2D()
+            {
+                X = X,
+                Y = Y
+            };
+        }
+
         public FrameDouble Scale(double scaleFactor)
         {
             var nWidth = Width * scaleFactor;
@@ -75,6 +84,11 @@
             cloned.X += d;
 
             return cloned;
+        }
+
+        public override string ToString()
+        {
+            return $"[{X};{Y};{Width};{Height}]";
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Documents;
 using BookWiki.Core;
+using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 
 namespace BookWiki.Presentation.Wpf.Models
 {
@@ -24,7 +25,7 @@ namespace BookWiki.Presentation.Wpf.Models
 
             var result = new List<IInline>();
 
-            foreach (var pInline in p.Inlines)
+            foreach (var pInline in p.Inlines.Enumerate())
             {
                 result.Add(new InlineFromRichTextBoxInline(pInline));
             }

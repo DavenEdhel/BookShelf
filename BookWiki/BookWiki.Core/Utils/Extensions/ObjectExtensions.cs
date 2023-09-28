@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 
 namespace Keurig.IQ.Core.CrossCutting.Extensions
 {
@@ -17,10 +18,11 @@ namespace Keurig.IQ.Core.CrossCutting.Extensions
             }
         }
 
-        public static T As<T>(this object self)
-            where T : class
+        public static T As<T>(this T view, out T result)
         {
-            return self as T;
+            result = view;
+
+            return view;
         }
 
         public static bool IsNull(this object self)
@@ -36,6 +38,20 @@ namespace Keurig.IQ.Core.CrossCutting.Extensions
         public static bool IsNot<T>(this object self)
         {
             return !(self is T);
+        }
+
+        public static T Make<T>(this T item, Action<T> action)
+        {
+            action(item);
+
+            return item;
+        }
+
+        public static T InScopeOf<T>(this T self, CompositeDisposable scope) where T : IDisposable
+        {
+            scope.Add(self);
+
+            return self;
         }
     }
 }

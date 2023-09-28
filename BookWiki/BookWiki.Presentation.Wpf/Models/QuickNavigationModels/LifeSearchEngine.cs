@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using BookWiki.Core.Articles;
 using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
@@ -187,6 +189,143 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
 
                 current = current.NextBlock.CastTo<Paragraph>();
             }
+        }
+    }
+
+    public class NavigateToArticleEngine
+    {
+        private readonly SpecialItemsHighlightEngine _specialItemsHighlighter;
+
+        public NavigateToArticleEngine(RichTextBox rtb,
+            IHighlightCollection highlightCollection,
+            ScrollViewer scroll)
+        {
+            _specialItemsHighlighter = new SpecialItemsHighlightEngine(rtb, highlightCollection, BookShelf.Instance.Articles, scroll,
+                specialItem =>
+                {
+                    BookShelf.Instance.OpenArticleOrSearch(specialItem);
+                });
+        }
+
+        public bool IsApplicable(ISubstring selectedSubstring)
+        {
+            return _specialItemsHighlighter.IsApplicable(selectedSubstring);
+        }
+
+        public void Navigate(ISubstring substring)
+        {
+            _specialItemsHighlighter.Navigate(substring);
+        }
+    }
+
+    public class SpecialItemsHighlightEngine
+    {
+        private FlowDocument _document;
+        private RichTextBox _rtb;
+        private readonly IHighlightCollection _highlightCollection;
+        private readonly ArticlesLibrary _articles;
+
+        private List<string> SpecialItems
+        {
+            get
+            {
+                return _articles.Search("*").SelectMany(x => x.Article.NameVariations).Select(x => x.ToLowerInvariant()).ToList();
+            }
+        }
+
+        private readonly ScrollViewer _scroll;
+        private readonly Action<string> _onSpecialItemClick;
+        private bool highlighted;
+
+        public SpecialItemsHighlightEngine(
+            RichTextBox rtb,
+            IHighlightCollection highlightCollection,
+            ArticlesLibrary articles,
+            ScrollViewer scroll,
+            Action<string> onSpecialItemClick)
+        {
+            _document = rtb.Document;
+            _rtb = rtb;
+            _highlightCollection = highlightCollection;
+            _articles = articles;
+            _scroll = scroll;
+            _onSpecialItemClick = onSpecialItemClick;
+
+            _rtb.PreviewKeyDown += RtbOnPreviewKeyDown;
+            _rtb.PreviewKeyUp += RtbOnPreviewKeyUp;
+        }
+
+        private void RtbOnPreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (highlighted)
+            {
+                _highlightCollection.ClearHighlighting();
+                highlighted = false;
+            }
+        }
+
+        private void RtbOnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Shift) &&
+                e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control))
+            {
+                HighlightAll();
+                highlighted = true;
+            }
+            
+        }
+
+        private void HighlightAll()
+        {
+            _highlightCollection.ClearHighlighting();
+
+            foreach (var p in GetAllVisibleParagraphs())
+            {
+                var words = new PunctuationSeparatedEnumeration(_document, p).ToArray();
+
+                foreach (var substring in words)
+                {
+                    if (SpecialItems.Contains(substring.Text.ToLowerInvariant()))
+                    {
+                        _highlightCollection.Highlight(substring, false,
+                            text =>
+                            {
+                                _highlightCollection.ClearHighlighting();
+
+                                _onSpecialItemClick(text);
+                            });
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<Paragraph> GetAllVisibleParagraphs()
+        {
+            var first = _rtb.GetPositionFromPoint(new Point(0, _scroll.VerticalOffset), true).Paragraph;
+            var last = _rtb.GetPositionFromPoint(new Point(0, _scroll.VerticalOffset + _scroll.ActualHeight), true).Paragraph;
+            var current = first;
+
+            yield return current;
+
+            while (current != last)
+            {
+                current = current.NextBlock?.CastTo<Paragraph>();
+
+                if (current != null)
+                {
+                    yield return current;
+                }
+            }
+        }
+
+        public bool IsApplicable(ISubstring selectedSubstring)
+        {
+            return SpecialItems.Contains(selectedSubstring.Text.ToLowerInvariant());
+        }
+
+        public void Navigate(ISubstring substring)
+        {
+            _onSpecialItemClick(substring.Text);
         }
     }
 }

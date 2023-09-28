@@ -49,6 +49,24 @@ namespace BookWiki.Presentation.Wpf.Models
             wnd.Scroll.ScrollToVerticalOffset(ScrollOffset);
         }
 
+        public void ApplyTo(ArticleWindow wnd)
+        {
+            wnd.Top = Position.Y;
+            wnd.Left = Position.X;
+
+            if (WasMinimized)
+            {
+                wnd.WindowState = WindowState.Minimized;
+            }
+
+            if (WasMaximized)
+            {
+                wnd.WindowState = WindowState.Maximized;
+            }
+
+            wnd.Scroll.ScrollToVerticalOffset(ScrollOffset);
+        }
+
         public ScreensStateDto ToDto()
         {
             return new ScreensStateDto()

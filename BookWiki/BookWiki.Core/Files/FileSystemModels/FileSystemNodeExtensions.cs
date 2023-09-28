@@ -37,5 +37,10 @@ namespace BookWiki.Core.Files.FileSystemModels
 
             return leafPaths.Any(x => openTabPaths.Any(y => y.EqualsTo(x)));
         }
+
+        public static bool IsArticlesFolder(this IFileSystemNode node)
+        {
+            return node.Path.Name.PlainText == "Статьи";
+        }
     }
 }

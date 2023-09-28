@@ -19,10 +19,10 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
 
         public IEnumerator<ISubstring> GetEnumerator()
         {
-            var i = new PunctuationSeparatedEnumerationV2(_p.Inlines.Select(x => new OffsetText()
+            var i = new PunctuationSeparatedEnumerationV2(_p.Inlines.Enumerate().ToArray().Select(x => new OffsetText()
             {
                 Offset = _document.ContentStart.GetOffsetToPosition(x.ContentStart),
-                Text = FlowDocumentExtensions.GetText(x)
+                Text = x.GetText()
             })).ToArray();
 
             return i.ToList().GetEnumerator();
@@ -31,6 +31,21 @@ namespace BookWiki.Presentation.Wpf.Models.SpellCheckModels
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+    }
+
+    public static class RichTextBoxExtensions
+    {
+        public static IEnumerable<Inline> Enumerate(this InlineCollection inlines)
+        {
+            var f = inlines.FirstInline;
+
+            while (f != null)
+            {
+                yield return f;
+
+                f = f.NextInline;
+            }
         }
     }
 }

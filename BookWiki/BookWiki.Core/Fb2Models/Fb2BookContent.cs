@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.Utils.TextModels;
@@ -14,6 +15,8 @@ namespace BookWiki.Core.Fb2Models
             _chapters = chapters;
         }
 
-        public string Value => string.Join("\n", _chapters.Select(x => new Fb2Chapter(x).Value));
+        public Func<IAbsolutePath, IString> Chapter { get; set; } = x => new Fb2Chapter(x);
+
+        public string Value => string.Join("\n", _chapters.Select(x => Chapter(x).Value));
     }
 }
