@@ -6,5 +6,7 @@
         {
             Captured.OnNext(true);
         }
+
+        public bool IsExclusive => false;
     }
 }

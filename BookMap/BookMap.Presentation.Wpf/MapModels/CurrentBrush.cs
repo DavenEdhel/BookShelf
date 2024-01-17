@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive.Subjects;
+using BookMap.Presentation.Apple.Services;
 using BookMap.Presentation.Wpf.Core;
 
 namespace BookMap.Presentation.Wpf.InteractionModels
@@ -77,6 +78,18 @@ namespace BookMap.Presentation.Wpf.InteractionModels
         {
             SizeInPixels = brush.SizeInPixels;
             Color = brush.Color;
+        }
+
+        public int SizeInPixels { get; }
+        public IBgraColor Color { get; }
+    }
+
+    public class BrushFromConfig : IBrush
+    {
+        public BrushFromConfig(BrushInfo info)
+        {
+            SizeInPixels = (int)info.Size;
+            Color = new BgraColorFromHex(info.Color);
         }
 
         public int SizeInPixels { get; }

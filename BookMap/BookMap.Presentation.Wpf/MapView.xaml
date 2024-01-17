@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="BookMap.Presentation.Wpf.MapView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BookMap.Presentation.Wpf"
+             mc:Ignorable="d"
+             ClipToBounds="True"
+             Height="1000" Width="1500">
+    <Grid>
+        <Canvas Name="Container">
+        </Canvas>
+        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom" FontFamily="Times New Roman" FontSize="16" Background="#66FFFFFF" Name="Info" Padding="8">Info</TextBlock>
+    </Grid>
+</UserControl>

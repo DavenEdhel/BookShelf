@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using BookMap.Core.Models;
 using BookMap.Presentation.Apple.Models;
@@ -10,6 +13,15 @@ using BookMap.Presentation.Wpf.Models;
 
 namespace BookMap.Presentation.Wpf.MapModels
 {
+    public class TextAsTexture
+    {
+        public Size Size { get; set; }
+
+        public uint[] Buffer { get; set; }
+
+        public double FontSize { get; set; }
+    }
+
     public class MapPart : Image, IMapPart
     {
         private readonly MapReference _reference;
@@ -66,7 +78,17 @@ namespace BookMap.Presentation.Wpf.MapModels
             return false;
         }
 
-        public void Draw(Point p3, IBrush brush)
+        public double GetScaleFactorW()
+        {
+            return w / Width;
+        }
+
+        public double GetScaleFactorH()
+        {
+            return h / Height;
+        }
+
+        public DrawingResult Draw(Point p3, IBrush brush)
         {
             var p4 = new Point()
             {
@@ -76,21 +98,87 @@ namespace BookMap.Presentation.Wpf.MapModels
 
             var writable = (WriteableBitmap)Source;
 
-            writable.Draw(p4, brush, new Circle());
+            return writable.Draw(p4, brush, new Circle());
+        }
 
-            //var area = new Int32Rect((int)p4.X, (int)p4.Y, 10, 10);
-            //var part = new uint[10 * 10];
-            //var stride = 10 * 4;
-            //var offset = 0;
+        public TextAsTexture RenderTextIntoMemory(string text, Color color, TextBox tb)
+        {
+            var fontSize = tb.FontSize * GetScaleFactorH();
+            var height = tb.ActualHeight * GetScaleFactorH();
+            var width = tb.ActualWidth * GetScaleFactorW();
 
-            //writable.CopyPixels(area, part, stride, offset);
+            if (Double.IsNaN(fontSize) || Double.IsNaN(height) || Double.IsNaN(width))
+            {
+                return null;
+            }
 
-            //for (var j = 0; j < 100; j++)
-            //{
-            //    part[j] = 4292381556;
-            //}
+            var writeableBm1 = (WriteableBitmap)Source;
 
-            //writable.WritePixels(area, part, stride, offset);
+            var tt = new FormattedText(
+                text,
+                CultureInfo.CurrentCulture,
+                FlowDirection.LeftToRight,
+                new Typeface(tb.FontFamily, tb.FontStyle, tb.FontWeight, tb.FontStretch),
+                fontSize,
+                new SolidColorBrush(color),
+                new NumberSubstitution(),
+                TextFormattingMode.Ideal,
+                VisualTreeHelper.GetDpi(this).PixelsPerDip
+            );
+
+            DrawingVisual drawingVisual = new DrawingVisual();
+            DrawingContext drawingContext = drawingVisual.RenderOpen();
+            drawingContext.DrawText(tt, new Point(0, 0));
+            drawingContext.Close();
+
+            RenderTargetBitmap bmp = new RenderTargetBitmap((int)width, (int)height, 96, 96, PixelFormats.Pbgra32);
+            bmp.Render(drawingVisual);
+
+            var area = new Int32Rect(0, 0, bmp.PixelWidth, bmp.PixelHeight);
+            var part = new uint[bmp.PixelWidth * bmp.PixelHeight];
+            var stride = bmp.PixelWidth * 4;
+
+            bmp.CopyPixels(area, part, stride, 0);
+
+            return new TextAsTexture()
+            {
+                Size = new Size(bmp.PixelWidth, bmp.PixelHeight),
+                Buffer = part,
+                FontSize = fontSize
+            };
+        }
+
+        public DrawingResult Draw(Point p3, TextAsTexture texture)
+        {
+            var p4 = new Point()
+            {
+                X = p3.X * w / Width,
+                Y = p3.Y * h / Height - texture.FontSize / 2
+            };
+
+            var writeableBm1 = (WriteableBitmap)Source;
+
+            return writeableBm1.Draw(p4, texture.Size, texture.Buffer);
+        }
+
+        public void Draw(Point p3, string text, Color color, TextBox tb)
+        {
+            var texture = RenderTextIntoMemory(text, color, tb);
+
+            if (texture == null)
+            {
+                return;
+            }
+
+            var p4 = new Point()
+            {
+                X = p3.X * w / Width,
+                Y = p3.Y * h / Height - texture.FontSize/ 2
+            };
+
+            var writeableBm1 = (WriteableBitmap)Source;
+
+            writeableBm1.Draw(p4, texture.Size, texture.Buffer);
         }
 
         public void Save()

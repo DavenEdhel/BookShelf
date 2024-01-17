@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using BookMap.Presentation.Apple.Models;
 using BookMap.Presentation.Wpf.InteractionModels;
+using BookMap.Presentation.Wpf.MapModels.DrawModels;
 
 namespace BookMap.Presentation.Wpf.MapModels
 {
@@ -14,8 +15,9 @@ namespace BookMap.Presentation.Wpf.MapModels
         {
         }
 
-        public void Draw(Point p3, IBrush brush)
+        public DrawingResult Draw(Point p3, IBrush brush)
         {
+            return new DrawingResult();
         }
     }
 }

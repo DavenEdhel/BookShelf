@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using BookMap.Presentation.Apple.Models;
+using BookMap.Presentation.Apple.Services;
 using BookMap.Presentation.Wpf.Core;
 using BookMap.Presentation.Wpf.InteractionModels;
 using static System.String;
@@ -29,14 +30,16 @@ namespace BookMap.Presentation.Wpf.Views
         private readonly LabeledCursor _cursor;
         private readonly Scaling _scaling = new();
         private readonly Inverted _invertedScaling;
+        private readonly MapProviderSynchronous _mapProvider;
 
         public Palette()
         {
             InitializeComponent();
         }
 
-        public Palette(CurrentBrush brush, CoordinateSystem coordinateSystem)
+        public Palette(CurrentBrush brush, CoordinateSystem coordinateSystem, MapProviderSynchronous mapProvider)
         {
+            _mapProvider = mapProvider;
             _brush = brush;
             _cursorBrush = new CurrentBrush();
             _cursorBrush.Set(_brush.Snapshot());
@@ -47,10 +50,13 @@ namespace BookMap.Presentation.Wpf.Views
                 brushView.BrushTitle = string.Empty;
             }
 
+            mapProvider.MapChanged 
+                += MapChanged;
+
             B2Erase.Brush = new EraserBrush();
             B2Erase.BrushTitle = "Erase";
 
-            _cursor = new LabeledCursor(CursorContainer, brush, coordinateSystem);
+            _cursor = new LabeledCursor(CursorContainer, _cursorBrush, coordinateSystem);
             _cursor.Title = Empty;
 
             IsVisibleChanged += OnIsVisibleChanged;
@@ -100,6 +106,23 @@ namespace BookMap.Presentation.Wpf.Views
             }
         }
 
+        private void MapChanged(string obj)
+        {
+            int index = 0;
+            foreach (var brushView in Brushes.Skip(2))
+            {
+                var savedBrush = _mapProvider.Settings.Brushes.ElementAtOrDefault(index);
+
+                if (savedBrush == null)
+                {
+                    break;
+                }
+
+                brushView.Brush = new BrushFromConfig(savedBrush);
+                index++;
+            }
+        }
+
         private IEnumerable<BrushView> Brushes
         {
             get
@@ -129,6 +152,16 @@ namespace BookMap.Presentation.Wpf.Views
             else
             {
                 _brush.Set(_cursorBrush.Snapshot());
+
+                var info = Brushes.Skip(2).Select(
+                    x => new BrushInfo()
+                    {
+                        Size = x.Brush.SizeInPixels,
+                        Color = new HexColorFromBgra(x.Brush.Color).Hex
+                    }
+                ).ToArray();
+
+                _mapProvider.ChangeSettings(x => x.Brushes = info);
             }
         }
 

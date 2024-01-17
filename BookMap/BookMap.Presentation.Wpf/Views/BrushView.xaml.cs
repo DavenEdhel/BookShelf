@@ -59,6 +59,17 @@ namespace BookMap.Presentation.Wpf.Views
                 _brush = value;
 
                 Size.Text = _brush.SizeInPixels.ToString();
+                Size.Foreground = new SolidColorBrush(
+                    new MediaColorFromArgbColor(
+                        new RgbWithAlpha(
+                            new ComplementaryArgb(
+                                new RgbaColorFromBgra(_brush.Color.Bgra)
+                            ),
+                            255
+                        )
+
+                    ).Color
+                );
                 Color.Background = new SolidColorBrush(
                     new MediaColorFromArgbColor(
                         new RgbaColorFromBgra(_brush.Color.Bgra)

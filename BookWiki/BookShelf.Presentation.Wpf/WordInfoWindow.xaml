@@ -1,0 +1,47 @@
+﻿<Window x:Class="BookWiki.Presentation.Wpf.WordInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
+        mc:Ignorable="d"
+        WindowState="Maximized"
+        Title="Детали слова" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Слово:</TextBlock>
+                    <TextBlock Name="WordTextBox"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Добавить в словарь:</TextBlock>
+                    <TextBlock Name="AdjustedWordToLearn"></TextBlock>
+                </StackPanel>
+                <Button FontSize="16" Background="White" Click="Learn">Выучить</Button>
+                <StackPanel Orientation="Vertical" Name="ParsedWords">
+                    
+                </StackPanel>
+                <Button FontSize="16" Background="White" Click="LearnAll">Выучить все</Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBox Name="AdjustedNameForSearch" KeyDown="AdjustedNameForSearch_OnKeyDown" TextChanged="AdjustedNameForSearch_OnTextChanged" MinWidth="100"></TextBox>
+                <Button FontFamily="Times New Roman" Click="ButtonBase_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Искать везде</Button>
+                <Button FontFamily="Times New Roman" Click="OpenSearch_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Открыть поиск</Button>
+                <Button FontFamily="Times New Roman" Click="OpenGoogle_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Google</Button>
+            </StackPanel>
+            <WebBrowser Name="WordFromWiki" Grid.Row="1"></WebBrowser>
+        </Grid>
+        
+    </Grid>
+</Window>

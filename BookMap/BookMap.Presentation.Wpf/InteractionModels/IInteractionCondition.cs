@@ -16,6 +16,8 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
             public virtual bool CanUseSimultaneously => _origin.CanUseSimultaneously;
 
+            public virtual bool IsExclusive => _origin.IsExclusive;
+
             public virtual BehaviorSubject<bool> Captured => _origin.Captured;
 
             public virtual void OnKeyDown(KeyEventArgs keyEventArgs)

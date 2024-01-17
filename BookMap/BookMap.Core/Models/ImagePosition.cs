@@ -23,6 +23,26 @@
             };
         }
 
+        public ImagePosition Left()
+        {
+            return new ImagePosition()
+            {
+                Level = Level,
+                X = X - 1,
+                Y = Y
+            };
+        }
+
+        public ImagePosition Up()
+        {
+            return new ImagePosition()
+            {
+                Level = Level,
+                X = X,
+                Y = Y - 1
+            };
+        }
+
         public ImagePosition Down()
         {
             return new ImagePosition()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,7 +14,7 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
         public WithPredefinedCursor(
             Canvas container,
-            LabeledCursor cursor,
+            IEnumerable<ICursor> cursors,
             Cursor style,
             IExecutableInteraction interaction) : base(interaction)
         {
@@ -26,7 +27,10 @@ namespace BookMap.Presentation.Wpf.InteractionModels
                 {
                     if (_interaction.IsActive.Value)
                     {
-                        cursor.Hide();
+                        foreach (var cursor in cursors)
+                        {
+                            cursor.Hide();
+                        }
                         _container.Cursor = _style;
                     }
                 }

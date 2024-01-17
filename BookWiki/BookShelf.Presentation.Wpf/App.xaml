@@ -1,0 +1,12 @@
+﻿<Application x:Class="BookWiki.Presentation.Wpf.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
+             StartupUri="FileSystemWindow.xaml">
+    <Application.Resources>
+        <Style TargetType="{x:Type Paragraph}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="TextIndent" Value="39"/>
+        </Style>
+    </Application.Resources>
+</Application>

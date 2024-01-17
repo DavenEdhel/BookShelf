@@ -83,6 +83,11 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
         private void ProcessCapture(Action<ICapturable> action)
         {
+            if (_interactions.Any(x => x.Capture.IsExclusive && x.Capture.Captured.Value))
+            {
+                return;
+            }
+
             foreach (var interaction in _interactions)
             {
                 action(interaction.Capture);
@@ -91,6 +96,11 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
         private void UpdateActivationStatus()
         {
+            if (_interactions.Any(x => x.Capture.IsExclusive && x.Capture.Captured.Value))
+            {
+                return;
+            }
+
             var captureFound = false;
 
             foreach (var interaction in _interactions)
@@ -120,6 +130,16 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
         private void ProcessOnlyCaptured(Action<IExecutableInteraction> action)
         {
+            if (_interactions.Any(x => x.Capture.IsExclusive && x.Capture.Captured.Value))
+            {
+                foreach (var capturableInteraction in _interactions.Where(x => x.Capture.IsExclusive && x.Capture.Captured.Value))
+                {
+                    action(capturableInteraction.Behavior);
+                }
+
+                return;
+            }
+
             foreach (var interaction in _interactions)
             {
                 if (interaction.Capture.Captured.Value)

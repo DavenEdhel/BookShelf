@@ -1,0 +1,60 @@
+﻿<Window x:Class="BookWiki.Presentation.Wpf.CompiledNovelWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
+        mc:Ignorable="d" ResizeMode="CanResizeWithGrip"
+        PreviewKeyDown="NovelWindow_OnPreviewKeyDown"
+        SizeChanged="OnResize"
+        Title="Novel" Height="890" Width="734" MinHeight="890" MinWidth="734">
+    <Grid Name="Root">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition MinWidth="718"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Background="Transparent" MouseDown="ChangeOpenedTabsVisibility"></StackPanel>
+        <StackPanel Grid.Column="3" Background="Transparent" MouseDown="ChangeRightSideVisibility"></StackPanel>
+        <Grid Grid.Column="1" Height="851" Width="718">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="30"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel MouseDown="TopBarMouseDown" Background="Transparent" Grid.Row="0"></StackPanel>
+            <Grid Name="TopBarGrid" Grid.Row="0" Background="Transparent" Visibility="Hidden" MouseDown="TopBarMouseDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition MinWidth="100" Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="4" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Padding="5, 0, 5, 0" Name="ScrollSwitchButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="ScrollSwitch">Scroll Visible</Button>
+                </StackPanel>
+            </Grid>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" Name="Scroll">
+                <Grid>
+                    <local:EnhancedRichTextBox Background="White" IsReadOnly="True" Padding="0 0 0 50" x:Name="Rtb" HorizontalContentAlignment="Right" KeyDown="Rtb_OnKeyDown" KeyUp="LearnNewWordFromCursor">
+                    </local:EnhancedRichTextBox>
+                </Grid>
+            </ScrollViewer>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="100"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition MinWidth="100" Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox BorderThickness="0" PreviewKeyDown="OnSearchPreviewKeyDown" KeyDown="OnSearchKeyDown" Name="SearchBox" FontFamily="Times New Roman" FontSize="12" TextAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2"></TextBox>
+                <local:PagesView Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Background="White" FontFamily="Times New Roman" FontSize="18" x:Name="Pages" Margin="0, 0, 10, 0"></local:PagesView>
+            </Grid>
+        </Grid>
+    </Grid>
+    
+</Window>

@@ -11,9 +11,9 @@ namespace BookMap.Presentation.Wpf.InteractionModels
             IExecutableInteraction interaction) : base(interaction)
         {
             interaction.IsActive.Skip(1).Subscribe(
-                isCaptured =>
+                isActive =>
                 {
-                    if (isCaptured)
+                    if (isActive)
                     {
                         label.Set($"{featureName} is turned ON");
                     }

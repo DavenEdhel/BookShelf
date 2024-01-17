@@ -10,7 +10,14 @@ using BookMap.Presentation.Wpf.MapModels.DrawModels;
 
 namespace BookMap.Presentation.Wpf.InteractionModels
 {
-    public class LabeledCursor
+    public interface ICursor
+    {
+        void Show();
+
+        void Hide();
+    }
+
+    public class LabeledCursor : ICursor
     {
         private readonly CurrentBrush _currentBrush;
         private readonly CoordinateSystem _coordinates;
@@ -18,9 +25,11 @@ namespace BookMap.Presentation.Wpf.InteractionModels
         private readonly TextBlock _label;
         private Point _lastPosition = new Point(0, 0);
         private IBrush _lastBrush = new EraserBrush();
+        private readonly IDrawingShape _shape;
 
-        public LabeledCursor(Canvas container, CurrentBrush currentBrush, CoordinateSystem coordinates)
+        public LabeledCursor(Canvas container, CurrentBrush currentBrush, CoordinateSystem coordinates, IDrawingShape shape = null)
         {
+            _shape = shape ?? new Circle();
             _currentBrush = currentBrush;
             _coordinates = coordinates;
             var cursorSize = 1536 * 10 / 2560;
@@ -67,11 +76,13 @@ namespace BookMap.Presentation.Wpf.InteractionModels
             }
         }
 
+        public double CursorSize => (1536 * (_currentBrush.SizeInPixels) / 2560 * _coordinates.ScaleBetweenLevels);
+
         public void PositionAndResizeAndColorize(Point current)
         {
             _lastPosition = current;
 
-            var cursorSize = (1536 * (_currentBrush.SizeInPixels) / 2560 * _coordinates.ScaleBetweenLevels);
+            var cursorSize = CursorSize;
 
             _cursor.Width = cursorSize;
             _cursor.Height = cursorSize;
@@ -98,7 +109,7 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
             var cursorSource = new WriteableBitmap(cursorSizeInPixels, cursorSizeInPixels, 96, 96, PixelFormats.Bgra32, null);
 
-            cursorSource.Draw(new Point(0, 0), _currentBrush, new Circle());
+            cursorSource.Draw(new Point(0, 0), _currentBrush, _shape);
 
             _cursor.Source = cursorSource;
         }
