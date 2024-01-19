@@ -41,7 +41,7 @@ namespace BookWiki.Presentation.Wpf
 
         public CompiledNovelWindow(IFileSystemNode compiledBook)
         {
-            BookShelf.Instance.PageConfig.Changed += PageConfigOnChanged;
+            BooksApplication.Instance.PageConfig.Changed += PageConfigOnChanged;
 
             var statistics = new NodeFolder(compiledBook.Path);
 
@@ -72,7 +72,7 @@ namespace BookWiki.Presentation.Wpf
             Pages.Scroll = Scroll;
             Pages.Start();
 
-            PageConfigOnChanged(BookShelf.Instance.PageConfig.Current);
+            PageConfigOnChanged(BooksApplication.Instance.PageConfig.Current);
 
             _openedTabs.Start();
             _rightSide.Start();
@@ -93,7 +93,7 @@ namespace BookWiki.Presentation.Wpf
         {
             base.OnClosed(e);
 
-            BookShelf.Instance.ReportWindowClosed();
+            BooksApplication.Instance.ReportWindowClosed();
         }
 
         private void PageConfigOnChanged(UserInterfaceSettings obj)
@@ -108,7 +108,7 @@ namespace BookWiki.Presentation.Wpf
         {
             foreach (var relativePath in novelPaths)
             {
-                var novel = new Novel(relativePath, BookShelf.Instance.RootPath);
+                var novel = new Novel(relativePath, BooksApplication.Instance.RootPath);
 
                 new DocumentFlowContentFromTextAndFormat(novel).LoadInto(Rtb);
             }
@@ -126,9 +126,9 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
-                    if (new SpellCheckV2(BookShelf.Instance.Dictionary, BookShelf.Instance.Articles).IsCorrect(selectedSubstring.Text) == false)
+                    if (new SpellCheckV2(BooksApplication.Instance.Dictionary, BooksApplication.Instance.Articles).IsCorrect(selectedSubstring.Text) == false)
                     {
-                        BookShelf.Instance.Dictionary.Learn(selectedSubstring.Text);
+                        BooksApplication.Instance.Dictionary.Learn(selectedSubstring.Text);
                     }
                 }
             }
@@ -138,7 +138,7 @@ namespace BookWiki.Presentation.Wpf
         {
             if (e.Key == Key.W && e.KeyboardDevice.Modifiers == ModifierKeys.Control)
             {
-                BookShelf.Instance.ShowFileSystem();
+                BooksApplication.Instance.ShowFileSystem();
 
                 e.Handled = true;
             }
@@ -233,7 +233,7 @@ namespace BookWiki.Presentation.Wpf
         {
             ToggleScroll();
 
-            BookShelf.Instance.PageConfig.SetScrollVisibility(ScrollSwitchButton.Content.ToString() == "Scroll Visible");
+            BooksApplication.Instance.PageConfig.SetScrollVisibility(ScrollSwitchButton.Content.ToString() == "Scroll Visible");
         }
 
         private void ToggleScroll()
@@ -263,7 +263,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void NovelWindow_OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            if (BooksApplication.Instance.KeyProcessor.Handle(e.KeyboardDevice))
             {
                 e.Handled = true;
                 return;
@@ -278,7 +278,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            if (BooksApplication.Instance.KeyProcessor.Handle(e.KeyboardDevice))
             {
                 e.Handled = true;
                 return;

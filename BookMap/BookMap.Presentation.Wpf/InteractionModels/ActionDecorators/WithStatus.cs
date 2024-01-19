@@ -10,7 +10,7 @@ namespace BookMap.Presentation.Wpf.InteractionModels
             ILabel label,
             IExecutableInteraction interaction) : base(interaction)
         {
-            interaction.IsActive.Skip(1).Subscribe(
+            interaction.IsActive.Skip(1).DistinctUntilChanged().Subscribe(
                 isActive =>
                 {
                     if (isActive)

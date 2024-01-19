@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,22 +10,54 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 {
     public class Interactions
     {
-        private readonly ICapturableInteraction[] _interactions;
+        private readonly Window _window;
+        private readonly Canvas _container;
+        private ICapturableInteraction[] _interactions;
+        private readonly List<UIElement> _allowed = new();
+        private bool _isActive;
 
         public Interactions(
             Window window,
-            Canvas container,
-            params ICapturableInteraction[] interactions)
+            Canvas container)
+        {
+            _window = window;
+            _container = container;
+        }
+
+        public void Add(params ICapturableInteraction[] interactions)
         {
             _interactions = interactions;
 
-            window.KeyDown += OnKeyDown;
-            window.KeyUp += OnKeyUp;
+            _window.KeyDown += OnKeyDown;
+            _window.KeyUp += OnKeyUp;
 
-            container.MouseWheel += OnMouseWheel;
-            container.MouseDown += OnMouseDown;
-            container.MouseUp += OnMouseUp;
-            container.MouseMove += OnMouseMove;
+            _container.MouseEnter += Activate;
+            _container.MouseLeave += Deactivate;
+
+            _container.MouseWheel += OnMouseWheel;
+            _container.MouseDown += OnMouseDown;
+            _container.MouseUp += OnMouseUp;
+            _container.MouseMove += OnMouseMove;
+        }
+
+        public void RegisterForInteraction(UIElement element)
+        {
+            _allowed.Add(element);
+        }
+
+        public void UnregisterFromInteraction(UIElement element)
+        {
+            _allowed.Remove(element);
+        }
+
+        private void Activate(object sender, MouseEventArgs e)
+        {
+            _isActive = true;
+        }
+
+        private void Deactivate(object sender, MouseEventArgs e)
+        {
+            _isActive = false;
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -34,6 +67,14 @@ namespace BookMap.Presentation.Wpf.InteractionModels
             UpdateActivationStatus();
 
             ProcessOnlyCaptured(x => x.OnKeyDown(e));
+
+            if (_isActive)
+            {
+                if (_allowed.Any(x => x.IsFocused) == false)
+                {
+                    e.Handled = true;
+                }
+            }
         }
 
         private void OnKeyUp(object sender, KeyEventArgs e)
@@ -43,6 +84,14 @@ namespace BookMap.Presentation.Wpf.InteractionModels
             UpdateActivationStatus();
 
             ProcessOnlyCaptured(x => x.OnKeyUp(e));
+
+            if (_isActive)
+            {
+                if (_allowed.Any(x => x.IsFocused) == false)
+                {
+                    e.Handled = true;
+                }
+            }
         }
 
         private void OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -79,10 +128,20 @@ namespace BookMap.Presentation.Wpf.InteractionModels
             UpdateActivationStatus();
 
             ProcessOnlyCaptured(x => x.OnMouseWheel(e));
+
+            if (_isActive)
+            {
+                e.Handled = true;
+            }
         }
 
         private void ProcessCapture(Action<ICapturable> action)
         {
+            if (_isActive == false)
+            {
+                return;
+            }
+
             if (_interactions.Any(x => x.Capture.IsExclusive && x.Capture.Captured.Value))
             {
                 return;
@@ -96,6 +155,11 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
         private void UpdateActivationStatus()
         {
+            if (_isActive == false)
+            {
+                return;
+            }
+
             if (_interactions.Any(x => x.Capture.IsExclusive && x.Capture.Captured.Value))
             {
                 return;
@@ -130,6 +194,11 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
         private void ProcessOnlyCaptured(Action<IExecutableInteraction> action)
         {
+            if (_isActive == false)
+            {
+                return;
+            }
+
             if (_interactions.Any(x => x.Capture.IsExclusive && x.Capture.Captured.Value))
             {
                 foreach (var capturableInteraction in _interactions.Where(x => x.Capture.IsExclusive && x.Capture.Captured.Value))

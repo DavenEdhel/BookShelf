@@ -102,6 +102,18 @@ namespace BookMap.Presentation.Wpf.InteractionModels
         public IBgraColor Color { get; } = new BgraColorFromArgb(0, 0, 0, 0);
     }
 
+    public class MutableBrush : IBrush
+    {
+        public MutableBrush(IBrush brush)
+        {
+            SizeInPixels = brush.SizeInPixels;
+            Color = brush.Color;
+        }
+
+        public int SizeInPixels { get; set; }
+        public IBgraColor Color { get; set; }
+    }
+
     public class DefaultBrush : IBrush
     {
         public int SizeInPixels { get; } = 10;

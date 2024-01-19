@@ -252,3 +252,6 @@ Keurig.IQ.Test.Droid/Resources/Resource.Designer.cs
 
 # Jetbrains Rider files
 .idea/
+BookWiki/Binaries/BookShelf/
+BookWiki/Binaries/BookShelfClear/
+BookWiki/Binaries/BookShelfStage/

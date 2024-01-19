@@ -30,7 +30,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
             Title = node.Path.Name.PlainText;
 
-            _novels = _node.InnerNodes.Where(x => x.IsContentFolder).Select(x => BookShelf.Instance.Read(x.Path.RelativePath(BookShelf.Instance.RootPath))).ToArray();
+            _novels = _node.InnerNodes.Where(x => x.IsContentFolder).Select(x => BooksApplication.Instance.Read(x.Path.RelativePath(BooksApplication.Instance.RootPath))).ToArray();
 
             var statistics = new NodeFolder(node.Path);
 
@@ -121,7 +121,7 @@ namespace BookWiki.Presentation.Wpf.Views
             {
                 Annotation = BookAnnotation.Text,
                 Title = BookTitle.Text,
-                Chapters = CheckedNovels().ToArray().Select(x => x.Source.AbsolutePath(BookShelf.Instance.RootPath)).ToList()
+                Chapters = CheckedNovels().ToArray().Select(x => x.Source.AbsolutePath(BooksApplication.Instance.RootPath)).ToList()
             }.CompileToFolder(_node.Path);
 
             MessageBox.Show("Книга скомпилирована", "Результат");

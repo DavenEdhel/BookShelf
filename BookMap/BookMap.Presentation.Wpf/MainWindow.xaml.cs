@@ -28,15 +28,6 @@ using Path = System.IO.Path;
 
 namespace BookMap.Presentation.Wpf
 {
-    //todo:
-    // useful api to draw on image
-    // pointer for moving, pointer for drawing, pointer for labels, they should be different
-    //  pointer should correspond drawing area
-    //  should have borders of colors of drawing or semitransparent
-    //  ground or label on it with the color of drawing
-    // palette, try to use wpf one, but not necessary
-    // ability to create and fast configure new map
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using BookShelf.Presentation.Wpf;
 using BookWiki.Core.Files.PathModels;
 
 namespace BookWiki.Presentation.Wpf.Models
@@ -47,6 +48,22 @@ namespace BookWiki.Presentation.Wpf.Models
             }
 
             wnd.Scroll.ScrollToVerticalOffset(ScrollOffset);
+        }
+
+        public void ApplyTo(MapWindow wnd)
+        {
+            wnd.Top = Position.Y;
+            wnd.Left = Position.X;
+
+            if (WasMinimized)
+            {
+                wnd.WindowState = WindowState.Minimized;
+            }
+
+            if (WasMaximized)
+            {
+                wnd.WindowState = WindowState.Maximized;
+            }
         }
 
         public void ApplyTo(ArticleWindow wnd)

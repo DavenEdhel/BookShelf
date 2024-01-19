@@ -30,7 +30,7 @@ namespace BookWiki.Presentation.Wpf.Views
                 else
                 {
                     return Visibility.Visible;
-                    BookShelf.Instance.RightSideBarConfig.Change(x => x.IsVisible = true);
+                    BooksApplication.Instance.RightSideBarConfig.Change(x => x.IsVisible = true);
                 }
             }
             else
@@ -68,9 +68,9 @@ namespace BookWiki.Presentation.Wpf.Views
         {
             Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
 
-            BookShelf.Instance.RightSideBarConfig.Changed += RightSideBarConfigOnChanged;
+            BooksApplication.Instance.RightSideBarConfig.Changed += RightSideBarConfigOnChanged;
 
-            RightSideBarConfigOnChanged(BookShelf.Instance.RightSideBarConfig.Current);
+            RightSideBarConfigOnChanged(BooksApplication.Instance.RightSideBarConfig.Current);
 
             ConsoleView.Start();
         }
@@ -86,7 +86,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
         public void Stop()
         {
-            BookShelf.Instance.RightSideBarConfig.Changed -= RightSideBarConfigOnChanged;
+            BooksApplication.Instance.RightSideBarConfig.Changed -= RightSideBarConfigOnChanged;
 
             ConsoleView.Stop();
         }
@@ -97,7 +97,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
             Visibility = visibility;
 
-            BookShelf.Instance.RightSideBarConfig.Change(x => x.IsVisible = visibility == Visibility.Visible);
+            BooksApplication.Instance.RightSideBarConfig.Change(x => x.IsVisible = visibility == Visibility.Visible);
         }
 
         private void ToggleDetailsView(object sender, RoutedEventArgs routedEventArgs)
@@ -118,7 +118,7 @@ namespace BookWiki.Presentation.Wpf.Views
                 ConsoleView.SetHeight(450);
             }
 
-            BookShelf.Instance.RightSideBarConfig.Change(x => x.IsCommentBarVisible = DetailsView.Visibility == Visibility.Visible);
+            BooksApplication.Instance.RightSideBarConfig.Change(x => x.IsCommentBarVisible = DetailsView.Visibility == Visibility.Visible);
         }
 
         private void ToggleConsoleView(object sender, RoutedEventArgs e)
@@ -139,7 +139,7 @@ namespace BookWiki.Presentation.Wpf.Views
                 DetailsView.Height = 450;
             }
 
-            BookShelf.Instance.RightSideBarConfig.Change(x => x.IsConsoleBarHidden = ConsoleView.Visibility == Visibility.Visible);
+            BooksApplication.Instance.RightSideBarConfig.Change(x => x.IsConsoleBarHidden = ConsoleView.Visibility == Visibility.Visible);
         }
     }
 }

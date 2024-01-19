@@ -200,10 +200,10 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
             IHighlightCollection highlightCollection,
             ScrollViewer scroll)
         {
-            _specialItemsHighlighter = new SpecialItemsHighlightEngine(rtb, highlightCollection, BookShelf.Instance.Articles, scroll,
+            _specialItemsHighlighter = new SpecialItemsHighlightEngine(rtb, highlightCollection, BooksApplication.Instance.Articles, scroll,
                 specialItem =>
                 {
-                    BookShelf.Instance.OpenArticleOrSearch(specialItem);
+                    BooksApplication.Instance.OpenArticleOrSearch(specialItem);
                 });
         }
 

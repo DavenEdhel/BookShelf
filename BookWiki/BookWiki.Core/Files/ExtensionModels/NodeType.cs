@@ -5,6 +5,7 @@
         Unknown,
         Directory,
         Novel,
-        Article
+        Article,
+        Map
     }
 }

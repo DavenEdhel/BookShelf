@@ -15,7 +15,7 @@ namespace BookWiki.Presentation.Wpf.Views
         {
             Content = _rtb = new EnhancedRichTextBox();
 
-            Height = 450 - BookShelf.Instance.Config.HeightModification;
+            Height = 450 - BooksApplication.Instance.Config.HeightModification;
             _rtb.Background = new SolidColorBrush(Colors.White);
         }
 

@@ -23,15 +23,15 @@ namespace BookWiki.Presentation.Wpf
         {
             Novel.TextChanged += Content_OnTextChanged;
             Scroll.ScrollChanged += Scroll_OnScrollChanged;
-            BookShelf.Instance.PageConfig.Changed += PageConfigOnChanged;
-            PageConfigOnChanged(BookShelf.Instance.PageConfig.Current);
+            BooksApplication.Instance.PageConfig.Changed += PageConfigOnChanged;
+            PageConfigOnChanged(BooksApplication.Instance.PageConfig.Current);
         }
 
         public void Stop()
         {
             Novel.TextChanged -= Content_OnTextChanged;
             Scroll.ScrollChanged -= Scroll_OnScrollChanged;
-            BookShelf.Instance.PageConfig.Changed -= PageConfigOnChanged;
+            BooksApplication.Instance.PageConfig.Changed -= PageConfigOnChanged;
         }
 
         private void Content_OnTextChanged(object sender, TextChangedEventArgs e)
@@ -78,7 +78,7 @@ namespace BookWiki.Presentation.Wpf
 
             UpdatePaging();
 
-            BookShelf.Instance.PageConfig.SetDisplayMode(_pageMode);
+            BooksApplication.Instance.PageConfig.SetDisplayMode(_pageMode);
         }
 
         private void UpdatePaging()

@@ -69,12 +69,12 @@ namespace BookWiki.Presentation.Wpf.Views
         {
             Open();
 
-            BookShelf.Instance.AllArticlesWindow?.Close();
+            BooksApplication.Instance.AllArticlesWindow?.Close();
         }
 
         public void Open()
         {
-            BookShelf.Instance.OpenArticle(_searchResult?.Article.Source);
+            BooksApplication.Instance.OpenArticle(_searchResult?.Article.Source);
         }
     }
 }

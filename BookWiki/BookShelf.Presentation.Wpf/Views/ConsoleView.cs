@@ -46,7 +46,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
             _input.KeyDown += InputOnKeyDown;
 
-            _consoleLogSource.LogSource = BookShelf.Instance.PageConfig.Current.IsLoggingOn ? (ILogSource)new ConsoleLogSource(_output, Dispatcher.CurrentDispatcher) : new EmptyLogSource();
+            _consoleLogSource.LogSource = BooksApplication.Instance.PageConfig.Current.IsLoggingOn ? (ILogSource)new ConsoleLogSource(_output, Dispatcher.CurrentDispatcher) : new EmptyLogSource();
         }
 
         public void Start()
@@ -83,7 +83,7 @@ namespace BookWiki.Presentation.Wpf.Views
                     if (queryString.Arguments == "показывать")
                     {
                         _consoleLogSource.LogSource = new ConsoleLogSource(_output, Dispatcher.CurrentDispatcher);
-                        BookShelf.Instance.PageConfig.Current.IsLoggingOn = true;
+                        BooksApplication.Instance.PageConfig.Current.IsLoggingOn = true;
                         _input.Text = string.Empty;
                         return;
                     }
@@ -91,7 +91,7 @@ namespace BookWiki.Presentation.Wpf.Views
                     if (queryString.Arguments == "скрыть")
                     {
                         _consoleLogSource.LogSource = new EmptyLogSource();
-                        BookShelf.Instance.PageConfig.Current.IsLoggingOn = false;
+                        BooksApplication.Instance.PageConfig.Current.IsLoggingOn = false;
                         _input.Text = string.Empty;
                         return;
                     }
@@ -151,10 +151,10 @@ namespace BookWiki.Presentation.Wpf.Views
         {
             get
             {
-                var namesPath = BookShelf.Instance.Root.GetAllLeafs()
+                var namesPath = BooksApplication.Instance.Root.GetAllLeafs()
                     .First(x => x.Path.FullPath.Contains(@"Материалы\Имена"));
 
-                var novel = BookShelf.Instance.Read(namesPath.Path.RelativePath(BookShelf.Instance.RootPath));
+                var novel = BooksApplication.Instance.Read(namesPath.Path.RelativePath(BooksApplication.Instance.RootPath));
 
                 return novel;
             }

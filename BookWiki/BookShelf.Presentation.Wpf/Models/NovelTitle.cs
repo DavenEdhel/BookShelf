@@ -23,4 +23,14 @@ namespace BookWiki.Presentation.Wpf.Models
 
         public string PlainText { get; private set; }
     }
+
+    public class MapTitle
+    {
+        public MapTitle(IPath path)
+        {
+            PlainText = path.Name.PlainText + " << Карта";
+        }
+
+        public string PlainText { get; private set; }
+    }
 }

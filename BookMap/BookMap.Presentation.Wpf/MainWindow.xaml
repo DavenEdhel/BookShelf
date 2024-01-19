@@ -7,7 +7,69 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="1000" Width="1500">
     <Grid>
-        <local:MapView x:Name="Map" Width="800" Height="600" Background="Red"></local:MapView>
+        <ScrollViewer>
+            <StackPanel>
+                <local:MapView x:Name="Map" Width="800" Height="600" Background="Red"></local:MapView>
+                <TextBox></TextBox>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+                <TextBlock>A</TextBlock>
+            </StackPanel>
+        </ScrollViewer>
+        
     </Grid>
     
 </Window>

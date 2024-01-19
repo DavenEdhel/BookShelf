@@ -41,7 +41,7 @@ namespace BookWiki.Presentation.Wpf
         {
             InitializeComponent();
 
-            FileSystemScroll.Content = new FileSystemView(BookShelf.Instance.Root);
+            FileSystemScroll.Content = new FileSystemView(BooksApplication.Instance.Root);
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -52,12 +52,12 @@ namespace BookWiki.Presentation.Wpf
 
                 if (_doNotStoreSession == false)
                 {
-                    BookShelf.Instance.StoreSession();
+                    BooksApplication.Instance.StoreSession();
 
                     _doNotStoreSession = true;
                 }
 
-                BookShelf.Instance.CloseAllAsync();
+                BooksApplication.Instance.CloseAllAsync();
 
                 e.Cancel = true;
                 base.OnClosing(e);
@@ -75,7 +75,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            if (BooksApplication.Instance.KeyProcessor.Handle(e.KeyboardDevice))
             {
                 return;
             }

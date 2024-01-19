@@ -48,14 +48,6 @@ namespace BookMap.Presentation.Wpf.MapModels
             _image = _mapProvider.GetImageAsync(position, _isLabel);
 
             Source = _source = _image.ToWpfImage().Value;
-
-            //Source = _source = new WriteableBitmap(
-            //    new BitmapImage(
-            //        new Uri(
-            //            new MapPartFilePath(_info, position, _isLabel).FullPath
-            //        )
-            //    )
-            //);
         }
 
         public bool Contains(Point point)
@@ -90,6 +82,11 @@ namespace BookMap.Presentation.Wpf.MapModels
 
         public DrawingResult Draw(Point p3, IBrush brush)
         {
+            if (Position.Level == 0 && (Position.X != 0 || Position.Y != 0))
+            {
+                return new DrawingResult();
+            }
+
             var p4 = new Point()
             {
                 X = p3.X * w / Width - brush.SizeInPixels/2,
@@ -111,8 +108,6 @@ namespace BookMap.Presentation.Wpf.MapModels
             {
                 return null;
             }
-
-            var writeableBm1 = (WriteableBitmap)Source;
 
             var tt = new FormattedText(
                 text,
@@ -150,6 +145,11 @@ namespace BookMap.Presentation.Wpf.MapModels
 
         public DrawingResult Draw(Point p3, TextAsTexture texture)
         {
+            if (Position.Level == 0 && (Position.X != 0 || Position.Y != 0))
+            {
+                return new DrawingResult();
+            }
+
             var p4 = new Point()
             {
                 X = p3.X * w / Width,
@@ -159,26 +159,6 @@ namespace BookMap.Presentation.Wpf.MapModels
             var writeableBm1 = (WriteableBitmap)Source;
 
             return writeableBm1.Draw(p4, texture.Size, texture.Buffer);
-        }
-
-        public void Draw(Point p3, string text, Color color, TextBox tb)
-        {
-            var texture = RenderTextIntoMemory(text, color, tb);
-
-            if (texture == null)
-            {
-                return;
-            }
-
-            var p4 = new Point()
-            {
-                X = p3.X * w / Width,
-                Y = p3.Y * h / Height - texture.FontSize/ 2
-            };
-
-            var writeableBm1 = (WriteableBitmap)Source;
-
-            writeableBm1.Draw(p4, texture.Size, texture.Buffer);
         }
 
         public void Save()

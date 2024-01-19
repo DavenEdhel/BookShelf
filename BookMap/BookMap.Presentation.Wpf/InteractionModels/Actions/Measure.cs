@@ -35,11 +35,15 @@ namespace BookMap.Presentation.Wpf.InteractionModels
                 }
 
                 _label.Set($"Measure on {_measure.Meters}m");
+
+                _measureMode = true;
             }
 
             if (!e.IsDown && e.Key == Key.LeftShift)
             {
                 _label.Set($"Measure off {_measure.Meters}m");
+
+                _measureMode = false;
             }
         }
 

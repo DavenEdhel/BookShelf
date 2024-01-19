@@ -17,7 +17,7 @@ namespace BookWiki.Presentation.Wpf.Models
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(BookShelf.Instance.Config.BackupPath))
+                if (string.IsNullOrWhiteSpace(BooksApplication.Instance.Config.BackupPath))
                 {
                     Result = "Не установлен директорий для бэкапа.";
 
@@ -42,7 +42,7 @@ namespace BookWiki.Presentation.Wpf.Models
         {
             var dirNameForBackup = _node.Path.Name.PlainText;
 
-            var expectedDirectory = Path.Combine(BookShelf.Instance.Config.BackupPath, dirNameForBackup);
+            var expectedDirectory = Path.Combine(BooksApplication.Instance.Config.BackupPath, dirNameForBackup);
 
             var n = 0;
 

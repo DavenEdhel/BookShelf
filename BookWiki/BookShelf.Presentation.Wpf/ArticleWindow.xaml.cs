@@ -54,8 +54,8 @@ namespace BookWiki.Presentation.Wpf
         public ArticleWindow(Article article)
         {
             _article = article;
-            _metadata = new ArticleMetadata(article.Source.AbsolutePath(BookShelf.Instance.RootPath));
-            BookShelf.Instance.PageConfig.Changed += PageConfigOnChanged;
+            _metadata = new ArticleMetadata(article.Source.AbsolutePath(BooksApplication.Instance.RootPath));
+            BooksApplication.Instance.PageConfig.Changed += PageConfigOnChanged;
 
             _novel = article.Source;
             InitializeComponent();
@@ -77,7 +77,7 @@ namespace BookWiki.Presentation.Wpf
 
             LoadContent(article);
 
-            PageConfigOnChanged(BookShelf.Instance.PageConfig.Current);
+            PageConfigOnChanged(BooksApplication.Instance.PageConfig.Current);
 
             _token = new CancellationTokenSource();
             RunAutosave();
@@ -91,7 +91,7 @@ namespace BookWiki.Presentation.Wpf
                 Tags,
                 InlineSuggestions,
                 new ArticlesScope(
-                    new ArticlesScopeOnFileSystem(BookShelf.Instance.CurrentNovel, BookShelf.Instance.RootPath)
+                    new ArticlesScopeOnFileSystem(BooksApplication.Instance.CurrentNovel, BooksApplication.Instance.RootPath)
                 )
             );
 
@@ -101,9 +101,9 @@ namespace BookWiki.Presentation.Wpf
 
         private void ApplyHeightAdjustments()
         {
-            this.MinHeight -= BookShelf.Instance.Config.HeightModification;
-            Height -= BookShelf.Instance.Config.HeightModification;
-            NovelContentGrid.Height -= BookShelf.Instance.Config.HeightModification;
+            this.MinHeight -= BooksApplication.Instance.Config.HeightModification;
+            Height -= BooksApplication.Instance.Config.HeightModification;
+            NovelContentGrid.Height -= BooksApplication.Instance.Config.HeightModification;
         }
 
         private async Task RunAutosave()
@@ -122,7 +122,7 @@ namespace BookWiki.Presentation.Wpf
                 {
                     if (Save())
                     {
-                        BookShelf.Instance.PageConfig.Changed -= PageConfigOnChanged;
+                        BooksApplication.Instance.PageConfig.Changed -= PageConfigOnChanged;
 
                         _canBeClosed = true;
 
@@ -176,7 +176,7 @@ namespace BookWiki.Presentation.Wpf
         {
             base.OnClosed(e);
 
-            BookShelf.Instance.ReportWindowClosed();
+            BooksApplication.Instance.ReportWindowClosed();
         }
 
         private void PageConfigOnChanged(UserInterfaceSettings obj)
@@ -204,7 +204,7 @@ namespace BookWiki.Presentation.Wpf
 
                     var formattedContent = new FormattedContentFromDocumentFlow(c);
 
-                    var file = new ContentFolder(_novel.AbsolutePath(BookShelf.Instance.RootPath));
+                    var file = new ContentFolder(_novel.AbsolutePath(BooksApplication.Instance.RootPath));
                     file.Save(formattedContent);
 
                     _article.Refresh();
@@ -216,7 +216,7 @@ namespace BookWiki.Presentation.Wpf
                         Tags = Tags.Text.Split(' ')
                     });
 
-                    BookShelf.Instance.Articles.Save(_article);
+                    BooksApplication.Instance.Articles.Save(_article);
                 }
 
                 return true;
@@ -289,9 +289,9 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
-                    if (new SpellCheckV2(BookShelf.Instance.Dictionary, BookShelf.Instance.Articles).IsCorrect(selectedSubstring.Text) == false)
+                    if (new SpellCheckV2(BooksApplication.Instance.Dictionary, BooksApplication.Instance.Articles).IsCorrect(selectedSubstring.Text) == false)
                     {
-                        BookShelf.Instance.Dictionary.Learn(selectedSubstring.Text);
+                        BooksApplication.Instance.Dictionary.Learn(selectedSubstring.Text);
                     }
                 }
             }
@@ -301,7 +301,7 @@ namespace BookWiki.Presentation.Wpf
         {
             if (e.Key == Key.W && e.KeyboardDevice.Modifiers == ModifierKeys.Control)
             {
-                BookShelf.Instance.ShowFileSystem();
+                BooksApplication.Instance.ShowFileSystem();
 
                 e.Handled = true;
             }
@@ -405,7 +405,7 @@ namespace BookWiki.Presentation.Wpf
         {
             ToggleScroll();
 
-            BookShelf.Instance.PageConfig.SetScrollVisibility(ScrollSwitchButton.Content.ToString() == "Scroll Visible");
+            BooksApplication.Instance.PageConfig.SetScrollVisibility(ScrollSwitchButton.Content.ToString() == "Scroll Visible");
         }
 
         private void ToggleScroll()
@@ -442,7 +442,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void NovelWindow_OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            if (BooksApplication.Instance.KeyProcessor.Handle(e.KeyboardDevice))
             {
                 e.Handled = true;
                 return;
@@ -462,7 +462,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void OnSearchPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            if (BooksApplication.Instance.KeyProcessor.Handle(e.KeyboardDevice))
             {
                 e.Handled = true;
                 return;
@@ -585,7 +585,7 @@ namespace BookWiki.Presentation.Wpf
                     File.Copy(
                         files[0],
                         Path.Combine(
-                            _article.Source.AbsolutePath(BookShelf.Instance.RootPath).FullPath,
+                            _article.Source.AbsolutePath(BooksApplication.Instance.RootPath).FullPath,
                             Guid.NewGuid().ToString().Replace("-", "") + ext
                         )
                     );
@@ -597,7 +597,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void ReloadImages()
         {
-            var images = Directory.GetFiles(_article.Source.AbsolutePath(BookShelf.Instance.RootPath).FullPath).Where(
+            var images = Directory.GetFiles(_article.Source.AbsolutePath(BooksApplication.Instance.RootPath).FullPath).Where(
                 x =>
                 {
                     var ext = Path.GetExtension(x);
@@ -643,7 +643,7 @@ namespace BookWiki.Presentation.Wpf
         {
             if (e.ChangedButton == MouseButton.Left)
             {
-                _article.Source.AbsolutePath(BookShelf.Instance.RootPath).OpenInExplorer();
+                _article.Source.AbsolutePath(BooksApplication.Instance.RootPath).OpenInExplorer();
             }
 
             if (e.ChangedButton == MouseButton.Right)
@@ -658,7 +658,7 @@ namespace BookWiki.Presentation.Wpf
                     ImagesContainer.Visibility = Visibility.Collapsed;
                 }
 
-                File.Move(imagePath, Path.Combine(BookShelf.Instance.Trashcan.Root.FullPath, filename));
+                File.Move(imagePath, Path.Combine(BooksApplication.Instance.Trashcan.Root.FullPath, filename));
             }
         }
 

@@ -3,81 +3,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using BookShelf.Presentation.Wpf.Views;
 using BookWiki.Core.Files.FileSystemModels;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Presentation.Wpf.Models;
 
 namespace BookWiki.Presentation.Wpf.Views
 {
-    public class TagsEditBox : TextBox
-    {
-        public TagsEditBox()
-        {
-            
-        }
-    }
-
-    public class ArticleNodeView : StackPanel
-    {
-        private IFileSystemNode _node;
-        private StackPanel _childItems;
-        private int _offset = 20;
-
-        public ArticleNodeView(IFileSystemNode node)
-        {
-            _node = node;
-            Orientation = Orientation.Vertical;
-
-            var itemGrid = new Grid();
-            itemGrid.ColumnDefinitions.Add(new ColumnDefinition()
-            {
-                Width = GridLength.Auto
-            });
-            itemGrid.ColumnDefinitions.Add(new ColumnDefinition());
-
-            var itemStack = new StackPanel();
-            Grid.SetColumn(itemStack, 0);
-            itemStack.VerticalAlignment = VerticalAlignment.Center;
-            itemStack.Orientation = Orientation.Horizontal;
-            itemStack.Margin = new Thickness(_offset, 0, 0, 0);
-
-            var fileNodeName = new TextBlock();
-            fileNodeName.MouseUp += FileNodeNameOnMouseUp;
-            fileNodeName.Height = 30;
-            fileNodeName.Margin = new Thickness(10, 10, 0, 0);
-            fileNodeName.FontFamily = new FontFamily("Times New Roman");
-            fileNodeName.FontSize = 16;
-            fileNodeName.Text = node.Path.Name.PlainText;
-            fileNodeName.TextAlignment = TextAlignment.Center;
-
-            itemStack.Children.Add(fileNodeName);
-
-            var buttons = new StackPanel();
-            Grid.SetColumn(buttons, 1);
-            buttons.VerticalAlignment = VerticalAlignment.Center;
-            buttons.Orientation = Orientation.Horizontal;
-            buttons.HorizontalAlignment = HorizontalAlignment.Right;
-            buttons.Margin = new Thickness(_offset, 0, 0, 0);
-
-            Children.Add(itemGrid);
-
-            itemGrid.Children.Add(itemStack);
-            itemGrid.Children.Add(buttons);
-
-            _childItems = new StackPanel();
-            _childItems.Margin = new Thickness(_offset * 2, 0, 0, 0);
-            _childItems.Orientation = Orientation.Vertical;
-            Children.Add(_childItems);
-        }
-
-        private void FileNodeNameOnMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            BookShelf.Instance.OpenArticle(_node.Path.RelativePath(BookShelf.Instance.RootPath));
-
-            BookShelf.Instance.AllArticlesWindow?.Close();
-        }
-    }
-
     public class FileSystemView : StackPanel
     {
         private IFileSystemNode _node;
@@ -145,7 +77,7 @@ namespace BookWiki.Presentation.Wpf.Views
             buttons.Margin = new Thickness(_offset, 0, 0, 0);
 
             var statisticsButton = new Button();
-            statisticsButton.Visibility = node.IsContentFolder ? Visibility.Hidden : Visibility.Visible;
+            statisticsButton.Visibility = node.IsContentFolder || node.IsMapsFolder() || node.IsArticlesFolder() ? Visibility.Hidden : Visibility.Visible;
             statisticsButton.Width = 90;
             statisticsButton.Height = 30;
             statisticsButton.Margin = new Thickness(10, 0, 0, 0);
@@ -156,7 +88,7 @@ namespace BookWiki.Presentation.Wpf.Views
             buttons.Children.Add(statisticsButton);
 
             var compilation = new Button();
-            compilation.Visibility = node.IsContentFolder ? Visibility.Hidden : Visibility.Visible;
+            compilation.Visibility = node.IsContentFolder || node.IsMapsFolder() || node.IsArticlesFolder() ? Visibility.Hidden : Visibility.Visible;
             compilation.Width = 90;
             compilation.Height = 30;
             compilation.Margin = new Thickness(10, 0, 0, 0);
@@ -189,7 +121,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
             if (_node.IsContentFolder == false)
             {
-                var shouldBeOpened = BookShelf.Instance.Session.OpenedContentTabs.Any(x => x.NovelPathToLoad.Contains(_node.Path.RelativePath(BookShelf.Instance.RootPath)));
+                var shouldBeOpened = BooksApplication.Instance.Session.OpenedContentTabs.Any(x => x.NovelPathToLoad.Contains(_node.Path.RelativePath(BooksApplication.Instance.RootPath)));
 
                 if (shouldBeOpened)
                 {
@@ -218,9 +150,25 @@ namespace BookWiki.Presentation.Wpf.Views
 
         private void FileNodeNameOnMouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (_node.IsMapsFolder())
+            {
+                var contentWindow = new NewMapWindow();
+                if (contentWindow.ShowDialog() == true)
+                {
+                    BooksApplication.Instance.Save(_node, new FileName(contentWindow.ContentName.Text), contentWindow.Extension);
+
+                    _node = new FileSystemNode(_node.Path.FullPath);
+
+                    Collapse();
+                    Expand();
+                }
+
+                return;
+            }
+
             if (_node.IsArticlesFolder())
             {
-                BookShelf.Instance.OpenArticlesSearch();
+                BooksApplication.Instance.OpenArticlesSearch();
 
                 return;
             }
@@ -230,7 +178,7 @@ namespace BookWiki.Presentation.Wpf.Views
                 var contentWindow = new NewContentWindow();
                 if (contentWindow.ShowDialog() == true)
                 {
-                    BookShelf.Instance.Save(_node, new FileName(contentWindow.ContentName.Text), contentWindow.Extension);
+                    BooksApplication.Instance.Save(_node, new FileName(contentWindow.ContentName.Text), contentWindow.Extension);
 
                     _node = new FileSystemNode(_node.Path.FullPath);
 
@@ -240,7 +188,7 @@ namespace BookWiki.Presentation.Wpf.Views
             }
             else
             {
-                BookShelf.Instance.Open(_node.Path.RelativePath(BookShelf.Instance.RootPath));
+                BooksApplication.Instance.Open(_node.Path.RelativePath(BooksApplication.Instance.RootPath));
             }
         }
 
@@ -258,7 +206,14 @@ namespace BookWiki.Presentation.Wpf.Views
 
         public void Expand()
         {
-            if (_node.IsArticlesFolder())
+            if (_node.IsMapsFolder())
+            {
+                foreach (var fileSystemNode in _node.InnerNodes)
+                {
+                    _childItems.Children.Add(new MapNodeView(fileSystemNode));
+                }
+            }
+            else if (_node.IsArticlesFolder())
             {
                 foreach (var fileSystemNode in _node.InnerNodes)
                 {

@@ -61,7 +61,7 @@ namespace BookWiki.Presentation.Wpf
                 GlobalScope,
                 BookScope,
                 ChapterScope,
-                new ArticlesScopeOnFileSystem(BookShelf.Instance.CurrentNovel, BookShelf.Instance.RootPath)
+                new ArticlesScopeOnFileSystem(BooksApplication.Instance.CurrentNovel, BooksApplication.Instance.RootPath)
             ).InScopeOf(_scope);
 
             foreach (var articlesScopeView in _articlesScopeBehavior.Views)
@@ -99,12 +99,12 @@ namespace BookWiki.Presentation.Wpf
 
         private void SetArticlesAsync()
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => ArticlesView.Set(BookShelf.Instance.Articles.Search(QueryBox.Text, _articlesScopeBehavior.Scope))));
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => ArticlesView.Set(BooksApplication.Instance.Articles.Search(QueryBox.Text, _articlesScopeBehavior.Scope))));
         }
 
         private void SetAllArticlesAsync()
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => ArticlesView.Set(BookShelf.Instance.Articles.Search("*", _articlesScopeBehavior.Scope))));
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => ArticlesView.Set(BooksApplication.Instance.Articles.Search("*", _articlesScopeBehavior.Scope))));
         }
 
         private void QueryBox_OnKeyDown(object sender, KeyEventArgs e)
@@ -117,8 +117,8 @@ namespace BookWiki.Presentation.Wpf
 
             if (e.Key == Key.Enter && e.KeyboardDevice.Modifiers.HasFlag(ModifierKeys.Control))
             {
-                var article = BookShelf.Instance.Articles.New();
-                BookShelf.Instance.OpenArticle(article.Source, fullscreen: true).InitWith(QueryBox.Text.CapitalizeFirstLetter(), _articlesScopeBehavior.Scope);
+                var article = BooksApplication.Instance.Articles.New();
+                BooksApplication.Instance.OpenArticle(article.Source, fullscreen: true).InitWith(QueryBox.Text.CapitalizeFirstLetter(), _articlesScopeBehavior.Scope);
                 Close();
                 return;
             }
@@ -127,8 +127,8 @@ namespace BookWiki.Presentation.Wpf
             {
                 if (ArticlesView.NothingFound)
                 {
-                    var article = BookShelf.Instance.Articles.New();
-                    BookShelf.Instance.OpenArticle(article.Source, fullscreen: true).InitWith(QueryBox.Text.CapitalizeFirstLetter(), _articlesScopeBehavior.Scope);
+                    var article = BooksApplication.Instance.Articles.New();
+                    BooksApplication.Instance.OpenArticle(article.Source, fullscreen: true).InitWith(QueryBox.Text.CapitalizeFirstLetter(), _articlesScopeBehavior.Scope);
                     Close();
                 }
                 else if (ArticlesView.NothingIsSelected)
@@ -164,7 +164,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void NewArticle(object sender, RoutedEventArgs e)
         {
-            BookShelf.Instance.OpenArticle(BookShelf.Instance.Articles.New().Source, fullscreen: true).InitWith(QueryBox.Text.CapitalizeFirstLetter(), _articlesScopeBehavior.Scope);
+            BooksApplication.Instance.OpenArticle(BooksApplication.Instance.Articles.New().Source, fullscreen: true).InitWith(QueryBox.Text.CapitalizeFirstLetter(), _articlesScopeBehavior.Scope);
 
             Close();
         }
@@ -173,7 +173,7 @@ namespace BookWiki.Presentation.Wpf
         {
             QueryBox.Text = search;
             SetArticlesAsync();
-            _tagsSearch.FillTags(BookShelf.Instance.Articles.Tags);
+            _tagsSearch.FillTags(BooksApplication.Instance.Articles.Tags);
         }
     }
 }

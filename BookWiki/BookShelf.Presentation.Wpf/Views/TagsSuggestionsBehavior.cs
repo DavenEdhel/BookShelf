@@ -23,9 +23,9 @@ namespace BookWiki.Presentation.Wpf.Views
         {
             Suggestions = suggestions;
 
-            _tagsSubscription = BookShelf.Instance.Articles.Tags.Subscribe(FillTags);
+            _tagsSubscription = BooksApplication.Instance.Articles.Tags.Subscribe(FillTags);
 
-            FillTags(BookShelf.Instance.Articles.Tags);
+            FillTags(BooksApplication.Instance.Articles.Tags);
         }
 
         public void FillTags(Tags tags)
@@ -65,11 +65,11 @@ namespace BookWiki.Presentation.Wpf.Views
             _scope.ScopeChanged.Subscribe(
                 _ =>
                 {
-                    FillTags(BookShelf.Instance.Articles.Tags);
+                    FillTags(BooksApplication.Instance.Articles.Tags);
                 }
             ).InScopeOf(_subscription);
 
-            BookShelf.Instance.Articles.Tags.Subscribe(FillTags).InScopeOf(_subscription);
+            BooksApplication.Instance.Articles.Tags.Subscribe(FillTags).InScopeOf(_subscription);
 
             QueryBox.TextChanged += QueryBox_OnTextChanged;
             QueryBox.SelectionChanged += QueryBoxOnSelectionChanged;
@@ -78,7 +78,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
         private void QueryBoxOnSelectionChanged(object sender, RoutedEventArgs e)
         {
-            FillTags(BookShelf.Instance.Articles.Tags);
+            FillTags(BooksApplication.Instance.Articles.Tags);
         }
 
         private void QueryBox_OnPreviewKeyDown(object sender, KeyEventArgs e)
@@ -162,7 +162,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
         private void QueryBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            FillTags(BookShelf.Instance.Articles.Tags);
+            FillTags(BooksApplication.Instance.Articles.Tags);
         }
 
         private string GetTagQuery()

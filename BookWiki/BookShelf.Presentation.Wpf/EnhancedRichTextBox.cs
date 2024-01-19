@@ -37,7 +37,7 @@ namespace BookWiki.Presentation.Wpf
 
                 if (selectedSubstring != null)
                 {
-                    BookShelf.Instance.OpenArticleOrSearch(selectedSubstring.Text);
+                    BooksApplication.Instance.OpenArticleOrSearch(selectedSubstring.Text);
                 }
             }
         }
@@ -204,7 +204,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (BookShelf.Instance.KeyProcessor.Handle(e.KeyboardDevice))
+            if (BooksApplication.Instance.KeyProcessor.Handle(e.KeyboardDevice))
             {
                 e.Handled = true;
                 return;

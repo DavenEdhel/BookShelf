@@ -79,5 +79,12 @@ namespace BookWiki.Core.Utils
                 }
             }
         }
+
+        public static T AddInto<T>(this T item, List<T> items)
+        {
+            items.Add(item);
+
+            return item;
+        }
     }
 }

@@ -245,7 +245,7 @@ namespace BookWiki.Presentation.Wpf
         {
             Title = "Learning...";
 
-            await BookShelf.Instance.Dictionary.Learn(AdjustedWordToLearn.Text);
+            await BooksApplication.Instance.Dictionary.Learn(AdjustedWordToLearn.Text);
 
             Close();
         }
@@ -268,7 +268,7 @@ namespace BookWiki.Presentation.Wpf
             {
                 foreach (TextBlock parsedWordsChild in ParsedWords.Children)
                 {
-                    await BookShelf.Instance.Dictionary.Learn(parsedWordsChild.Text);
+                    await BooksApplication.Instance.Dictionary.Learn(parsedWordsChild.Text);
                 }
             }
 

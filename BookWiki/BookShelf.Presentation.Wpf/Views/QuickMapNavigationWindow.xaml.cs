@@ -11,21 +11,21 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using BookWiki.Core.Files.FileSystemModels;
+using BookMap.Presentation.Wpf.Core;
 using BookWiki.Core.Files.PathModels;
+using BookWiki.Presentation.Wpf;
 using BookWiki.Presentation.Wpf.Models;
-using Keurig.IQ.Core.CrossCutting.Extensions;
 
-namespace BookWiki.Presentation.Wpf
+namespace BookShelf.Presentation.Wpf.Views
 {
     /// <summary>
-    /// Interaction logic for QuickNavigationWindow.xaml
+    /// Interaction logic for QuickMapNavigationWindow.xaml
     /// </summary>
-    public partial class QuickNavigationWindow : Window
+    public partial class QuickMapNavigationWindow : Window
     {
         private int _lineSelected = 0;
 
-        public QuickNavigationWindow()
+        public QuickMapNavigationWindow()
         {
             InitializeComponent();
 
@@ -61,14 +61,14 @@ namespace BookWiki.Presentation.Wpf
 
             var novelPath = Items.Children[_lineSelected - 1].CastTo<TextBlock>().Tag.CastTo<IAbsolutePath>();
 
-            BooksApplication.Instance.Open(novelPath.RelativePath(BooksApplication.Instance.RootPath));
+            BooksApplication.Instance.OpenMap(novelPath.RelativePath(BooksApplication.Instance.RootPath));
         }
 
         private void RefreshSuggestions()
         {
             Items.Children.Clear();
 
-            var allLeafs = BooksApplication.Instance.Search.Execute(SearchBar.Text);
+            var allLeafs = BooksApplication.Instance.SearchMap.Execute(SearchBar.Text);
 
             var i = 1;
             foreach (var fileSystemNode in allLeafs)
@@ -82,7 +82,7 @@ namespace BookWiki.Presentation.Wpf
         {
             return new TextBlock()
             {
-                Text = new NovelTitle(path).PlainText,
+                Text = new MapTitle(path).PlainText,
                 Tag = path,
                 FontFamily = new FontFamily("Times New Roman"),
                 FontSize = 12,
@@ -113,14 +113,14 @@ namespace BookWiki.Presentation.Wpf
                 {
                     itemsChild.Background = Brushes.White;
                 }
-                
+
                 i++;
             }
         }
 
         private void QuickNavigationWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
-            
+
         }
 
         private void SearchBar_OnPreviewKeyDown(object sender, KeyEventArgs e)

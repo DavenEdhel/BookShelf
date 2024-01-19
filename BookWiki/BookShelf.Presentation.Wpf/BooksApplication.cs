@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using BookShelf.Presentation.Wpf;
 using BookWiki.Core;
 using BookWiki.Core.Articles;
 using BookWiki.Core.Files.FileModels;
@@ -20,9 +21,9 @@ using BookWiki.Presentation.Wpf.Models.KeyProcessorModels;
 
 namespace BookWiki.Presentation.Wpf
 {
-    public class BookShelf
+    public class BooksApplication
     {
-        public static readonly BookShelf Instance = new BookShelf();
+        public static readonly BooksApplication Instance = new BooksApplication();
         private bool _sessionRestored;
 
         public IEnumerable<NovelWindow> OpenedNovels
@@ -48,6 +49,20 @@ namespace BookWiki.Presentation.Wpf
                     if (currentWindow is ArticleWindow articleWindow)
                     {
                         yield return articleWindow;
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<MapWindow> OpenedMaps
+        {
+            get
+            {
+                foreach (Window currentWindow in Application.Current.Windows)
+                {
+                    if (currentWindow is MapWindow mapWindow)
+                    {
+                        yield return mapWindow;
                     }
                 }
             }
@@ -85,9 +100,9 @@ namespace BookWiki.Presentation.Wpf
             }
         }
 
-        public BookShelf()
+        public BooksApplication()
         {
-            Config = JsonConvert.DeserializeObject<AppConfigDto>(File.ReadAllText("AppConfig.json"));
+            Config = new AppConfig().Data;
 
             RootPath = new RootPath(Config.Root);
 
@@ -105,6 +120,8 @@ namespace BookWiki.Presentation.Wpf
 
             Articles = new ArticlesLibrary(RootPath);
 
+            Maps = new MapsLibrary(RootPath);
+
             Trashcan = new Trashcan(RootPath);
         }
 
@@ -112,7 +129,11 @@ namespace BookWiki.Presentation.Wpf
 
         public SearchByFileEngine Search { get; } = new SearchByFileEngine();
 
+        public SearchMapEngine SearchMap { get; } = new SearchMapEngine();
+
         public ArticlesLibrary Articles { get; }
+
+        public MapsLibrary Maps { get; }
 
         public Trashcan Trashcan { get; }
 
@@ -175,7 +196,7 @@ namespace BookWiki.Presentation.Wpf
         {
             Novel novelItem;
 
-            novelItem = new Novel(novel, BookShelf.Instance.RootPath);
+            novelItem = new Novel(novel, BooksApplication.Instance.RootPath);
             return novelItem;
         }
 
@@ -229,6 +250,40 @@ namespace BookWiki.Presentation.Wpf
             else
             {
                 OpenArticlesSearch($"{query.Trim()}", focusedOnQuery: true);
+            }
+        }
+
+        public MapWindow OpenMap(IRelativePath map, bool fullscreen = true)
+        {
+            var mapView = OpenedMaps.FirstOrDefault(x => x.MapPath.EqualsTo(map));
+
+            if (mapView != null)
+            {
+                mapView.ActivateOrRestore(fullscreen);
+
+                return mapView;
+            }
+            else
+            {
+                var wnd = new MapWindow(map);
+
+                var state = Session.ScreenStates.FirstOrDefault(x => x.Novel.EqualsTo(map));
+
+                if (state != null)
+                {
+                    state.ApplyTo(wnd);
+                }
+
+                if (fullscreen)
+                {
+                    wnd.WindowState = WindowState.Maximized;
+                }
+
+                wnd.Show();
+
+                ItemsListChanged();
+
+                return wnd;
             }
         }
 
@@ -296,7 +351,7 @@ namespace BookWiki.Presentation.Wpf
 
                 try
                 {
-                    novelItem = new Novel(novel, BookShelf.Instance.RootPath);
+                    novelItem = new Novel(novel, BooksApplication.Instance.RootPath);
                     var novelLength = novelItem.Content.Length;
                 }
                 catch (Exception e)
@@ -329,6 +384,11 @@ namespace BookWiki.Presentation.Wpf
         public async void CloseAllAsync()
         {
             AllArticlesWindow?.Close();
+
+            foreach (var openedMap in OpenedMaps)
+            {
+                openedMap.Close();
+            }
 
             foreach (var openedArticles in OpenedArticles)
             {

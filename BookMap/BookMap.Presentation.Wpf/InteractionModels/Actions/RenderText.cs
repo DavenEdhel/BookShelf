@@ -13,12 +13,14 @@ namespace BookMap.Presentation.Wpf.InteractionModels
         private readonly IBrush _brush;
         private readonly Locked _renderTextInteractionLock;
         private readonly LabeledCursor _cursor;
+        private readonly Interactions _engine;
 
         public RenderText(Canvas canvas,
             MapLayer layer,
             IBrush brush,
             Locked renderTextInteractionLock,
-            LabeledCursor cursor
+            LabeledCursor cursor,
+            Interactions engine
         )
         {
             _canvas = canvas;
@@ -26,6 +28,7 @@ namespace BookMap.Presentation.Wpf.InteractionModels
             _brush = brush;
             _renderTextInteractionLock = renderTextInteractionLock;
             _cursor = cursor;
+            _engine = engine;
         }
 
         private bool _moveInProgress;
@@ -63,6 +66,8 @@ namespace BookMap.Presentation.Wpf.InteractionModels
                 );
                 _textToRender.FontSize = _cursor.CursorSize * (72.0 / 96.0);
 
+                _engine.RegisterForInteraction(_textToRender);
+
                 _absolute = e.GetPosition(_canvas);
 
                 _layer.SnapshotPositionsForMaps(e);
@@ -97,6 +102,8 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
                 _canvas.Children.Remove(_textToRender);
 
+                _engine.UnregisterFromInteraction(_textToRender);
+
                 _textToRender = null;
 
                 _renderTextInteractionLock.Unlock();
@@ -107,6 +114,8 @@ namespace BookMap.Presentation.Wpf.InteractionModels
                 _textToRender.PreviewKeyDown -= TextToRenderOnPreviewKeyDown;
 
                 _canvas.Children.Remove(_textToRender);
+
+                _engine.UnregisterFromInteraction(_textToRender);
 
                 _textToRender = null;
 

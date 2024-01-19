@@ -18,13 +18,13 @@ namespace BookWiki.Presentation.Wpf.Views
 
         public void Start()
         {
-            BookShelf.Instance.ItemsListChanged += Render;
+            BooksApplication.Instance.ItemsListChanged += Render;
             Render();
         }
 
         public void Stop()
         {
-            BookShelf.Instance.ItemsListChanged -= Render;
+            BooksApplication.Instance.ItemsListChanged -= Render;
         }
 
         private void Render()
@@ -36,16 +36,21 @@ namespace BookWiki.Presentation.Wpf.Views
 
             Children.Clear();
 
-            Render(BookShelf.Instance.FileSystemWindow);
+            Render(BooksApplication.Instance.FileSystemWindow);
 
-            foreach (var novelWindow in BookShelf.Instance.OpenedNovels.OrderBy(x => x.Title))
+            foreach (var novelWindow in BooksApplication.Instance.OpenedNovels.OrderBy(x => x.Title))
             {
                 Render(novelWindow);
             }
 
-            foreach (var articleWindow in BookShelf.Instance.OpenedArticles.OrderBy(x => x.Title))
+            foreach (var articleWindow in BooksApplication.Instance.OpenedArticles.OrderBy(x => x.Title))
             {
                 Render(articleWindow);
+            }
+
+            foreach (var mapWindow in BooksApplication.Instance.OpenedMaps.OrderBy(x => x.Title))
+            {
+                Render(mapWindow);
             }
         }
 

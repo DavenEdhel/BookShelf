@@ -21,16 +21,24 @@ using BookMap.Presentation.Wpf.MapModels;
 using BookMap.Presentation.Wpf.MapModels.DrawModels;
 using BookMap.Presentation.Wpf.Models;
 using BookMap.Presentation.Wpf.Views;
+using BookWiki.Core.Utils;
 using Newtonsoft.Json;
 using Measure = BookMap.Presentation.Wpf.InteractionModels.Measure;
+using Path = System.IO.Path;
 
 namespace BookMap.Presentation.Wpf
 {
+    //todo:
+    // useful api to draw on image
+    // features:
+    //  markers
+    //   layer for markers display
+    //   api to extend and display markers on map with links to wiki
+    //  textures
+    //   drawing with textures
+    //   import textures
     public partial class MapView : UserControl, IMapView, ILabel
     {
-        private int w = 2560;
-        private int h = 1920;
-
         private MapProviderSynchronous _mapProvider;
         private CoordinateSystem _coordinates;
         private Models.Measure _measure;
@@ -49,20 +57,32 @@ namespace BookMap.Presentation.Wpf
         private Palette _palette;
         private Interactions _interactions;
         private CurrentBrush _brush;
-
-        // fake ctor
+        
         public MapView()
         {
             InitializeComponent();
         }
 
-        public void Init(Window window, string mapName)
+        public void Init(Window window, string path)
+        {
+            Init(window, Path.GetFileName(path), new AppConfigDto()
+            {
+                Root = path.Replace(Path.GetFileName(path), "")
+            });
+        }
+
+        public void CleanUp()
+        {
+            _mapProvider.ClearCache();
+        }
+
+        public void Init(Window window, string mapName, AppConfigDto config = null)
         {
             _coordinates = new CoordinateSystem();
             _mapProvider = new MapProviderSynchronous(new WpfImageFactory());
             _measure = new Models.Measure(_coordinates);
 
-            _config = JsonConvert.DeserializeObject<AppConfigDto>(File.ReadAllText("MapConfig.json"));
+            _config = config ?? JsonConvert.DeserializeObject<AppConfigDto>(File.ReadAllText("MapConfig.json"));
 
             FileSystemServiceSynchronous.DirectoryPath = _config.Root;
 
@@ -93,13 +113,17 @@ namespace BookMap.Presentation.Wpf
                 textCursor
             };
 
+            var toolKeys = new List<Key>();
+
             _palette = new Palette(_brush, _coordinates, _mapProvider);
             Container.Children.Add(_palette);
 
             _interactions = new Interactions(
                 window,
-                Container,
+                Container
+            );
 
+            _interactions.Add(
                 new Interaction(
                     new Blocking(
                         new WhenRightMouseButtonClicked()
@@ -149,7 +173,7 @@ namespace BookMap.Presentation.Wpf
 
                 new Interaction(
                     new Blocking(
-                        new WhenKeyPressed(Key.X)
+                        new WhenKeyPressed(Key.X.AddInto(toolKeys), deactivation: toolKeys)
                     ),
                     new WithStatus(
                         "Draw on labels",
@@ -168,7 +192,7 @@ namespace BookMap.Presentation.Wpf
 
                 new Interaction(
                     new Blocking(
-                        new WhenKeyPressed(Key.Z)
+                        new WhenKeyPressed(Key.Z.AddInto(toolKeys), deactivation: toolKeys)
                     ),
                     new WithStatus(
                         "Draw on ground",
@@ -187,7 +211,7 @@ namespace BookMap.Presentation.Wpf
 
                 new Interaction(
                     new Locked(
-                        new WhenKeyPressed(Key.C)
+                        new WhenKeyPressed(Key.C.AddInto(toolKeys), deactivation: toolKeys)
                     ).As(out var renderTextInteractionLock),
                     new WithStatus(
                         "Write text",
@@ -201,7 +225,8 @@ namespace BookMap.Presentation.Wpf
                                 _labels,
                                 _brush,
                                 renderTextInteractionLock,
-                                textCursor
+                                textCursor,
+                                _interactions
                             )
                         )
                     )
@@ -210,8 +235,8 @@ namespace BookMap.Presentation.Wpf
                 new Interaction(
                     new Blocking(
                         new WhenKeysPressed(
-                            on: Key.LeftCtrl,
-                            off: Key.LeftShift
+                            on: Key.LeftCtrl.AddInto(toolKeys),
+                            off: Key.LeftShift.AddInto(toolKeys)
                         )
                     ),
 
@@ -229,7 +254,6 @@ namespace BookMap.Presentation.Wpf
                             )
                         )
                     )
-
                 ),
 
                 new Interaction(
@@ -253,7 +277,7 @@ namespace BookMap.Presentation.Wpf
 
             _coordinates.Reset();
 
-            _mapProvider.LoadMap("1");
+            _mapProvider.LoadMap(mapName);
 
             _coordinates.ActualWidthInMeters = _mapProvider.Settings.Width;
 

@@ -6,10 +6,9 @@
              xmlns:local="clr-namespace:BookMap.Presentation.Wpf"
              mc:Ignorable="d"
              ClipToBounds="True"
-             Height="1000" Width="1500">
+             d:Height="1000" d:Width="1500">
     <Grid>
-        <Canvas Name="Container">
-        </Canvas>
-        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Bottom" FontFamily="Times New Roman" FontSize="16" Background="#66FFFFFF" Name="Info" Padding="8">Info</TextBlock>
+        <Canvas Name="Container" Background="#10000000"></Canvas>
+        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" FontFamily="Times New Roman" Background="#66FFFFFF" FontSize="16" Name="Info" Padding="8">Info</TextBlock>
     </Grid>
 </UserControl>

@@ -109,7 +109,21 @@ namespace BookMap.Presentation.Wpf.InteractionModels
 
             var cursorSource = new WriteableBitmap(cursorSizeInPixels, cursorSizeInPixels, 96, 96, PixelFormats.Bgra32, null);
 
-            cursorSource.Draw(new Point(0, 0), _currentBrush, _shape);
+            if (new RgbaColorFromBgra(_currentBrush.Color.Bgra).A == 0)
+            {
+                cursorSource.Draw(
+                    new Point(0, 0),
+                    new MutableBrush(_currentBrush)
+                    {
+                        Color = new BgraColorFromArgb(0, 0, 0, 20)
+                    },
+                    _shape
+                );
+            }
+            else
+            {
+                cursorSource.Draw(new Point(0, 0), _currentBrush, _shape);
+            }
 
             _cursor.Source = cursorSource;
         }

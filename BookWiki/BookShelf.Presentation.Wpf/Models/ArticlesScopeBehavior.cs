@@ -122,6 +122,14 @@ namespace BookWiki.Presentation.Wpf.Models
     {
         public ArticlesScopeOnFileSystem(IRelativePath novel, IRootPath root)
         {
+            if (novel == null)
+            {
+                Chapter = new EmptyContent<ScopeDto>().Named("нет");
+                Book = new EmptyContent<ScopeDto>().Named("нет");
+                Global = new EmptyContent<ScopeDto>().Named("нет");
+                return;
+            }
+
             Chapter = new MutableNamedContent<ScopeDto>(
                 new JsonFile<ScopeDto>(novel.Down("scope.json").AbsolutePath(root)),
                 novel.Name.PlainText

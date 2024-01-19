@@ -42,12 +42,12 @@ namespace BookWiki.Presentation.Wpf.Views
             _node = node;
             InitializeComponent();
 
-            _directoryPath = new AbsoluteDirectoryPath(BookShelf.Instance.RootPath, node);
+            _directoryPath = new AbsoluteDirectoryPath(BooksApplication.Instance.RootPath, node);
             Title = new NovelTitle(_node).PlainText;
 
             BookTitle.Text = new NovelTitleShort(node).Value;
 
-            _novels = new FileSystemNode(_directoryPath).InnerNodes.Where(x => x.IsContentFolder).Select(x => BookShelf.Instance.Read(x.Path.RelativePath(BookShelf.Instance.RootPath))).SortAndReturn().ToArray();
+            _novels = new FileSystemNode(_directoryPath).InnerNodes.Where(x => x.IsContentFolder).Select(x => BooksApplication.Instance.Read(x.Path.RelativePath(BooksApplication.Instance.RootPath))).SortAndReturn().ToArray();
 
             foreach (var novel in _novels)
             {
@@ -78,10 +78,10 @@ namespace BookWiki.Presentation.Wpf.Views
 
         private void GenerageFb2(object sender, RoutedEventArgs e)
         {
-            new CompileToFb2Operation(_node, BookShelf.Instance.RootPath)
+            new CompileToFb2Operation(_node, BooksApplication.Instance.RootPath)
             {
                 ChangeNameOfChapterToNameOfFile = CheckedNovels().Count() > 1,
-                SelectedNovels = CheckedNovels().Select(x => x.Source.AbsolutePath(BookShelf.Instance.RootPath)).ToArray()
+                SelectedNovels = CheckedNovels().Select(x => x.Source.AbsolutePath(BooksApplication.Instance.RootPath)).ToArray()
             }.Execute();
 
             //var content = new Fb2TemplateString()

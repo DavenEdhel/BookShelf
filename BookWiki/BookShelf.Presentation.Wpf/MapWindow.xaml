@@ -1,0 +1,33 @@
+﻿<Window x:Class="BookShelf.Presentation.Wpf.MapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BookShelf.Presentation.Wpf"
+        xmlns:wpf="clr-namespace:BookMap.Presentation.Wpf;assembly=BookMap.Presentation.Wpf"
+        mc:Ignorable="d"
+        PreviewKeyDown="NovelWindow_OnPreviewKeyDown"
+        Title="MapWindow" Height="800" Width="1200">
+
+    <Grid Name="Root">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition Width="300"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel Background="Transparent" MouseDown="ChangeOpenedTabsVisibility"></StackPanel>
+        <StackPanel Grid.Column="2" Background="Transparent">
+            <TextBlock  Name="Suggestions" FontFamily="Times New Roman" Foreground="Gray" FontSize="14" TextWrapping="Wrap"></TextBlock>
+        </StackPanel>
+        <Grid Name="NovelContentGrid" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackPanel MouseDown="TopBarMouseDown" Background="Transparent" Grid.Row="0"></StackPanel>
+            <Grid Name="TopBarGrid" Grid.Row="0" Background="Transparent" Visibility="Hidden" MouseDown="TopBarMouseDown">
+            </Grid>
+            <wpf:MapView Grid.Row="1" x:Name="Map"></wpf:MapView>
+        </Grid>
+    </Grid>
+</Window>

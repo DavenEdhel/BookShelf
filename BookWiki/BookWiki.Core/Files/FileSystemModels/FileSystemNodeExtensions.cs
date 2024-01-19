@@ -42,5 +42,10 @@ namespace BookWiki.Core.Files.FileSystemModels
         {
             return node.Path.Name.PlainText == "Статьи";
         }
+
+        public static bool IsMapsFolder(this IFileSystemNode node)
+        {
+            return node.Path.Name.PlainText == "Карты";
+        }
     }
 }

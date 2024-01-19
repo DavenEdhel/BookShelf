@@ -62,6 +62,10 @@ namespace BookWiki.Core.Files.PathModels
                 {
                     return NodeType.Article;
                 }
+                case "m":
+                {
+                    return NodeType.Article;
+                }
                 default:
                 {
                     return NodeType.Unknown;
@@ -79,6 +83,8 @@ namespace BookWiki.Core.Files.PathModels
                     return "n";
                 case NodeType.Article:
                     return "ar";
+                case NodeType.Map:
+                    return "m";
                 default:
                     return string.Empty;
             }

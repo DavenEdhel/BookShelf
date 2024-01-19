@@ -15,7 +15,7 @@ namespace BookWiki.Presentation.Wpf
     {
         protected override void OnActivated(EventArgs e)
         {
-            BookShelf.Instance.RestoreLastSession();
+            BooksApplication.Instance.RestoreLastSession();
 
             base.OnActivated(e);
         }

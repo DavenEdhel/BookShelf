@@ -110,13 +110,6 @@ namespace BookMap.Presentation.Wpf.MapModels
             }
         }
 
-        public MapPart MapPart(MouseEventArgs point)
-        {
-            var absolute = point.GetPosition(_container);
-
-            return MapPart(absolute);
-        }
-
         public void Draw(MouseEventArgs point, IBrush brush)
         {
             var absolute = point.GetPosition(_container);
@@ -182,6 +175,8 @@ namespace BookMap.Presentation.Wpf.MapModels
             {
                 mapPart.Save();
             }
+
+            _affectedParts.Clear();
         }
     }
 }
