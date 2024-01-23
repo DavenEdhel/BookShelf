@@ -14,6 +14,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using BookMap.Presentation.Apple.Models;
+using BookMap.Presentation.Wpf;
+using BookShelf.Presentation.Wpf.Views;
 using BookWiki.Core;
 using BookWiki.Core.Fb2Models;
 using BookWiki.Core.Files.FileModels;
@@ -23,6 +26,7 @@ using BookWiki.Core.LifeSpellCheckModels;
 using BookWiki.Core.Logging;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf.Models;
+using BookWiki.Presentation.Wpf.Models.PinsModels;
 using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using BookWiki.Presentation.Wpf.Views;
@@ -46,6 +50,8 @@ namespace BookWiki.Presentation.Wpf
         private CancellationTokenSource _token;
         private LifeSearchEngine _lifeSearchEngine;
         private OpenedTabsView _openedTabs;
+        private string _mapName;
+        private FrameDouble _region;
 
         public bool ClosingFailed { get; set; } = false;
 
@@ -169,6 +175,11 @@ namespace BookWiki.Presentation.Wpf
             _tagsAutocomplete.Dispose();
             _tagsAutocomplete2.Dispose();
 
+            if (MapContainer.Children.Count > 0)
+            {
+                MapContainer.Children[0].CastTo<MapView>().CleanUp();
+            }
+
             base.OnClosing(e);
         }
 
@@ -213,7 +224,12 @@ namespace BookWiki.Presentation.Wpf
                     {
                         Name = ArticleName.Text,
                         NameVariations = NameVariations.Text.Split(' '),
-                        Tags = Tags.Text.Split(' ')
+                        Tags = Tags.Text.Split(' '),
+                        MapLink = new ArticleMetadata.Data.MapLinkDto()
+                        {
+                            MapName = _mapName,
+                            Region = _region
+                        }
                     });
 
                     BooksApplication.Instance.Articles.Save(_article);
@@ -239,7 +255,16 @@ namespace BookWiki.Presentation.Wpf
             ArticleName.Text = article.Name;
             NameVariations.Text = article.NameVariations.JoinStringsWithoutSkipping(" ");
             Tags.Text = article.Tags.JoinStringsWithoutSkipping(" ");
+            _mapName = article.MapLink?.MapName;
+            _region = article.MapLink?.Region;
 
+            RefreshMapMenuButtons();
+
+            if (string.IsNullOrWhiteSpace(_mapName) == false)
+            {
+                InitMap();
+            }
+            
             ReloadImages();
         }
 
@@ -532,6 +557,7 @@ namespace BookWiki.Presentation.Wpf
         private readonly ArticleMetadata _metadata;
         private readonly TagsOverviewBehavior _tagsAutocomplete;
         private readonly TagsSuggestionsBehavior _tagsAutocomplete2;
+        private MapView _map;
 
         private bool CanTabsBeVisible(double width) => width > _usualWidth + 200 * 2 + 5;
 
@@ -679,6 +705,105 @@ namespace BookWiki.Presentation.Wpf
             NameVariations.Text = title;
             Rtb.Focus();
             Tags.Text = $" {scope.JoinStringsWithoutSkipping(" ")}";
+        }
+
+        private void OnSetMap(object sender, RoutedEventArgs e)
+        {
+            new QuickMapNavigationWindow()
+            {
+                OnMapSelected = OnMapSelected
+            }.ShowDialog();
+        }
+
+        private void OnMapSelected(IRelativePath obj)
+        {
+            _mapName = obj.Parts.Last().PlainText;
+
+            RefreshMapMenuButtons();
+
+            InitMap();
+        }
+
+        private void OnResetMap(object sender, RoutedEventArgs e)
+        {
+            if (_region != null)
+            {
+                _map.Bookmarks.Restore(_region);
+            }
+        }
+
+        private void OnDeleteMap(object sender, RoutedEventArgs e)
+        {
+            RemoveMap();
+            _mapName = null;
+            _region = null;
+
+            RefreshMapMenuButtons();
+        }
+
+        private void OnSaveMap(object sender, RoutedEventArgs e)
+        {
+            _region = _map.Bookmarks.Current();
+        }
+
+        private void RefreshMapMenuButtons()
+        {
+            if (string.IsNullOrWhiteSpace(_mapName))
+            {
+                SaveMap.Visibility = Visibility.Collapsed;
+                DeleteMap.Visibility = Visibility.Collapsed;
+                ResetMap.Visibility = Visibility.Collapsed;
+                SetMap.Visibility = Visibility.Collapsed;
+                FullScreen.Visibility = Visibility.Collapsed;
+                MapContainer.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                SaveMap.Visibility = Visibility.Visible;
+                ResetMap.Visibility = Visibility.Visible;
+                SetMap.Visibility = Visibility.Collapsed;
+                DeleteMap.Visibility = Visibility.Visible;
+                MapContainer.Visibility = Visibility.Visible;
+                FullScreen.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void InitMap()
+        {
+            _map = new MapView();
+            _map.InitPins(new PinAsPointFeature(_article, _map));
+            _map.Init(this, BooksApplication.Instance.Maps.MapsRoot.Down(_mapName).FullPath);
+
+            if (_region != null)
+            {
+                _map.Bookmarks.Restore(_region);
+            }
+
+            MapContainer.Children.Add(_map);
+        }
+
+        private void RemoveMap()
+        {
+            if (MapContainer.Children.Count > 0)
+            {
+                _map.CleanUp();
+                MapContainer.Children.Clear();
+
+                _map = null;
+            }
+        }
+
+        private void OnFullScreenMap(object sender, RoutedEventArgs e)
+        {
+            BooksApplication.Instance.OpenMap(BooksApplication.Instance.Maps.MapsRoot.RelativePath(BooksApplication.Instance.RootPath).Down(_mapName));
+        }
+
+        private void OnMapTitleClicked(object sender, MouseButtonEventArgs e)
+        {
+            new QuickMapNavigationWindow()
+            {
+                OnMapSelected = OnMapSelected
+            }.ShowDialog();
         }
     }
 }

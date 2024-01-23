@@ -24,9 +24,9 @@ namespace BookMap.Presentation.Apple.Views
         {
             private readonly MapProvider _mapProvider;
 
-            private IEnumerable<Bookmark> _items;
+            private IEnumerable<BookmarkDto> _items;
 
-            public event Action<Bookmark> BookmarkSelected = delegate { };
+            public event Action<BookmarkDto> BookmarkSelected = delegate { };
 
             public BookmarkTableViewSource(MapProvider mapProvider)
             {
@@ -63,7 +63,7 @@ namespace BookMap.Presentation.Apple.Views
                 return list.IndexPathForSelectedRow?.Row ?? -1;
             }
 
-            public Bookmark GetSelectedBookmark(UITableView list)
+            public BookmarkDto GetSelectedBookmark(UITableView list)
             {
                 return _items.ElementAtOrDefault(GetSelectedIndex(list));
             }
@@ -99,7 +99,7 @@ namespace BookMap.Presentation.Apple.Views
             Initialize();
         }
 
-        public Bookmark SelectedBookmark => _source.GetSelectedBookmark(_list);
+        public BookmarkDto SelectedBookmark => _source.GetSelectedBookmark(_list);
 
         public void Select(string bookmark)
         {
@@ -163,7 +163,7 @@ namespace BookMap.Presentation.Apple.Views
             _addBookmarkMapView.RemoveFromSuperview();
         }
 
-        private void BookmarkCreated(Bookmark s)
+        private void BookmarkCreated(BookmarkDto s)
         {
             _mapProvider.AddBookmark(s);
 
@@ -185,7 +185,7 @@ namespace BookMap.Presentation.Apple.Views
             _list.ReloadData();
         }
 
-        private void SourceOnBookmarkSelected(Bookmark bookmark)
+        private void SourceOnBookmarkSelected(BookmarkDto bookmark)
         {
             _mapView.PositionMapToBookmark(bookmark);
         }

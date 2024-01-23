@@ -326,11 +326,27 @@ namespace BookMap.Presentation.Apple.Services
             }
         }
 
-        public void AddBookmark(Bookmark bookmark)
+        public void AddBookmark(BookmarkDto bookmark)
         {
             ChangeSettings(settings =>
             {
                 settings.Bookmarks.Add(bookmark);
+            });
+        }
+
+        public void AddBookmark(BookmarkV2 bookmark)
+        {
+            ChangeSettings(settings =>
+            {
+                settings.BookmarksV2.Add(bookmark);
+            });
+        }
+
+        public void AddPin(PinDto pin)
+        {
+            ChangeSettings(settings =>
+            {
+                settings.Pins.Add(pin);
             });
         }
 
@@ -342,9 +358,30 @@ namespace BookMap.Presentation.Apple.Services
             });
         }
 
+        public void RemoveBookmark(Guid id)
+        {
+            ChangeSettings(settings =>
+            {
+                settings.BookmarksV2.RemoveAll(x => x.Id == id);
+            });
+        }
+
         public void UpdateBookmark(FrameDouble bookmark, int index)
         {
             ChangeSettings(settings => { settings.Bookmarks[index].World = bookmark; });
+        }
+
+        public void UpdateBookmark(Guid id, FrameDouble bookmark)
+        {
+            ChangeSettings(settings => { settings.BookmarksV2.First(x => x.Id == id).World = bookmark; });
+        }
+
+        public void RemovePin(Guid pinId)
+        {
+            ChangeSettings(settings =>
+            {
+                settings.Pins.RemoveAll(x => x.Id == pinId);
+            });
         }
     }
 }

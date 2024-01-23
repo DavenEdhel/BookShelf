@@ -376,7 +376,7 @@ namespace BookMap.Presentation.Apple.Services
             }
         }
 
-        public void AddBookmark(Bookmark bookmark)
+        public void AddBookmark(BookmarkDto bookmark)
         {
             ChangeSettings(settings =>
             {

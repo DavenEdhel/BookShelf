@@ -195,6 +195,13 @@ namespace BookWiki.Core.Articles
             return _allArticles.First(x => x.Source.EqualsTo(path));
         }
 
+        public Article TryGet(string id)
+        {
+            EnsureArticlesLoaded();
+
+            return _allArticles.FirstOrDefault(x => x.Id == id);
+        }
+
         public Article New()
         {
             var articleAbsolutePath = new FolderPath(

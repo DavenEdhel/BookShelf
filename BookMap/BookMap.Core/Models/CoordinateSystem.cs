@@ -240,6 +240,40 @@ namespace BookMap.Presentation.Apple.Models
             return result;
         }
 
+        public PointDouble2D GetWorldPoint(ImagePositionDouble position)
+        {
+            if (position == null)
+            {
+                return null;
+            }
+
+            var part = GetWorldPart(position.Level);
+
+            var originalPosition = new PointDouble2D()
+            {
+                X = _currentWorld.X + part.Width * position.X,
+                Y = _currentWorld.Y + part.Height * position.Y
+            };
+
+            return originalPosition;
+        }
+
+        public ImagePositionDouble GetWorldPosition(PointDouble2D screenPoint)
+        {
+            var x = screenPoint.X - _currentWorld.X;
+            var y = screenPoint.Y - _currentWorld.Y;
+
+            var xx = x / _currentWorld.Width;
+            var yy = y / _currentWorld.Height;
+
+            return new ImagePositionDouble()
+            {
+                Level = DescreetLevel,
+                X = xx * Math.Pow(8, DescreetLevel),
+                Y = yy * Math.Pow(8, DescreetLevel)
+            };
+        }
+
         private BoundsDouble GetOriginPart(int level)
         {
             var parts = Math.Pow(8, level);
@@ -289,10 +323,18 @@ namespace BookMap.Presentation.Apple.Models
             return screenPoint.Multiply(Scale).Substract(CurrentWorld.Offset());
         }
 
-        public void Position(Bookmark bookmark)
+        public void Position(BookmarkDto bookmark)
         {
             _currentWorld = bookmark.World.Clone();
             _lastWorld = bookmark.World.Clone();
+
+            RaiseLevelScaleChanged();
+        }
+
+        public void Position(FrameDouble bookmark)
+        {
+            _currentWorld = bookmark.Clone();
+            _lastWorld = bookmark.Clone();
 
             RaiseLevelScaleChanged();
         }

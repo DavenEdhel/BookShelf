@@ -39,9 +39,10 @@ namespace BookMap.Presentation.Wpf
     //   import textures
     public partial class MapView : UserControl, IMapView, ILabel
     {
-        private MapProviderSynchronous _mapProvider;
-        private CoordinateSystem _coordinates;
-        private Models.Measure _measure;
+        private IPinsFeature _pinsFeature;
+        private readonly MapProviderSynchronous _mapProvider;
+        private readonly CoordinateSystem _coordinates;
+        private readonly Models.Measure _measure;
 
         private MapPart[] _activeGround = new MapPart[9];
         private MapPart[] _nextGround = new MapPart[9];
@@ -57,18 +58,38 @@ namespace BookMap.Presentation.Wpf
         private Palette _palette;
         private Interactions _interactions;
         private CurrentBrush _brush;
-        
+        private PinsLayer _pins;
+
         public MapView()
         {
+            _coordinates = new CoordinateSystem();
+            _mapProvider = new MapProviderSynchronous(new WpfImageFactory());
+            _measure = new Models.Measure(_coordinates);
+
+            Bookmarks = new Bookmarks(_mapProvider, this);
+
             InitializeComponent();
         }
 
+        public void InitPins(IPinsFeature pinsFeature)
+        {
+            _pinsFeature = pinsFeature;
+        }
+
+        public Bookmarks Bookmarks { get; }
+
+        public PinsLayer Pins => _pins;
+
         public void Init(Window window, string path)
         {
-            Init(window, Path.GetFileName(path), new AppConfigDto()
-            {
-                Root = path.Replace(Path.GetFileName(path), "")
-            });
+            Init(
+                window,
+                Path.GetFileName(path),
+                new AppConfigDto()
+                {
+                    Root = path.Replace(Path.GetFileName(path), "")
+                }
+            );
         }
 
         public void CleanUp()
@@ -78,9 +99,9 @@ namespace BookMap.Presentation.Wpf
 
         public void Init(Window window, string mapName, AppConfigDto config = null)
         {
-            _coordinates = new CoordinateSystem();
-            _mapProvider = new MapProviderSynchronous(new WpfImageFactory());
-            _measure = new Models.Measure(_coordinates);
+            _pinsFeature ??= new PinsAsLabelFeature();
+
+            _pins = new PinsLayer(_coordinates, _pinsFeature, _mapProvider);
 
             _config = config ?? JsonConvert.DeserializeObject<AppConfigDto>(File.ReadAllText("MapConfig.json"));
 
@@ -100,6 +121,8 @@ namespace BookMap.Presentation.Wpf
                 Container.Children.Add(_activeGround[i]);
                 Container.Children.Add(_activeLabels[i]);
             }
+
+            Container.Children.Add(_pins);
 
             _ground = new MapLayer(Container, _activeGround);
             _labels = new MapLayer(Container, _activeLabels);
@@ -234,6 +257,27 @@ namespace BookMap.Presentation.Wpf
 
                 new Interaction(
                     new Blocking(
+                        new WhenKeyPressed(Key.V.AddInto(toolKeys), deactivation: toolKeys)
+                    ),
+                    new WithStatus(
+                        "Add pin",
+                        this,
+                        new WithPredefinedCursor(
+                            Container,
+                            cursors,
+                            Cursors.Help,
+                            new AddPin(
+                                Container,
+                                _coordinates,
+                                this,
+                                _pins
+                            )
+                        )
+                    )
+                ),
+
+                new Interaction(
+                    new Blocking(
                         new WhenKeysPressed(
                             on: Key.LeftCtrl.AddInto(toolKeys),
                             off: Key.LeftShift.AddInto(toolKeys)
@@ -279,9 +323,35 @@ namespace BookMap.Presentation.Wpf
 
             _mapProvider.LoadMap(mapName);
 
+            _pins.Load();
+
             _coordinates.ActualWidthInMeters = _mapProvider.Settings.Width;
 
             Reposition(1, new Point(0, 0), new Vector(0, 0));
+        }
+
+        public void PositionMapToBookmark(BookmarkV2 bookmark)
+        {
+            _coordinates.Position(bookmark.World);
+
+            Reposition(1, new Point(0, 0), new Vector(0, 0));
+        }
+
+        public void PositionMapToRegion(FrameDouble region)
+        {
+            _coordinates.Position(region);
+
+            Reposition(1, new Point(0, 0), new Vector(0, 0));
+        }
+
+        public BookmarkV2 ExtractBookmark()
+        {
+            return new BookmarkV2()
+            {
+                Id = Guid.NewGuid(),
+                Name = string.Empty,
+                World = _coordinates.CurrentWorld.Clone()
+            };
         }
 
         public void Reposition(double lastScale, Point zoomLocation, Vector offset)
@@ -305,6 +375,8 @@ namespace BookMap.Presentation.Wpf
 
             PositionLevel(level0, 0);
             PositionLevel(level1, 1);
+
+            Pins.Reposition();
         }
 
         private void PositionLevel(ImagePosition[] positions, int level)

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookWiki.Presentation.Wpf"
+        xmlns:wpf="clr-namespace:BookMap.Presentation.Wpf;assembly=BookMap.Presentation.Wpf"
         mc:Ignorable="d"
         Height="890" Width="734" MinHeight="890" MinWidth="734"
         PreviewKeyDown="NovelWindow_OnPreviewKeyDown"
@@ -59,6 +60,24 @@
                         <Canvas Name="HighlightBox">
                         </Canvas>
                     </Grid>
+                    <StackPanel Margin="0, 0, 0, 5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock VerticalAlignment="Stretch" MouseUp="OnMapTitleClicked" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="22">Карта</TextBlock>
+                            <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Right">
+                                <Button Padding="5, 0, 5, 0" Name="SetMap" Background="White" HorizontalAlignment="Right" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="OnSetMap">добавить</Button>
+                                <Button Padding="5, 0, 5, 0" Name="ResetMap" Background="White" HorizontalAlignment="Right" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="OnResetMap">назад</Button>
+                                <Button Padding="5, 0, 5, 0" Name="DeleteMap" Background="White" HorizontalAlignment="Right" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="OnDeleteMap">удалить</Button>
+                                <Button Padding="5, 0, 5, 0" Name="SaveMap" Background="White" HorizontalAlignment="Right" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="OnSaveMap">сохранить</Button>
+                                <Button Padding="5, 0, 5, 0" Name="FullScreen" Background="White" HorizontalAlignment="Right" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="OnFullScreenMap">развернуть</Button>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Name="MapContainer" Height="400"></Grid>
+                    </StackPanel>
+                    
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition></ColumnDefinition>

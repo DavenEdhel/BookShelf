@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using BookMap.Presentation.Apple.Models;
+using BookMap.Presentation.Wpf.Models;
 
 namespace BookMap.Presentation.Wpf.InteractionModels
 {
@@ -96,6 +97,45 @@ namespace BookMap.Presentation.Wpf.InteractionModels
             _coordinates.End();
 
             _lastScale = 1;
+        }
+    }
+
+    public class AddPin : ExecutableInteraction
+    {
+        private readonly Canvas _container;
+
+        private CoordinateSystem _coordinates;
+        private readonly IMapView _mapView;
+        private readonly PinsLayer _pins;
+
+        public AddPin(
+            Canvas container,
+            CoordinateSystem coordinates,
+            IMapView mapView,
+            PinsLayer pins
+        )
+        {
+            _container = container;
+            _coordinates = coordinates;
+            _mapView = mapView;
+            _pins = pins;
+        }
+
+        public override bool CanUseSimultaneously => true;
+
+        public override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            var clickPosition = e.GetPosition(_container);
+
+            _pins.Add(
+                _coordinates.GetWorldPosition(
+                    new PointDouble2D()
+                    {
+                        X = clickPosition.X,
+                        Y = clickPosition.Y
+                    }
+                )
+            );
         }
     }
 }

@@ -38,6 +38,8 @@ namespace BookMap.Presentation.Wpf
             InitializeComponent();
 
             Map.Init(this, mapName: "1");
+
+            Map.Pins.Visible = false;
         }
     }
 }

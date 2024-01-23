@@ -27,6 +27,8 @@ namespace BookShelf.Presentation.Wpf.Views
 
         public QuickMapNavigationWindow()
         {
+            OnMapSelected = Navigate;
+
             InitializeComponent();
 
             SearchBar.Focus();
@@ -35,6 +37,10 @@ namespace BookShelf.Presentation.Wpf.Views
 
             RefreshSelection();
         }
+
+        
+
+        public Action<IRelativePath> OnMapSelected { get; set; }
 
         private void SearchBarKeyDown(object sender, KeyEventArgs e)
         {
@@ -61,7 +67,12 @@ namespace BookShelf.Presentation.Wpf.Views
 
             var novelPath = Items.Children[_lineSelected - 1].CastTo<TextBlock>().Tag.CastTo<IAbsolutePath>();
 
-            BooksApplication.Instance.OpenMap(novelPath.RelativePath(BooksApplication.Instance.RootPath));
+            OnMapSelected(novelPath.RelativePath(BooksApplication.Instance.RootPath));
+        }
+
+        private void Navigate(IRelativePath obj)
+        {
+            BooksApplication.Instance.OpenMap(obj);
         }
 
         private void RefreshSuggestions()

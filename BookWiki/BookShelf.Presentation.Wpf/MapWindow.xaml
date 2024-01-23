@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookShelf.Presentation.Wpf"
         xmlns:wpf="clr-namespace:BookMap.Presentation.Wpf;assembly=BookMap.Presentation.Wpf"
+        xmlns:views="clr-namespace:BookWiki.Presentation.Wpf.Views"
         mc:Ignorable="d"
         PreviewKeyDown="NovelWindow_OnPreviewKeyDown"
         Title="MapWindow" Height="800" Width="1200">
@@ -16,9 +17,14 @@
             <ColumnDefinition Width="300"></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <StackPanel Background="Transparent" MouseDown="ChangeOpenedTabsVisibility"></StackPanel>
-        <StackPanel Grid.Column="2" Background="Transparent">
-            <TextBlock  Name="Suggestions" FontFamily="Times New Roman" Foreground="Gray" FontSize="14" TextWrapping="Wrap"></TextBlock>
-        </StackPanel>
+        <Grid Grid.Column="2" Background="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <views:BookmarksView Grid.Row="0" Background="Transparent" x:Name="BookmarksView"></views:BookmarksView>
+            <views:PinsView Grid.Row="1" Background="Transparent" x:Name="PinsView"></views:PinsView>
+        </Grid>
         <Grid Name="NovelContentGrid" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"></RowDefinition>
@@ -26,6 +32,17 @@
             </Grid.RowDefinitions>
             <StackPanel MouseDown="TopBarMouseDown" Background="Transparent" Grid.Row="0"></StackPanel>
             <Grid Name="TopBarGrid" Grid.Row="0" Background="Transparent" Visibility="Hidden" MouseDown="TopBarMouseDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition MinWidth="100" Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="4" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Padding="5, 0, 5, 0" Name="ScrollSwitchButton" Background="White" Margin="5,0,5,0" FontFamily="Times New Roman" FontSize="14" Click="PinsSwitch">Pins Visible</Button>
+                </StackPanel>
             </Grid>
             <wpf:MapView Grid.Row="1" x:Name="Map"></wpf:MapView>
         </Grid>

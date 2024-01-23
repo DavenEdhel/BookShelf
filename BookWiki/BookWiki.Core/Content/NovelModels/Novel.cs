@@ -27,7 +27,7 @@ namespace BookWiki.Core
             _metadata = new ArticleMetadata(novelPath.AbsolutePath(root));
         }
 
-        public string Title => _contentFolder.Source.Name.PlainText;
+        public string Id => _contentFolder.Source.Name.PlainText;
 
         public IRelativePath Source => _novelPath;
 
@@ -40,6 +40,8 @@ namespace BookWiki.Core
         public string[] NameVariations => _metadata.NameVariations;
 
         public string[] Tags => _metadata.Tags;
+
+        public ArticleMetadata.Data.MapLinkDto MapLink => _metadata.MapLink;
 
         public void Refresh()
         {

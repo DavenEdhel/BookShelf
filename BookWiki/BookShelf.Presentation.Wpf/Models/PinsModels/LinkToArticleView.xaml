@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="BookShelf.Presentation.Wpf.Models.PinsModels.LinkToArticleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BookShelf.Presentation.Wpf.Models.PinsModels"
+             mc:Ignorable="d" 
+             MaxHeight="400" Width="100">
+    <StackPanel Background="White">
+        <TextBlock MouseUp="OpenArticle" VerticalAlignment="Stretch" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="10">Статья</TextBlock>
+        <TextBlock MouseUp="OpenArticle" Name="ArticleName" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="12"></TextBlock>
+    </StackPanel>
+</UserControl>

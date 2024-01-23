@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using BookMap.Presentation.Apple.Models;
 
 namespace BookMap.Presentation.Apple.Services
 {
@@ -6,7 +8,11 @@ namespace BookMap.Presentation.Apple.Services
     {
         public double Width { get; set; } = 100;
 
-        public List<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
+        public List<BookmarkDto> Bookmarks { get; set; } = new List<BookmarkDto>();
+
+        public List<BookmarkV2> BookmarksV2 { get; set; } = new List<BookmarkV2>();
+
+        public List<PinDto> Pins { get; set; } = new List<PinDto>();
 
         public BrushInfo[] Brushes { get; set; } = new BrushInfo[8]
         {
@@ -23,5 +29,16 @@ namespace BookMap.Presentation.Apple.Services
         public bool ShowPalette { get; set; } = true;
 
         public bool ShowBookmarks { get; set; } = true;
+    }
+
+    public class PinDto
+    {
+        public Guid Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Payload { get; set; }
+
+        public ImagePositionDouble Position { get; set; }
     }
 }

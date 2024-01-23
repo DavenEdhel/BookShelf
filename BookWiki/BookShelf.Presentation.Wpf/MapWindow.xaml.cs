@@ -24,6 +24,7 @@ using BookWiki.Core.Logging;
 using BookWiki.Core.Utils.TextModels;
 using BookWiki.Presentation.Wpf;
 using BookWiki.Presentation.Wpf.Models;
+using BookWiki.Presentation.Wpf.Models.PinsModels;
 using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using BookWiki.Presentation.Wpf.Views;
@@ -46,6 +47,7 @@ namespace BookShelf.Presentation.Wpf
 
             InitializeComponent();
 
+            Map.InitPins(new PinAsArticleLinkFeature());
             Map.Init(this, mapPath.AbsolutePath(BooksApplication.Instance.RootPath).FullPath);
 
             _openedTabs = new OpenedTabsView();
@@ -61,13 +63,16 @@ namespace BookShelf.Presentation.Wpf
 
             _openedTabs.Start();
 
+            BookmarksView.Start(Map.Bookmarks);
+            PinsView.Start(Map.Pins, Map);
+
             ApplyHeightAdjustments();
         }
 
         public IRelativePath MapPath { get; set; }
 
         private readonly Logger _logger = new Logger(nameof(NovelWindow));
-        private OpenedTabsView _openedTabs;
+        private readonly OpenedTabsView _openedTabs;
 
         private void ApplyHeightAdjustments()
         {
@@ -81,6 +86,9 @@ namespace BookShelf.Presentation.Wpf
             base.OnClosing(e);
 
             Map.CleanUp();
+            _openedTabs.Stop();
+            BookmarksView.Stop();
+            PinsView.Stop();
         }
 
         protected override void OnClosed(EventArgs e)
@@ -112,7 +120,36 @@ namespace BookShelf.Presentation.Wpf
             {
                 _openedTabs.ToggleVisibility();
             }
+        }
 
+        private void PinsSwitch(object sender, RoutedEventArgs e)
+        {
+            TogglePins();
+
+            //BooksApplication.Instance.PageConfig.SetScrollVisibility(ScrollSwitchButton.Content.ToString() == "Scroll Visible");
+
+            // todo: pins visibility persistance - move into maps config and make it configurable there as well as other settings
+        }
+
+        private void TogglePins()
+        {
+            if (ArePinsVisible())
+            {
+                ScrollSwitchButton.Content = "Pins Hidden";
+
+                Map.Pins.Visible = false;
+            }
+            else
+            {
+                ScrollSwitchButton.Content = "Pins Visible";
+
+                Map.Pins.Visible = true;
+            }
+        }
+
+        private bool ArePinsVisible()
+        {
+            return ScrollSwitchButton.Content.ToString() == "Pins Visible";
         }
     }
 }

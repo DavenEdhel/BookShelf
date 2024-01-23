@@ -597,16 +597,16 @@ namespace BookMap.Presentation.Apple.Views
             }
         }
 
-        public void PositionMapToBookmark(Bookmark bookmark)
+        public void PositionMapToBookmark(BookmarkDto bookmark)
         {
             _coordinates.Position(bookmark);
 
             PositionMap();
         }
 
-        public Bookmark ExtractBookmark()
+        public BookmarkDto ExtractBookmark()
         {
-            return new Bookmark()
+            return new BookmarkDto()
             {
                 Name = string.Empty,
                 World = _coordinates.CurrentWorld.Clone()

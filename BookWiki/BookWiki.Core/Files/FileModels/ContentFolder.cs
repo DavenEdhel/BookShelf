@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using BookMap.Presentation.Apple.Models;
 using BookWiki.Core.Files.PathModels;
 using BookWiki.Core.FileSystem.FileModels;
 using BookWiki.Core.Utils.PropertyModels;
@@ -37,6 +38,8 @@ namespace BookWiki.Core.Files.FileModels
 
         public string[] Tags => _content.Value.Tags;
 
+        public Data.MapLinkDto MapLink => _content.Value.MapLink;
+
         public void Save(Data data)
         {
             var text = JsonConvert.SerializeObject(data);
@@ -53,11 +56,20 @@ namespace BookWiki.Core.Files.FileModels
 
         public class Data
         {
-            public string Name { get; set; } =string.Empty;
+            public string Name { get; set; } = string.Empty;
 
             public string[] Tags { get; set; } = new string[0];
 
             public string[] NameVariations { get; set; } = new string[0];
+
+            public MapLinkDto MapLink { get; set; } = null;
+
+            public class MapLinkDto
+            {
+                public string MapName { get; set; } = string.Empty;
+
+                public FrameDouble Region { get; set; } = null;
+            }
         }
 
         public void Invalidate()

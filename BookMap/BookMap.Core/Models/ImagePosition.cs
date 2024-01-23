@@ -1,5 +1,19 @@
 ﻿namespace BookMap.Presentation.Apple.Models
 {
+    public class ImagePositionDouble
+    {
+        public int Level { get; set; }
+
+        public double X { get; set; }
+
+        public double Y { get; set; }
+
+        public override string ToString()
+        {
+            return $"[{Level},{X:#0.00},{Y:#0.00}]";
+        }
+    }
+
     public class ImagePosition
     {
         public int Level { get; set; }

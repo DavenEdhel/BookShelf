@@ -32,5 +32,10 @@
                 Height = nHeight
             };
         }
+
+        public override string ToString()
+        {
+            return $"[{Width};{Height}]";
+        }
     }
 }

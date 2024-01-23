@@ -12,7 +12,7 @@ namespace BookMap.Presentation.Apple.Views
         private UIButton _cancel;
         private UITextField _editText;
 
-        public event Action<Bookmark> Created = delegate { };
+        public event Action<BookmarkDto> Created = delegate { };
         public event Action Canceled = delegate { };
 
         public AddBookmarkView(MapView mapView)
@@ -52,7 +52,7 @@ namespace BookMap.Presentation.Apple.Views
         private void CreateOnTouchUpInside(object sender, EventArgs e)
         {
             Created(
-                new Bookmark()
+                new BookmarkDto()
                 {
                     Name = _editText.Text,
                     World = _mapView.ExtractBookmark().World

@@ -9,7 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\marker.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="BigIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\marker.png" />
   </ItemGroup>
 
   <ItemGroup>
