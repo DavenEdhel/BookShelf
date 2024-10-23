@@ -41,6 +41,12 @@ namespace BookMap.Presentation.Wpf.Views
             _selected.OnNext(this);
         }
 
+        public void MakeSelected()
+        {
+            Select();
+            _selected.OnNext(this);
+        }
+
         public void Select()
         {
             Border.Visibility = Visibility.Visible;

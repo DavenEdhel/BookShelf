@@ -165,7 +165,7 @@ namespace BookWiki.Presentation.Wpf
 
         public RightSideBarConfig RightSideBarConfig { get; }
 
-        public IRelativePath CurrentNovel { get; private set; }
+        public IRelativePath CurrentNovel { get; set; }
 
         public event Action ItemsListChanged = delegate { };
 

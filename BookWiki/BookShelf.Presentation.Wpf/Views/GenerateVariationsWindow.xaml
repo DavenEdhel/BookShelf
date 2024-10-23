@@ -6,12 +6,15 @@
         xmlns:local="clr-namespace:BookWiki.Presentation.Wpf.Views"
         mc:Ignorable="d"
         MinWidth="600"
-        Height="300"
+        Height="500"
         Title="Вариации">
     <StackPanel Orientation="Vertical">
         <TextBlock VerticalAlignment="Stretch" Background="White" Foreground="Gray" FontFamily="Times New Roman" FontSize="22">Корень имени</TextBlock>
         <TextBox Name="Root" TextChanged="NameChanged" BorderThickness="1" BorderBrush="LightGray" VerticalAlignment="Stretch" Background="White" FontFamily="Times New Roman" FontSize="26"></TextBox>
         <StackPanel Name="Variations" Orientation="Horizontal">
+
+        </StackPanel>
+        <StackPanel Name="AutoVariations" Orientation="Horizontal">
 
         </StackPanel>
     </StackPanel>

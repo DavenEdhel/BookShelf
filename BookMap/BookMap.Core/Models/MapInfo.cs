@@ -26,9 +26,18 @@ namespace BookMap.Presentation.Apple.Services
             new BrushInfo(10, "#FFFFFF")
         };
 
+        public Dictionary<string, PaletteDto> PalettesV2 { get; set; } = new Dictionary<string, PaletteDto>();
+
         public bool ShowPalette { get; set; } = true;
 
         public bool ShowBookmarks { get; set; } = true;
+    }
+
+    public class PaletteDto
+    {
+        public BrushInfo[] Brushes { get; set; } = new BrushInfo[0];
+
+        public int Selected { get; set; } = 0;
     }
 
     public class PinDto

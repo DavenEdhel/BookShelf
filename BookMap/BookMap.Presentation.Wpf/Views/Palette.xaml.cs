@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,31 +18,157 @@ using BookMap.Presentation.Apple.Models;
 using BookMap.Presentation.Apple.Services;
 using BookMap.Presentation.Wpf.Core;
 using BookMap.Presentation.Wpf.InteractionModels;
+using BookWiki.Core.Utils;
 using static System.String;
 
 namespace BookMap.Presentation.Wpf.Views
 {
+    public class Palettes
+    {
+        private readonly Canvas _container;
+        private Dictionary<string, Palette> _all = new();
+        private string _currentFeature;
+
+        public Palettes(Canvas container)
+        {
+            _container = container;
+        }
+
+        public void Register(string feature, Palette palette)
+        {
+            _all[feature] = palette;
+            palette.Visibility = Visibility.Collapsed;
+            _container.Children.Add(palette);
+        }
+
+        public void Activate(string featureName)
+        {
+            _currentFeature = featureName;
+        }
+
+        public Palette Active
+        {
+            get
+            {
+                if (_currentFeature == null)
+                {
+                    return null;
+                }
+
+                if (_all.ContainsKey(_currentFeature))
+                {
+                    return _all[_currentFeature];
+                }
+
+                return null;
+            }
+        }
+    }
+
+    public interface IBrushes : IObservable<Unit>
+    {
+        BrushInfo[] Value { get; set; }
+
+        int Current { get; set; }
+    }
+
+    public class BrushesFromMapSettingsPalettes : IBrushes
+    {
+        private readonly string _scope;
+        private readonly MapProviderSynchronous _mapProvider;
+        private readonly Subject<Unit> _changed = new();
+
+        public BrushesFromMapSettingsPalettes(string scope, MapProviderSynchronous mapProvider)
+        {
+            _scope = scope;
+            _mapProvider = mapProvider;
+            _mapProvider.MapChanged += MapProviderOnMapChanged;
+        }
+
+        private void MapProviderOnMapChanged(string obj)
+        {
+            _changed.OnNext(Unit.Default);
+        }
+
+        public BrushInfo[] Value
+        {
+            get
+            {
+                var allPalettes = _mapProvider.Settings.PalettesV2;
+
+                if (allPalettes.ContainsKey(_scope))
+                {
+                    return allPalettes[_scope].Brushes;
+                }
+
+                if (_mapProvider.Settings.Brushes != null)
+                {
+                    return _mapProvider.Settings.Brushes;
+                }
+
+                return Array.Empty<BrushInfo>();
+            }
+            set
+            {
+                _mapProvider.ChangeSettings(x => x.PalettesV2[_scope] = new PaletteDto()
+                {
+                    Brushes = value,
+                    Selected = Current
+                });
+            }
+        }
+
+        public int Current
+        {
+            get
+            {
+                var allPalettes = _mapProvider.Settings.PalettesV2;
+
+                if (allPalettes.ContainsKey(_scope))
+                {
+                    return allPalettes[_scope].Selected;
+                }
+
+                return 0;
+            }
+            set
+            {
+                _mapProvider.ChangeSettings(x => x.PalettesV2[_scope] = new PaletteDto()
+                {
+                    Brushes = Value,
+                    Selected = value
+                });
+            }
+        }
+
+        public IDisposable Subscribe(IObserver<Unit> observer)
+        {
+            return _changed.Subscribe(observer);
+        }
+    }
+
+
     /// <summary>
     /// Interaction logic for Palette.xaml
     /// </summary>
     public partial class Palette : UserControl
     {
         private readonly CurrentBrush _brush;
+        private readonly IBrushes _brushes;
         private readonly CurrentBrush _cursorBrush;
         private readonly LabeledCursor _cursor;
         private readonly Scaling _scaling = new();
         private readonly Inverted _invertedScaling;
-        private readonly MapProviderSynchronous _mapProvider;
 
         public Palette()
         {
             InitializeComponent();
         }
 
-        public Palette(CurrentBrush brush, CoordinateSystem coordinateSystem, MapProviderSynchronous mapProvider)
+        public Palette(CurrentBrush brush, CoordinateSystem coordinateSystem, IBrushes brushes)
         {
-            _mapProvider = mapProvider;
             _brush = brush;
+            _brushes = brushes;
             _cursorBrush = new CurrentBrush();
             _cursorBrush.Set(_brush.Snapshot());
             InitializeComponent();
@@ -50,8 +178,7 @@ namespace BookMap.Presentation.Wpf.Views
                 brushView.BrushTitle = string.Empty;
             }
 
-            mapProvider.MapChanged 
-                += MapChanged;
+            brushes.Subscribe(_ => MapChanged());
 
             B2Erase.Brush = new EraserBrush();
             B2Erase.BrushTitle = "Erase";
@@ -106,12 +233,12 @@ namespace BookMap.Presentation.Wpf.Views
             }
         }
 
-        private void MapChanged(string obj)
+        private void MapChanged()
         {
             int index = 0;
             foreach (var brushView in Brushes.Skip(2))
             {
-                var savedBrush = _mapProvider.Settings.Brushes.ElementAtOrDefault(index);
+                var savedBrush = _brushes.Value.ElementAtOrDefault(index);
 
                 if (savedBrush == null)
                 {
@@ -121,6 +248,12 @@ namespace BookMap.Presentation.Wpf.Views
                 brushView.Brush = new BrushFromConfig(savedBrush);
                 index++;
             }
+
+            var brushToSelect = Brushes.ElementAt(_brushes.Current + 2);
+            _brush.Set(brushToSelect.Brush.Snapshot());
+            brushToSelect.MakeSelected();
+            _cursorBrush.Set(_brush.Snapshot());
+            SetSliders();
         }
 
         private IEnumerable<BrushView> Brushes
@@ -161,7 +294,8 @@ namespace BookMap.Presentation.Wpf.Views
                     }
                 ).ToArray();
 
-                _mapProvider.ChangeSettings(x => x.Brushes = info);
+                _brushes.Value = info;
+                _brushes.Current = Brushes.IndexOf(y => y == Brushes.First(x => x.IsSelected)) - 2;
             }
         }
 
@@ -368,11 +502,12 @@ namespace BookMap.Presentation.Wpf.Views
         {
             var left = _min;
             var right = _max;
-            var current = (left + right) / 2;
             var iterationsLeft = 500;
 
             while (true)
             {
+                var current = (left + right) / 2;
+
                 var currentValue = _current.Value(current);
 
                 if (currentValue == x)

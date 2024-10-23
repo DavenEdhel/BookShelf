@@ -98,6 +98,13 @@ namespace BookWiki.Presentation.Wpf
             ApplyHeightAdjustments();
         }
 
+        protected override void OnActivated(EventArgs e)
+        {
+            base.OnActivated(e);
+
+            BooksApplication.Instance.CurrentNovel = _novel;
+        }
+
         private void ApplyHeightAdjustments()
         {
             this.MinHeight -= BooksApplication.Instance.Config.HeightModification;

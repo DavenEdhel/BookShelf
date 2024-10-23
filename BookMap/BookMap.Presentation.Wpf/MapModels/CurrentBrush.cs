@@ -5,6 +5,11 @@ using BookMap.Presentation.Wpf.Core;
 
 namespace BookMap.Presentation.Wpf.InteractionModels
 {
+    public interface IBrushFromPalette : IBrush, IObservable<IBrush>
+    {
+        int BrushIndex { get; set; }
+    }
+
     public class CurrentBrush : IBrush, IObservable<IBrush>
     {
         public int SizeInPixels

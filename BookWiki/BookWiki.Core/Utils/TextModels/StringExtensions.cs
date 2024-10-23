@@ -1,4 +1,5 @@
-﻿using BookWiki.Core.Utils.TextModels;
+﻿using System.Linq;
+using BookWiki.Core.Utils.TextModels;
 
 namespace BookWiki.Core
 {
@@ -17,6 +18,11 @@ namespace BookWiki.Core
             }
 
             return text[0].ToString().ToUpper() + text.Substring(1, text.Length - 1);
+        }
+
+        public static bool IsIn(this string t, params string[] m)
+        {
+            return m.Contains(t);
         }
     }
 }

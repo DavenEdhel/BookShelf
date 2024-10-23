@@ -37,7 +37,7 @@ namespace BookMap.Presentation.Wpf
         {
             InitializeComponent();
 
-            Map.Init(this, mapName: "1");
+            Map.Init(this, "C:\\Work\\Projects\\BookShelf\\BookMap\\BookMap.Presentation.Wpf\\1");
 
             Map.Pins.Visible = false;
         }

@@ -12,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using BookWiki.Core;
+using BookWiki.Core.Utils.TextModels;
+using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Presentation.Wpf.Views
 {
@@ -54,6 +57,89 @@ namespace BookWiki.Presentation.Wpf.Views
                 v.Text = variation;
                 Variations.Children.Add(v);
             }
+        }
+
+        public void SetAutomatically(string word, Sex sex)
+        {
+            InitializeComponent();
+
+            Title.Text = word;
+            Variations.Children.Clear();
+
+            try
+            {
+                var last = word.Last();
+                var ending = new WordEnding(word).Value;
+                var beforeLast = word.Reverse().Skip(1).First();
+
+                if ((sex == Sex.M || sex == Sex.W) && ending.IsIn("а", "я"))
+                {
+                    if (ending == "а")
+                    {
+                        if (beforeLast.IsIn('ш'))
+                        {
+                            Set(word, new WordMainPart(word).Value, new[] { "а", "и", "е", "у", "ой", "е" });
+                        }
+                        else if (beforeLast.IsIn('н', 'в'))
+                        {
+                            Set(word, new WordMainPart(word).Value, new[] { "а", "ы", "е", "у", "ой", "е" });
+                        }
+                        else
+                        {
+                            Set(word, new WordMainPart(word).Value, new[] { "а", "и", "е", "у", "ой", "е" });
+                        }
+                    }
+
+                    if (ending == "я")
+                    {
+                        Set(word, new WordMainPart(word).Value, new[] { "я", "и", "е", "ю", "ей", "е" });
+                    }
+                }
+                else if ((sex == Sex.M || sex == Sex.U) && ending.IsIn("", "о", "е"))
+                {
+                    if (ending == "")
+                    {
+                        Set(word, new WordMainPart(word).Value, new[] { "", "а", "у", "", "ом", "е" });
+                    }
+
+                    if (ending == "о")
+                    {
+                        Set(word, new WordMainPart(word).Value, new[] { "о", "а", "у", "о", "ом", "е" });
+                    }
+
+                    if (ending == "е")
+                    {
+                        Set(word, new WordMainPart(word).Value, new[] { "е", "я", "ю", "е", "ем", "е" });
+                    }
+                }
+                else if ((sex == Sex.U && ending == ""))
+                {
+                    Set(word, new WordMainPart(word).Value, new[] { "", "и", "и", "", "ю", "и" });
+                }
+                else if ((sex == Sex.W && last == 'ь'))
+                {
+                    Set(word, word.Substring(0, word.Length - 1), new[] { "ь", "и", "и", "ь", "ью", "и" });
+                }
+                else
+                {
+                    Set(word, word, new[] { "", "", "", "", "", "" });
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        private void CreateVariation(string text)
+        {
+            var v = new TextBox();
+            v.BorderBrush = Brushes.LightGray;
+            v.VerticalAlignment = VerticalAlignment.Stretch;
+            v.Background = Brushes.White;
+            v.FontFamily = new FontFamily("Times New Roman");
+            v.FontSize = 16;
+            v.Text = text;
+            Variations.Children.Add(v);
         }
 
         public IEnumerable<string> TextVariations

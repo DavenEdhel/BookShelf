@@ -55,10 +55,10 @@ namespace BookMap.Presentation.Wpf
         private AppConfigDto? _config;
 
         private MapLayer _labels;
-        private Palette _palette;
         private Interactions _interactions;
         private CurrentBrush _brush;
         private PinsLayer _pins;
+        private Palettes _palettes;
 
         public MapView()
         {
@@ -126,20 +126,16 @@ namespace BookMap.Presentation.Wpf
 
             _ground = new MapLayer(Container, _activeGround);
             _labels = new MapLayer(Container, _activeLabels);
+
             _brush = new CurrentBrush();
 
-            var drawingCursor = new LabeledCursor(Container, currentBrush: _brush, _coordinates);
-            var textCursor = new LabeledCursor(Container, currentBrush: _brush, _coordinates, new IBeam());
-            var cursors = new ICursor[]
-            {
-                drawingCursor,
-                textCursor
-            };
+            //var drawingCursor = new LabeledCursor(Container, currentBrush: _brush, _coordinates);
+            //var textCursor = new LabeledCursor(Container, currentBrush: _brush, _coordinates, new IBeam());
+            var cursors = new List<LabeledCursor>();
 
             var toolKeys = new List<Key>();
 
-            _palette = new Palette(_brush, _coordinates, _mapProvider);
-            Container.Children.Add(_palette);
+            _palettes = new Palettes(Container);
 
             _interactions = new Interactions(
                 window,
@@ -155,8 +151,8 @@ namespace BookMap.Presentation.Wpf
                         Container,
                         cursors,
                         Cursors.Arrow,
-                        new Show(
-                            _palette,
+                        new TryShowActivePalette(
+                            _palettes,
                             Container
                         )
                     )
@@ -164,19 +160,27 @@ namespace BookMap.Presentation.Wpf
 
                 new Interaction(
                     new AlwaysOn(),
-                    new MoveCustomCursor(
+                    new MoveCustomCursors(
                         Container,
-                        drawingCursor
+                        cursors
                     )
                 ),
 
-                new Interaction(
-                    new AlwaysOn(),
-                    new MoveCustomCursor(
-                        Container,
-                        textCursor
-                    )
-                ),
+                //new Interaction(
+                //    new AlwaysOn(),
+                //    new MoveCustomCursor(
+                //        Container,
+                //        drawingCursor
+                //    )
+                //),
+
+                //new Interaction(
+                //    new AlwaysOn(),
+                //    new MoveCustomCursor(
+                //        Container,
+                //        textCursor
+                //    )
+                //),
 
                 new Interaction(
                     new Blocking(
@@ -198,61 +202,80 @@ namespace BookMap.Presentation.Wpf
                     new Blocking(
                         new WhenKeyPressed(Key.X.AddInto(toolKeys), deactivation: toolKeys)
                     ),
-                    new WithStatus(
-                        "Draw on labels",
-                        this,
-                        new WithCustomCursor(
-                            Container,
-                            "labels",
-                            drawingCursor,
-                            new Draw(
-                                _labels,
-                                _brush
+                    new WithPalette(
+                        "Draw on labels".As(out var drawOnLabelsFeature),
+                        _palettes,
+                        new Palette(new CurrentBrush().As(out var labelBrush), _coordinates, new BrushesFromMapSettingsPalettes(drawOnLabelsFeature, _mapProvider)),
+                        new WithStatus(
+                            drawOnLabelsFeature,
+                            this,
+                            new WithCustomCursor(
+                                Container,
+                                "labels",
+                                new LabeledCursor(Container, currentBrush: labelBrush, _coordinates).AddInto(cursors),
+                                cursors,
+                                new Draw(
+                                    _labels,
+                                    labelBrush
+                                )
                             )
                         )
-                    )
+                        )
+                    
                 ),
 
                 new Interaction(
                     new Blocking(
                         new WhenKeyPressed(Key.Z.AddInto(toolKeys), deactivation: toolKeys)
                     ),
-                    new WithStatus(
-                        "Draw on ground",
-                        this,
-                        new WithCustomCursor(
-                            Container,
-                            "ground",
-                            drawingCursor,
-                            new Draw(
-                                _ground,
-                                _brush
+                    new WithPalette(
+                        "Draw on ground".As(out var drawOnGroundFeature),
+                        _palettes,
+                        new Palette(new CurrentBrush().As(out var groundBrush), _coordinates, new BrushesFromMapSettingsPalettes(drawOnGroundFeature, _mapProvider)),
+                        new WithStatus(
+                            drawOnGroundFeature,
+                            this,
+                            new WithCustomCursor(
+                                Container,
+                                "ground",
+                                new LabeledCursor(Container, currentBrush: groundBrush, _coordinates).AddInto(cursors),
+                                cursors,
+                                new Draw(
+                                    _ground,
+                                    groundBrush
+                                )
                             )
                         )
-                    )
+                        )
                 ),
 
                 new Interaction(
                     new Locked(
                         new WhenKeyPressed(Key.C.AddInto(toolKeys), deactivation: toolKeys)
                     ).As(out var renderTextInteractionLock),
-                    new WithStatus(
-                        "Write text",
-                        this,
-                        new WithCustomCursor(
-                            Container,
-                            "text",
-                            textCursor,
-                            new RenderText(
+                    new WithPalette(
+                        "Write text".As(out var writeTextFeature),
+                        _palettes,
+                        new Palette(new CurrentBrush().As(out var textBrush), _coordinates, new BrushesFromMapSettingsPalettes(writeTextFeature, _mapProvider)),
+                        new WithStatus(
+                            writeTextFeature,
+                            this,
+                            new WithCustomCursor(
                                 Container,
-                                _labels,
-                                _brush,
-                                renderTextInteractionLock,
-                                textCursor,
-                                _interactions
+                                "text",
+                                new LabeledCursor(Container, currentBrush: textBrush, _coordinates, new IBeam()).As(out var customBeamCursor).AddInto(cursors),
+                                cursors,
+                                new RenderText(
+                                    Container,
+                                    _labels,
+                                    textBrush,
+                                    renderTextInteractionLock,
+                                    customBeamCursor,
+                                    _interactions
+                                )
                             )
                         )
-                    )
+                        )
                 ),
 
                 new Interaction(

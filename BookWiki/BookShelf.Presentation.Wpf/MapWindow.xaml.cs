@@ -65,21 +65,12 @@ namespace BookShelf.Presentation.Wpf
 
             BookmarksView.Start(Map.Bookmarks);
             PinsView.Start(Map.Pins, Map);
-
-            ApplyHeightAdjustments();
         }
 
         public IRelativePath MapPath { get; set; }
 
         private readonly Logger _logger = new Logger(nameof(NovelWindow));
         private readonly OpenedTabsView _openedTabs;
-
-        private void ApplyHeightAdjustments()
-        {
-            MinHeight -= BooksApplication.Instance.Config.HeightModification;
-            Height -= BooksApplication.Instance.Config.HeightModification;
-            NovelContentGrid.Height -= BooksApplication.Instance.Config.HeightModification;
-        }
 
         protected override void OnClosing(CancelEventArgs e)
         {
