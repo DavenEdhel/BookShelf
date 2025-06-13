@@ -40,4 +40,44 @@ namespace BookWiki.Core
 
         public Progress Completion { get; }
     }
+
+    public class IndexSequenceV3 : ISequence<int>
+    {
+        private readonly string _text;
+        private readonly string[] _stops;
+
+        public IndexSequenceV3(string text, params string[] stops)
+        {
+            _text = text;
+            _stops = stops;
+            Completion = new Progress(_text.Length);
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            
+            //for (int i = 0; i < _text.Length; i++)
+            //{
+            //    var c = _text[i];
+
+            //    if (_stops.Contains(c))
+            //    {
+            //        yield return i + 1;
+            //    }
+
+            //    Completion.Increment();
+            //}
+
+            Completion.MarkCompleted();
+
+            yield break;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public Progress Completion { get; }
+    }
 }

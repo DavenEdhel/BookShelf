@@ -21,10 +21,10 @@ namespace BookWiki.Core
                 offset = 1;
             }
 
-            if (substring.PlainText.Contains('\r'))
-            {
-                offset = 2;
-            }
+            //if (substring.PlainText.Contains('\r'))
+            //{
+            //    offset = 2;
+            //}
 
             var paragraphRange = new SimpleRange(substring.Length() - offset, substring.Offset);
 

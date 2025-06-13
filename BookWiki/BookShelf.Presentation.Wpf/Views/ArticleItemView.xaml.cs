@@ -45,6 +45,7 @@ namespace BookWiki.Presentation.Wpf.Views
             ArticleName.Text = $"{searchResult.Article.Name} ({searchResult.Score})";
             MatchedTags.Text = searchResult.MatchedTags.JoinStringsWithoutSkipping(" ");
             PartiallyMatchedTags.Text = searchResult.PartiallyMatchedTags.JoinStringsWithoutSkipping(" ");
+            AllTags.Text = searchResult.Article.Tags.JoinStringsWithoutSkipping(" ");
         }
 
         public bool IsSelected

@@ -99,12 +99,21 @@ namespace BookWiki.Presentation.Wpf
 
         private void SetArticlesAsync()
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => ArticlesView.Set(BooksApplication.Instance.Articles.Search(QueryBox.Text, _articlesScopeBehavior.Scope))));
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() =>
+                {
+                    ArticlesView.Set(BooksApplication.Instance.Articles.Search(QueryBox.Text, _articlesScopeBehavior.Scope));
+                }
+            ));
         }
 
         private void SetAllArticlesAsync()
         {
-            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() => ArticlesView.Set(BooksApplication.Instance.Articles.Search("*", _articlesScopeBehavior.Scope))));
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, 
+                new Action(() =>
+                    {
+                        ArticlesView.Set(BooksApplication.Instance.Articles.Search("*", _articlesScopeBehavior.Scope));
+                    }
+                ));
         }
 
         private void QueryBox_OnKeyDown(object sender, KeyEventArgs e)

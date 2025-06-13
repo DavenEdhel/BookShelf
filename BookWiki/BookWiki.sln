@@ -30,6 +30,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookMap.Presentation.Apple"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookShelf.Presentation.Wpf", "BookShelf.Presentation.Wpf\BookShelf.Presentation.Wpf.csproj", "{56477465-1CA1-4DF1-8C2A-E118BEA6D79D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DreamTextEditor", "DreamTextEditor", "{2C780562-B237-4FCA-A8FA-ED7BA5F634A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTextEditor.Wpf", "DreamTextEditor.Wpf\DreamTextEditor.Wpf.csproj", "{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +161,18 @@ Global
 		{56477465-1CA1-4DF1-8C2A-E118BEA6D79D}.Release|iPhone.Build.0 = Release|Any CPU
 		{56477465-1CA1-4DF1-8C2A-E118BEA6D79D}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{56477465-1CA1-4DF1-8C2A-E118BEA6D79D}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|iPhone.Build.0 = Release|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -165,6 +181,7 @@ Global
 		{A35D95BC-D258-47E3-A594-1D844E2F6FA3} = {0E18BBC2-1545-4988-803A-0B1C01BE0170}
 		{46DF904E-357C-4145-B4BE-353BDF951335} = {0E18BBC2-1545-4988-803A-0B1C01BE0170}
 		{32F44487-3DAA-4BB0-81E8-ADCAA4BC57D8} = {0E18BBC2-1545-4988-803A-0B1C01BE0170}
+		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F} = {2C780562-B237-4FCA-A8FA-ED7BA5F634A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EC593FB4-C64A-444F-B508-870E7EEC8D3C}

@@ -8,11 +8,20 @@ namespace BookWiki.Core
         public DocumentFlowContentFromTextAndFormat(IFormattedContent formattedContent) : this(formattedContent.Content, formattedContent.Format)
         {
 
+
         }
 
         public DocumentFlowContentFromTextAndFormat(IText text, ISequence<ITextInfo> format)
         {
             var indexes = new IndexSequenceV2(text.PlainText, '\n').ToArray();
+
+            //if (text.PlainText.Contains('\r'))
+            //{
+            //    foreach (var textInfo in format)
+            //    {
+                    
+            //    }
+            //}
 
             var paragraphs = new List<IParagraph>();
 

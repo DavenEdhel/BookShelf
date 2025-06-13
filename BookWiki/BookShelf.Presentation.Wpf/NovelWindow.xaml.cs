@@ -236,7 +236,14 @@ namespace BookWiki.Presentation.Wpf
 
         private void LoadContent(Novel novel)
         {
-            new DocumentFlowContentFromTextAndFormat(novel).ReloadInto(Rtb);
+            if (BooksApplication.Instance.Config.RemoveCaretReturn)
+            {
+                new DocumentFlowContentFromTextAndFormat(new StringText(novel.Content.PlainText.Replace("\r", "")), novel.Format).ReloadInto(Rtb);
+            }
+            else
+            {
+                new DocumentFlowContentFromTextAndFormat(novel).ReloadInto(Rtb);
+            }
 
             _rightSide.Details.LoadFrom(novel.Comments);
 

@@ -1,0 +1,71 @@
+﻿<Window x:Class="DreamTextEditor.Wpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DreamTextEditor.Wpf"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid PreviewKeyUp="UIElement_OnPreviewKeyUp">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <ScrollViewer>
+            <StackPanel>
+                <WrapPanel Name="TextPanelFirst">
+                    <TextBlock>123</TextBlock>
+                    <TextBlock>123</TextBlock>
+                    <Rectangle Width="10" Fill="Aqua"></Rectangle>
+                    <TextBlock>123</TextBlock>
+                    <TextBlock>123</TextBlock>
+                    <TextBlock>123</TextBlock>
+                    <TextBlock>123</TextBlock>
+                    <TextBlock>123</TextBlock>
+                    <TextBlock>123</TextBlock>
+                </WrapPanel>
+                <WrapPanel Name="TextPanel">
+                    <TextBlock>123</TextBlock>
+                    <Rectangle Width="10" Fill="Aqua"></Rectangle>
+                    <TextBlock>123</TextBlock>
+                    <TextBlock Visibility="Collapsed">897</TextBlock>
+                    <TextBlock>234</TextBlock>
+                    <TextBlock>543</TextBlock>
+                    <TextBlock>678</TextBlock>
+                    <TextBlock>987</TextBlock>
+                </WrapPanel>
+            </StackPanel>
+        </ScrollViewer>
+        <StackPanel Grid.Column="1">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>Last operation time:</TextBlock>
+                <TextBlock Name="LastOperationTime"></TextBlock>
+            </StackPanel>
+            <Button Click="AddItem">Add</Button>
+            <Button Click="InsertItem">Insert</Button>
+            <Button Click="InsertItem2">Insert2</Button>
+            <Button Click="Clear">Clear</Button>
+            <Button Click="RenderALot">Render a lot</Button>
+            <StackPanel Name="SelectionDiagnosticPanel">
+                <TextBlock>Selected content:</TextBlock>
+                <StackPanel Name="SelectedContent">
+                    <TextBlock>{ContentType (different content only)} "Content(cropped/full)" [Visibility]</TextBlock>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Foreground="DarkGreen">Wrap draft into control</TextBlock>
+                <TextBlock Foreground="DarkGreen">Cursor and discrete positioning</TextBlock>
+                <TextBlock Foreground="DarkGreen">Tests for cursor positioning</TextBlock>
+                <TextBlock>Cursor styling and animation</TextBlock>
+                <TextBlock>Cross document selection</TextBlock>
+                <TextBlock>Cursor way of selection</TextBlock>
+                <TextBlock>Arrows navigation</TextBlock>
+                <TextBlock>Shift + click, shift + arrow</TextBlock>
+                <TextBlock>copy/cut/paste/delete/replace</TextBlock>
+                <TextBlock>Simple document parsing</TextBlock>
+                <TextBlock>Test big doc performance - 300k</TextBlock>
+                <TextBlock>Different types of content</TextBlock>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

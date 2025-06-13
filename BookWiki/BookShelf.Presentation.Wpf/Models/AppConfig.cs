@@ -16,6 +16,8 @@ namespace BookWiki.Presentation.Wpf.Models
         public string BackupPath { get; set; }
 
         public int HeightModification { get; set; }
+
+        public bool RemoveCaretReturn { get; set; }
     }
 
     public class AppConfig
