@@ -109,6 +109,8 @@ namespace BookWiki.Presentation.Wpf.Models
 
         public bool IsGlobalEnabled { get; set; } = true;
 
+        public string MapName { get; set; }
+
         public ScopeDto Clone(Action<ScopeDto> change)
         {
             var n = (ScopeDto)MemberwiseClone();
@@ -118,9 +120,9 @@ namespace BookWiki.Presentation.Wpf.Models
         }
     }
 
-    public class ArticlesScopeOnFileSystem
+    public class ScopeOnFileSystem
     {
-        public ArticlesScopeOnFileSystem(IRelativePath novel, IRootPath root)
+        public ScopeOnFileSystem(IRelativePath novel, IRootPath root)
         {
             if (novel == null)
             {
@@ -176,9 +178,9 @@ namespace BookWiki.Presentation.Wpf.Models
 
     public class ArticlesScope : IArticleScope
     {
-        private readonly ArticlesScopeOnFileSystem _persistentScope;
+        private readonly ScopeOnFileSystem _persistentScope;
 
-        public ArticlesScope(ArticlesScopeOnFileSystem persistentScope)
+        public ArticlesScope(ScopeOnFileSystem persistentScope)
         {
             _persistentScope = persistentScope;
         }
@@ -217,6 +219,28 @@ namespace BookWiki.Presentation.Wpf.Models
         }
     }
 
+    public class MapScopeBehavior
+    {
+        private readonly ScopeOnFileSystem _persistentScope;
+
+        public MapScopeBehavior(ScopeOnFileSystem persistentScope)
+        {
+            _persistentScope = persistentScope;
+        }
+
+        public void Set(string mapName)
+        {
+            _persistentScope.Chapter.Content.MapName = mapName;
+
+            _persistentScope.Book.Content = _persistentScope.Book.Content.Clone(
+                x =>
+                {
+                    x.MapName = mapName;
+                }
+            );
+        }
+    }
+
     public class ArticlesScopeBehavior : IDisposable, IArticleScope
     {
         private readonly ScopeBox _global;
@@ -224,9 +248,9 @@ namespace BookWiki.Presentation.Wpf.Models
         private readonly ScopeBox _chapter;
         private readonly ScopeBox[] _scopes;
         private readonly CompositeDisposable _scope = new CompositeDisposable();
-        private readonly ArticlesScopeOnFileSystem _persistentScope;
+        private readonly ScopeOnFileSystem _persistentScope;
 
-        public ArticlesScopeBehavior(ScopeBox global, ScopeBox book, ScopeBox chapter, ArticlesScopeOnFileSystem persistentScope)
+        public ArticlesScopeBehavior(ScopeBox global, ScopeBox book, ScopeBox chapter, ScopeOnFileSystem persistentScope)
         {
             _global = global;
             _book = book;

@@ -61,7 +61,7 @@ namespace BookWiki.Presentation.Wpf
                 GlobalScope,
                 BookScope,
                 ChapterScope,
-                new ArticlesScopeOnFileSystem(BooksApplication.Instance.CurrentNovel, BooksApplication.Instance.RootPath)
+                BooksApplication.Instance.Scope
             ).InScopeOf(_scope);
 
             foreach (var articlesScopeView in _articlesScopeBehavior.Views)

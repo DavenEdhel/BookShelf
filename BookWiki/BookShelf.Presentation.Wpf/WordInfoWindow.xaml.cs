@@ -91,7 +91,16 @@ namespace BookWiki.Presentation.Wpf
         private async void ParseMorfologyTable()
         {
             var c = new HttpClient();
-            var result = await c.GetAsync("https://ru.m.wiktionary.org/wiki/" + AdjustedNameForSearch.Text);
+            var result = await c.SendAsync(
+                new HttpRequestMessage(HttpMethod.Get, "https://ru.m.wiktionary.org/wiki/" + AdjustedNameForSearch.Text)
+                {
+                    Headers =
+                    {
+                        {"User-Agent", "BookWiki/1.0 (Spellcheck from app instead of browsing)"}
+                    }
+                }
+            );
+            
             var html = await result.Content.ReadAsStringAsync();
 
             var match = Regex.Match(html, "class=\"[^\"]*\\bmorfotable\\b[^\"]*\"[^>]*>");
@@ -257,6 +266,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void OpenGoogle_OnClick(object sender, RoutedEventArgs e)
         {
+            
             WordFromWiki.Navigate("https://www.google.com/search?q=" + AdjustedNameForSearch.Text);
         }
 
@@ -273,6 +283,11 @@ namespace BookWiki.Presentation.Wpf
             }
 
             Close();
+        }
+
+        private void OpenYandex_OnClick(object sender, RoutedEventArgs e)
+        {
+            WordFromWiki.Navigate($"https://yandex.by/search/?text={AdjustedNameForSearch.Text} правописание");
         }
     }
 }

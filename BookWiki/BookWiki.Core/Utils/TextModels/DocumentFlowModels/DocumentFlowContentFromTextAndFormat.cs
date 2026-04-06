@@ -5,23 +5,20 @@ namespace BookWiki.Core
 {
     public class DocumentFlowContentFromTextAndFormat : IDocumentFlowContent
     {
-        public DocumentFlowContentFromTextAndFormat(IFormattedContent formattedContent) : this(formattedContent.Content, formattedContent.Format)
+        public DocumentFlowContentFromTextAndFormat(IFormattedContent formattedContent, bool removeCaretReturn) : this(formattedContent.Content, formattedContent.Format, removeCaretReturn)
         {
 
 
         }
 
-        public DocumentFlowContentFromTextAndFormat(IText text, ISequence<ITextInfo> format)
+        public DocumentFlowContentFromTextAndFormat(IText text, ISequence<ITextInfo> format, bool removeCaretReturn)
         {
-            var indexes = new IndexSequenceV2(text.PlainText, '\n').ToArray();
+            if (removeCaretReturn)
+            {
+                text = new StringText(text.PlainText.Replace("\r", ""));
+            }
 
-            //if (text.PlainText.Contains('\r'))
-            //{
-            //    foreach (var textInfo in format)
-            //    {
-                    
-            //    }
-            //}
+            var indexes = new IndexSequenceV2(text.PlainText, '\n').ToArray();
 
             var paragraphs = new List<IParagraph>();
 

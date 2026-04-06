@@ -15,7 +15,7 @@ namespace BookWiki.Core.Search
 
         public IEnumerator<NamesWithFullContent> GetEnumerator()
         {
-            var document = new DocumentFlowContentFromTextAndFormat(_novel.Content, _novel.Format);
+            var document = new DocumentFlowContentFromTextAndFormat(_novel.Content, _novel.Format, false);
 
             var content = document.Paragraphs.Where(x => x.FormattingStyle == TextStyle.None);
 

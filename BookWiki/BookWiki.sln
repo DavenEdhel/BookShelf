@@ -34,6 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DreamTextEditor", "DreamTex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreamTextEditor.Wpf", "DreamTextEditor.Wpf\DreamTextEditor.Wpf.csproj", "{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Experiments", "Experiments\Experiments.csproj", "{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +175,18 @@ Global
 		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|iPhone.Build.0 = Release|Any CPU
 		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{C5A33AFD-98BC-48A0-B3A4-8BC550C4724F}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Release|iPhone.Build.0 = Release|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{DBEE40E6-D991-4250-8BCA-EA3ADBC904A1}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -97,7 +97,7 @@ namespace BookWiki.Presentation.Wpf
                 Tags,
                 InlineSuggestions,
                 new ArticlesScope(
-                    new ArticlesScopeOnFileSystem(BooksApplication.Instance.CurrentNovel, BooksApplication.Instance.RootPath)
+                    new ScopeOnFileSystem(BooksApplication.Instance.CurrentNovel, BooksApplication.Instance.RootPath)
                 )
             );
 
@@ -247,7 +247,7 @@ namespace BookWiki.Presentation.Wpf
 
         private void LoadContent(Article article)
         {
-            new DocumentFlowContentFromTextAndFormat(article).ReloadInto(Rtb);
+            new DocumentFlowContentFromTextAndFormat(article, BooksApplication.Instance.Config.RemoveCaretReturn).ReloadInto(Rtb);
 
             _isChanged = false;
             SaveButton.Visibility = Visibility.Hidden;

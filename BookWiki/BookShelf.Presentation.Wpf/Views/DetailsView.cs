@@ -23,7 +23,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
         public void LoadFrom(IText novelComments)
         {
-            new DocumentFlowContentFromTextAndFormat(novelComments, new EmptySequence<ITextInfo>()).ReloadInto(_rtb);
+            new DocumentFlowContentFromTextAndFormat(novelComments, new EmptySequence<ITextInfo>(), BooksApplication.Instance.Config.RemoveCaretReturn).ReloadInto(_rtb);
         }
     }
 }

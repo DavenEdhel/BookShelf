@@ -110,7 +110,7 @@ namespace BookWiki.Presentation.Wpf
             {
                 var novel = new Novel(relativePath, BooksApplication.Instance.RootPath);
 
-                new DocumentFlowContentFromTextAndFormat(novel).LoadInto(Rtb);
+                new DocumentFlowContentFromTextAndFormat(novel, BooksApplication.Instance.Config.RemoveCaretReturn).LoadInto(Rtb);
             }
         }
 

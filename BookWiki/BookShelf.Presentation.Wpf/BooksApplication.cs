@@ -167,6 +167,8 @@ namespace BookWiki.Presentation.Wpf
 
         public IRelativePath CurrentNovel { get; set; }
 
+        public ScopeOnFileSystem Scope => new ScopeOnFileSystem(BooksApplication.Instance.CurrentNovel, BooksApplication.Instance.RootPath);
+
         public event Action ItemsListChanged = delegate { };
 
         public void RestoreLastSession()
@@ -255,6 +257,8 @@ namespace BookWiki.Presentation.Wpf
 
         public MapWindow OpenMap(IRelativePath map, bool fullscreen = true)
         {
+            new MapScopeBehavior(Scope).Set(map.Name.PlainText);
+
             var mapView = OpenedMaps.FirstOrDefault(x => x.MapPath.EqualsTo(map));
 
             if (mapView != null)
@@ -285,6 +289,8 @@ namespace BookWiki.Presentation.Wpf
 
                 return wnd;
             }
+
+           
         }
 
         public ArticleWindow OpenArticle(IRelativePath novel, bool fullscreen = true)

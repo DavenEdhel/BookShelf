@@ -17,6 +17,12 @@ namespace BookWiki.Presentation.Wpf.Models.KeyProcessorModels
                 return true;
             }
 
+            if (keyboard.IsKeyDown(Key.LeftAlt) && keyboard.IsKeyDown(Key.M))
+            {
+                _quickMap.TryOpenPreprocessed();
+                return true;
+            }
+
             if (keyboard.IsKeyDown(Key.LeftCtrl) && keyboard.IsKeyDown(Key.LeftShift) && keyboard.IsKeyDown(Key.N))
             {
                 _quickNavigation.Process();

@@ -1,4 +1,6 @@
 ﻿using BookShelf.Presentation.Wpf.Views;
+using BookWiki.Core.Files.PathModels;
+using Keurig.IQ.Core.CrossCutting.Extensions;
 
 namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
 {
@@ -23,6 +25,18 @@ namespace BookWiki.Presentation.Wpf.Models.QuickNavigationModels
         public void Process()
         {
             new QuickMapNavigationWindow().ShowDialog();
+        }
+
+        public void TryOpenPreprocessed()
+        {
+            if (string.IsNullOrEmpty(BooksApplication.Instance.Scope.Book.Content.MapName))
+            {
+                new QuickMapNavigationWindow().ShowDialog();
+            }
+            else
+            {
+                BooksApplication.Instance.OpenMap(BooksApplication.Instance.Maps.MapsRoot.RelativePath(BooksApplication.Instance.RootPath).Down(BooksApplication.Instance.Scope.Book.Content.MapName + ".m"));
+            }
         }
     }
 }

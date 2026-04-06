@@ -18,7 +18,7 @@ namespace BookWiki.Core.Tests
         [Test]
         public void SingleLineTextShouldContainOneParagraph()
         {
-            var d = new DocumentFlowContentFromTextAndFormat(new StringText("123456789"), new EmptySequence<ITextInfo>());
+            var d = new DocumentFlowContentFromTextAndFormat(new StringText("123456789"), new EmptySequence<ITextInfo>(), false);
 
             Claim.Equal(d.Paragraphs.Length, 1);
 
@@ -28,7 +28,7 @@ namespace BookWiki.Core.Tests
         [Test]
         public void EmptyTextShouldContainOneParagraph()
         {
-            var d = new DocumentFlowContentFromTextAndFormat(new StringText(""), new EmptySequence<ITextInfo>());
+            var d = new DocumentFlowContentFromTextAndFormat(new StringText(""), new EmptySequence<ITextInfo>(), false);
 
             Claim.Equal(d.Paragraphs.Length, 1);
 
@@ -47,7 +47,7 @@ namespace BookWiki.Core.Tests
                 new TextInfo(text.Substring(8, 2), TextStyle.Centered), 
             });
 
-            var d = new DocumentFlowContentFromTextAndFormat(text, format);
+            var d = new DocumentFlowContentFromTextAndFormat(text, format, false);
 
             Claim.Equal(d.Paragraphs.Length, 3);
 
@@ -71,7 +71,7 @@ namespace BookWiki.Core.Tests
                 new TextInfo(text.Substring(10, 2), TextStyle.Centered), 
             });
 
-            var d = new DocumentFlowContentFromTextAndFormat(text, format);
+            var d = new DocumentFlowContentFromTextAndFormat(text, format, false);
 
             Claim.Equal(d.Paragraphs.Length, 3);
 
@@ -93,7 +93,7 @@ namespace BookWiki.Core.Tests
                 new TextInfo(text.Substring(0, 5), TextStyle.Right),
             });
 
-            var d = new DocumentFlowContentFromTextAndFormat(text, format);
+            var d = new DocumentFlowContentFromTextAndFormat(text, format, false);
 
             Claim.Equal(d.Paragraphs.Length, 3);
 
@@ -170,7 +170,7 @@ namespace BookWiki.Core.Tests
             var textsStyles = format.Where(x => x.Style == TextStyle.BoldAndItalic || x.Style == TextStyle.Bold || x.Style == TextStyle.Italic).Select(x => text.Substring(x.Range.Offset, x.Range.Length)).ToArray();
             var paragraphsStyles = format.Where(x => x.Style == TextStyle.Centered || x.Style == TextStyle.Right).Where(x => x.Range.Length > 2).Select(x => text.Substring(x.Range.Offset, x.Range.Length)).ToArray();
 
-            var document = new DocumentFlowContentFromTextAndFormat(text, format);
+            var document = new DocumentFlowContentFromTextAndFormat(text, format, false);
 
             var paragraphs = document.Paragraphs.Where(x => x.FormattingStyle != TextStyle.None).ToArray();
             var inlines = document.Paragraphs.SelectMany(x => x.Inlines).Where(x => x.TextStyle != TextStyle.None).ToArray();
@@ -204,7 +204,7 @@ namespace BookWiki.Core.Tests
 
             var texts = format.Select(x => text.Substring(x.Range.Offset, x.Range.Length)).ToArray();
 
-            var document = new DocumentFlowContentFromTextAndFormat(text, format);
+            var document = new DocumentFlowContentFromTextAndFormat(text, format, false);
 
             var inlines = document.Paragraphs.SelectMany(x => x.Inlines).Where(x => x.TextStyle != TextStyle.None).ToArray();
 

@@ -15,7 +15,7 @@ namespace BookWiki.Core.Search
 
         public IEnumerator<GroupedNames> GetEnumerator()
         {
-            var document = new DocumentFlowContentFromTextAndFormat(_novel.Content, _novel.Format);
+            var document = new DocumentFlowContentFromTextAndFormat(_novel.Content, _novel.Format, false);
 
             var result = new List<List<IParagraph>>();
 

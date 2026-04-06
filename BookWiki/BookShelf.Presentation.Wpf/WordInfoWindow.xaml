@@ -39,6 +39,7 @@
                 <Button FontFamily="Times New Roman" Click="ButtonBase_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Искать везде</Button>
                 <Button FontFamily="Times New Roman" Click="OpenSearch_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Открыть поиск</Button>
                 <Button FontFamily="Times New Roman" Click="OpenGoogle_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Google</Button>
+                <Button FontFamily="Times New Roman" Click="OpenYandex_OnClick" FontSize="16" Background="White" Margin="10, 0, 0, 0" >Yandex</Button>
             </StackPanel>
             <WebBrowser Name="WordFromWiki" Grid.Row="1"></WebBrowser>
         </Grid>
