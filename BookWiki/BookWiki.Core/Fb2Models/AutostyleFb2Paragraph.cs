@@ -36,7 +36,7 @@ namespace BookWiki.Core.Fb2Models
                 {
                     if (string.IsNullOrWhiteSpace(_content))
                     {
-                        return "<br />";
+                        return "<empty-line/>";
                     }
                     else
                     {
@@ -55,12 +55,12 @@ namespace BookWiki.Core.Fb2Models
 
     public class AutostyleFb2Paragraph : IString
     {
-        private readonly string _content;
+        private readonly IString _content;
         private readonly ITextInfo _format;
 
-        public AutostyleFb2Paragraph(string content, ITextInfo format)
+        public AutostyleFb2Paragraph(string content, ITextInfo format, bool withoutComments = false)
         {
-            _content = content;
+            _content = new ConfigurablyClearedText(content, withoutComments);
             _format = format;
         }
 
@@ -79,14 +79,14 @@ namespace BookWiki.Core.Fb2Models
                             return RightStyle(_content).Value;
 
                         default:
-                            return _content;
+                            return _content.Value;
                     }
                 }
                 else
                 {
-                    if (string.IsNullOrWhiteSpace(_content))
+                    if (string.IsNullOrWhiteSpace(_content.Value))
                     {
-                        return "<br />";
+                        return "<empty-line/>";
                     }
                     else
                     {
@@ -96,11 +96,11 @@ namespace BookWiki.Core.Fb2Models
             }
         }
 
-        public Func<string, IString> CenteredStyle { get; set; } = content => new WrappedText(new WrappedText(content, "p").Value, "title");
+        public Func<IString, IString> CenteredStyle { get; set; } = content => new WrappedText(new WrappedText(content, "p").Value, "title");
 
-        public Func<string, IString> RightStyle { get; set; } = content => new WrappedText(new WrappedText(content, "emphasis").Value, "p");
+        public Func<IString, IString> RightStyle { get; set; } = content => new WrappedText(new WrappedText(content, "emphasis").Value, "p");
 
-        public Func<string, IString> NoStyle { get; set; } = content => new WrappedText(content, "p");
+        public Func<IString, IString> NoStyle { get; set; } = content => new WrappedText(content, "p");
     }
 
     public class CenteredFb2Paragraph : IString

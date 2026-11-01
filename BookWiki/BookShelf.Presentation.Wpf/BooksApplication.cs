@@ -18,6 +18,7 @@ using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
 using Newtonsoft.Json;
 using Exception = System.Exception;
 using BookWiki.Presentation.Wpf.Models.KeyProcessorModels;
+using BookShelf.Presentation.Wpf.Views;
 
 namespace BookWiki.Presentation.Wpf
 {
@@ -33,6 +34,20 @@ namespace BookWiki.Presentation.Wpf
                 foreach (Window currentWindow in Application.Current.Windows)
                 {
                     if (currentWindow is NovelWindow novelWindow)
+                    {
+                        yield return novelWindow;
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<TavernWindow> OpenedTaverns
+        {
+            get
+            {
+                foreach (Window currentWindow in Application.Current.Windows)
+                {
+                    if (currentWindow is TavernWindow novelWindow)
                     {
                         yield return novelWindow;
                     }
@@ -200,6 +215,29 @@ namespace BookWiki.Presentation.Wpf
 
             novelItem = new Novel(novel, BooksApplication.Instance.RootPath);
             return novelItem;
+        }
+
+        public void OpenTavern()
+        {
+            foreach (Window currentWindow in Application.Current.Windows)
+            {
+                if (currentWindow is TavernWindow fs)
+                {
+                    if (currentWindow.WindowState == WindowState.Minimized)
+                    {
+                        currentWindow.WindowState = WindowState.Normal;
+                    }
+
+                    fs.Activate();
+
+                    return;
+                }
+            }
+
+            var aw = new TavernWindow();
+            aw.Show();
+
+            ItemsListChanged();
         }
 
         public void OpenArticlesSearch(string search = "", bool focusedOnQuery = false)
@@ -390,6 +428,11 @@ namespace BookWiki.Presentation.Wpf
         public async void CloseAllAsync()
         {
             AllArticlesWindow?.Close();
+
+            foreach (var openedTaverns in OpenedTaverns)
+            {
+                openedTaverns.Close();
+            }
 
             foreach (var openedMap in OpenedMaps)
             {

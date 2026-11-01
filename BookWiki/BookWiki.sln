@@ -1,17 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.5.33516.290
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12224.181 stable
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookWiki.Presentation.Apple", "BookWiki.Presentation.Apple\BookWiki.Presentation.Apple.csproj", "{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookWiki.Core", "BookWiki.Core\BookWiki.Core.csproj", "{1B2CF424-0E54-4041-8E9E-28481FC8686E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookWiki.Core.Tests", "BookWiki.Core.Tests\BookWiki.Core.Tests.csproj", "{D12D47C9-A5C0-4B4D-9B17-E75EDDEE5D51}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WordsGenerator", "WordsGenerator\WordsGenerator.csproj", "{8BAF0430-99AF-41EF-B635-579486021B93}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppForDebugDiagnostic", "AppForDebugDiagnostic\AppForDebugDiagnostic.csproj", "{01787511-43C6-47DC-B717-67B0ADE521CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookWiki.HtmlConverter", "BookWiki.HtmlConverter\BookWiki.HtmlConverter.csproj", "{97CC32BC-B085-40B8-8675-2F5A76FC5829}"
 EndProject
@@ -46,16 +42,6 @@ Global
 		Release|iPhoneSimulator = Release|iPhoneSimulator
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Debug|iPhone.ActiveCfg = Debug|iPhone
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Debug|iPhone.Build.0 = Debug|iPhone
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Release|Any CPU.ActiveCfg = Release|iPhoneSimulator
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Release|iPhone.ActiveCfg = Release|iPhone
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Release|iPhone.Build.0 = Release|iPhone
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
-		{2E6D9EA3-63D5-4D6E-94BF-D9CF49DC8F91}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{1B2CF424-0E54-4041-8E9E-28481FC8686E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1B2CF424-0E54-4041-8E9E-28481FC8686E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B2CF424-0E54-4041-8E9E-28481FC8686E}.Debug|iPhone.ActiveCfg = Debug|Any CPU
@@ -92,16 +78,6 @@ Global
 		{8BAF0430-99AF-41EF-B635-579486021B93}.Release|iPhone.Build.0 = Release|Any CPU
 		{8BAF0430-99AF-41EF-B635-579486021B93}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
 		{8BAF0430-99AF-41EF-B635-579486021B93}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|Any CPU.ActiveCfg = Debug|iPhone
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|iPhone.ActiveCfg = Debug|iPhone
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|iPhone.Build.0 = Debug|iPhone
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|Any CPU.ActiveCfg = Release|iPhone
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|iPhone.ActiveCfg = Release|iPhone
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|iPhone.Build.0 = Release|iPhone
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
-		{01787511-43C6-47DC-B717-67B0ADE521CC}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{97CC32BC-B085-40B8-8675-2F5A76FC5829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{97CC32BC-B085-40B8-8675-2F5A76FC5829}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97CC32BC-B085-40B8-8675-2F5A76FC5829}.Debug|iPhone.ActiveCfg = Debug|Any CPU

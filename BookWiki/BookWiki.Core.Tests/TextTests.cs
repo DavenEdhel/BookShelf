@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace BookWiki.Core.Tests
 {
+    [TestFixture]
     public class TextTests
     {
         [Test]

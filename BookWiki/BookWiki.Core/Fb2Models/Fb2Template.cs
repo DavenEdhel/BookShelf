@@ -5,6 +5,13 @@ namespace BookWiki.Core.Fb2Models
 {
     public class Fb2Template
     {
+        private readonly bool withoutComments;
+
+        public Fb2Template(bool withoutComments)
+        {
+            this.withoutComments = withoutComments;
+        }
+
         public IBase64 Cover { get; set; }
 
         public string Annotation { get; set; }
@@ -20,7 +27,10 @@ namespace BookWiki.Core.Fb2Models
                 Title = Title,
                 Annotation = Annotation,
                 Cover = Cover ?? new AutodetectedCover(path),
-                Body = new Fb2BookContent(Chapters).Value
+                Body = new Fb2BookContent(Chapters, withoutComments)
+                {
+                    Chapter = x => new Fb2ChapterFromMarkdown(x, withoutComments)
+                }.Value
             }.Value;
 
             new Fb2File(path, Title, content).Save();

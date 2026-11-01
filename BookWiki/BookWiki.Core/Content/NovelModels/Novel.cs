@@ -55,9 +55,10 @@ namespace BookWiki.Core
     {
         private readonly IRelativePath _novelPath;
         private readonly IProperty<IText> _text;
+        private readonly IProperty<string[]> _markdown;
         private readonly IProperty<IText> _comments;
         private readonly IProperty<ISequence<ITextInfo>> _format;
-        private readonly IContentFolder _contentFolder;
+        private readonly ContentFolder _contentFolder;
 
         public Novel(IRelativePath novelPath, IRootPath root)
         {
@@ -65,6 +66,7 @@ namespace BookWiki.Core
             _contentFolder = new ContentFolder(novelPath.AbsolutePath(root));
             _comments = new CachedValue<IText>(() => _contentFolder.LoadComments());
             _text = new CachedValue<IText>(() => _contentFolder.LoadText());
+            _markdown = new CachedValue<string[]>(() => _contentFolder.LoadMarkdown());
             _format = new CachedValue<ISequence<ITextInfo>>(() => new RunOnceSequence<ITextInfo>(_contentFolder.LoadFormat()));
         }
 
@@ -77,6 +79,8 @@ namespace BookWiki.Core
         public ISequence<ITextInfo> Format => _format.Value;
 
         public IText Comments => _comments.Value;
+
+        public string[] Markdown => _markdown.Value;
 
         public int CompareTo(object obj)
         {

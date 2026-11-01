@@ -2,6 +2,8 @@
 {
     public interface IFile
     {
+        bool Exists { get; }
+
         void Save(string content);
 
         string Content { get; }

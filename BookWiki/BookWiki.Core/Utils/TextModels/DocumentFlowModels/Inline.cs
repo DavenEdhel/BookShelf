@@ -12,4 +12,17 @@
 
         public IText Text { get; set; }
     }
+
+    public class PlainInline : IInline
+    {
+        public PlainInline(string text)
+        {
+            Text = new StringText(text);
+            TextStyle = TextStyle.None;
+        }
+
+        public TextStyle TextStyle { get; set; }
+
+        public IText Text { get; set; }
+    }
 }

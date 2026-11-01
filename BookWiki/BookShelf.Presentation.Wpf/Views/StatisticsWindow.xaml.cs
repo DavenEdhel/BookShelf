@@ -117,7 +117,7 @@ namespace BookWiki.Presentation.Wpf.Views
 
         private void GenerageFb2(object sender, RoutedEventArgs e)
         {
-            new Fb2Template()
+            new Fb2Template(WithoutComments.IsChecked ?? false)
             {
                 Annotation = BookAnnotation.Text,
                 Title = BookTitle.Text,

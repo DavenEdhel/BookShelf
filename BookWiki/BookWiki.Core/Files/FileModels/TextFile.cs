@@ -47,5 +47,7 @@ namespace BookWiki.Core.Files.FileModels
                 return Array.Empty<string>();
             }
         }
+
+        public bool Exists => File.Exists(_pathToFile.FullPath);
     }
 }

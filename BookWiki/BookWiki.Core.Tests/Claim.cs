@@ -46,6 +46,16 @@ namespace Keurig.Tests.Common.Utils
             Assert.IsNotNull(item);
         }
 
+        public static void CollectionIs<T>(this IEnumerable<T> items, IEnumerable<T> items2)
+        {
+            items.Count().ClaimEqual(items2.Count());
+
+            for(var i = 0; i < items.Count(); i++)
+            {
+                items.ElementAt(i).ClaimEqual(items2.ElementAt(i));
+            }
+        }
+
         public static void CollectionNotEmpty<T>(IEnumerable<T> items)
         {
             Assert.IsNotEmpty(items);

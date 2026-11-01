@@ -1,4 +1,5 @@
 ﻿using System.Windows.Input;
+using BookShelf.Presentation.Wpf.Views;
 using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
 
 namespace BookWiki.Presentation.Wpf.Models.KeyProcessorModels
@@ -32,6 +33,12 @@ namespace BookWiki.Presentation.Wpf.Models.KeyProcessorModels
             if (keyboard.IsKeyDown(Key.LeftCtrl)  && keyboard.IsKeyDown(Key.N))
             {
                 _quickArticle.Process();
+                return true;
+            }
+
+            if (keyboard.IsKeyDown(Key.LeftCtrl) && keyboard.IsKeyDown(Key.J))
+            {
+                BooksApplication.Instance.OpenTavern();
                 return true;
             }
 

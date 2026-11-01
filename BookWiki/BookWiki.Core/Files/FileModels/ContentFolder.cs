@@ -84,11 +84,13 @@ namespace BookWiki.Core.Files.FileModels
         private const string ContentFileName = "Text.txt";
         private const string FormatFileName = "Format.json";
         private const string CommentsFileName = "Comments.txt";
+        private const string MarkdownFileName = "Content.md";
 
         private readonly IProperty<IText> _text;
         private readonly IFile _contentFile;
         private readonly IFile _formatFile;
         private readonly IFile _commentsFile;
+        private readonly IFile _markdownFile;
 
         public ContentFolder(IAbsolutePath path)
         {
@@ -97,6 +99,7 @@ namespace BookWiki.Core.Files.FileModels
             _contentFile = new TextFile(new FilePath(path, ContentFileName));
             _formatFile = new TextFile(new FilePath(path, FormatFileName));
             _commentsFile = new TextFile(new FilePath(path, CommentsFileName));
+            _markdownFile = new TextFile(new FilePath(path, MarkdownFileName));
 
             _text = new CachedValue<IText>(LoadText);
         }
@@ -145,6 +148,16 @@ namespace BookWiki.Core.Files.FileModels
         public void SaveComments(IText comments)
         {
             _commentsFile.Save(comments.PlainText);
+        }
+
+        public string[] LoadMarkdown()
+        {
+            return _markdownFile.Lines;
+        }
+
+        public void SaveMarkdown(string text)
+        {
+            _markdownFile.Save(text);
         }
     }
 }

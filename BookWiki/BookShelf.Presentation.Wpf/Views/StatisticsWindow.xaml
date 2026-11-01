@@ -11,9 +11,11 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <StackPanel>
-            <StackPanel Name="Chapters" Orientation="Vertical"></StackPanel>
-        </StackPanel>
+        <ScrollViewer>
+            <StackPanel>
+                <StackPanel Name="Chapters" Orientation="Vertical"></StackPanel>
+            </StackPanel>
+        </ScrollViewer>
         <StackPanel Name="Results" Grid.Column="1" Orientation="Vertical">
             <TextBlock Name="TotalSizeCharacters"></TextBlock>
             <TextBlock Name="CommentsSize"></TextBlock>
@@ -22,6 +24,7 @@
             <TextBlock FontFamily="Times New Roman" FontSize="16" Height="30">Аннотация:</TextBlock>
             <TextBox MinLines="5" FontFamily="Times New Roman" TextWrapping="Wrap" AcceptsReturn="True" FontSize="16" MinHeight="100" Name="BookAnnotation"></TextBox>
             <Button  FontFamily="Times New Roman" FontSize="16" Height="30" Click="GenerageFb2" Margin="10, 0">Сгенерировать</Button>
+            <CheckBox Name="WithoutComments" IsChecked="True" FontFamily="Times New Roman" FontSize="16" Height="30" Margin="10, 0">Удалить комменты</CheckBox>
             <Image Name="Cover"></Image>
         </StackPanel>
     </Grid>

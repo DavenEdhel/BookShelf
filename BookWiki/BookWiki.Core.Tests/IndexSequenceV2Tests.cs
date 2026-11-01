@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using BookWiki.Core.Search;
 using BookWiki.Core.Utils;
 using BookWiki.Core.Utils.TextModels;
 using Keurig.Tests.Common.Utils;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BookWiki.Core.Tests
 {
@@ -153,6 +154,18 @@ namespace BookWiki.Core.Tests
 
             Claim.Equal(substrings.Length, 1);
             Claim.Equal(substrings[0].Text, "123456");
+        }
+
+        [Test]
+        public void ShouldFindCommentsCorrectly()
+        {
+            //var sequences = new IndexSequenceV2("Text with *inline* comment.\n *\nAnd text with multiline comment\n*\n", '*');
+
+            var sequence = new TextRangeSequence("Text with *inline* comment.\n *\nAnd text with multiline comment\n*\n", '*');
+
+            var twoComments = new TextRangeSequence("Text with *inline**and onece more*\n", '*');
+
+            var startWithComment = new TextRangeSequence("*comment* Text\n", '*');
         }
     }
 }

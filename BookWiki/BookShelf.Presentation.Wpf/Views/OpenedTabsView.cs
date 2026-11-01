@@ -39,6 +39,8 @@ namespace BookWiki.Presentation.Wpf.Views
 
             Render(BooksApplication.Instance.FileSystemWindow);
 
+            RenderTavern();
+
             foreach (var novelWindow in BooksApplication.Instance.OpenedNovels.OrderBy(x => x.Title))
             {
                 Render(novelWindow);
@@ -71,6 +73,19 @@ namespace BookWiki.Presentation.Wpf.Views
             var w = b.Tag.CastTo<Window>();
 
             w.ActivateOrRestore();
+        }
+
+        private void RenderTavern()
+        {
+            var button = new TabItemView("Таверна");
+            Children.Add(button);
+
+            button.Click += TavernClicked;
+        }
+
+        private void TavernClicked(object sender, RoutedEventArgs e)
+        {
+            BooksApplication.Instance.OpenTavern();
         }
 
         public void ToggleVisibility(bool? toVisible = null)

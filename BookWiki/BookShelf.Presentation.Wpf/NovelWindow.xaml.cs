@@ -1,4 +1,18 @@
-﻿using System;
+﻿using BookWiki.Core;
+using BookWiki.Core.Fb2Models;
+using BookWiki.Core.Files.FileModels;
+using BookWiki.Core.Files.PathModels;
+using BookWiki.Core.FileSystem.FileModels;
+using BookWiki.Core.LifeSpellCheckModels;
+using BookWiki.Core.Logging;
+using BookWiki.Core.StructuredNovelModels;
+using BookWiki.Core.Utils.TextModels;
+using BookWiki.Presentation.Wpf.Models;
+using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
+using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
+using BookWiki.Presentation.Wpf.Views;
+using Keurig.IQ.Core.CrossCutting.Extensions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -11,19 +25,6 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using BookWiki.Core;
-using BookWiki.Core.Fb2Models;
-using BookWiki.Core.Files.FileModels;
-using BookWiki.Core.Files.PathModels;
-using BookWiki.Core.FileSystem.FileModels;
-using BookWiki.Core.LifeSpellCheckModels;
-using BookWiki.Core.Logging;
-using BookWiki.Core.Utils.TextModels;
-using BookWiki.Presentation.Wpf.Models;
-using BookWiki.Presentation.Wpf.Models.QuickNavigationModels;
-using BookWiki.Presentation.Wpf.Models.SpellCheckModels;
-using BookWiki.Presentation.Wpf.Views;
-using Keurig.IQ.Core.CrossCutting.Extensions;
 using TextCopy;
 
 namespace BookWiki.Presentation.Wpf
@@ -221,6 +222,8 @@ namespace BookWiki.Presentation.Wpf
                     var file = new ContentFolder(_novel.AbsolutePath(BooksApplication.Instance.RootPath));
                     file.Save(formattedContent);
 
+                    file.SaveMarkdown(new MarkdownFromDocumentFlow(c).PlainText);
+
                     file.SaveComments(_rightSide.Details.AllData);
                 }
 
@@ -236,7 +239,14 @@ namespace BookWiki.Presentation.Wpf
 
         private void LoadContent(Novel novel)
         {
-            new DocumentFlowContentFromTextAndFormat(novel, BooksApplication.Instance.Config.RemoveCaretReturn).ReloadInto(Rtb);
+            if (novel.Markdown.Any())
+            {
+                new DocumentFlowFromMarkdown(novel.Markdown).ReloadInto(Rtb);
+            }
+            else
+            {
+                new DocumentFlowContentFromTextAndFormat(novel, BooksApplication.Instance.Config.RemoveCaretReturn).ReloadInto(Rtb);
+            }
 
             _rightSide.Details.LoadFrom(novel.Comments);
 

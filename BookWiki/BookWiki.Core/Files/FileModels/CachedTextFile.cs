@@ -27,5 +27,7 @@ namespace BookWiki.Core.Files.FileModels
         public string Content => _content.Value;
 
         public string[] Lines => _lines.Value;
+
+        public bool Exists => _file.Exists;
     }
 }
